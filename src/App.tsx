@@ -16,68 +16,37 @@ import {
   StatHelpText,
   StatArrow,
   Container,
+  Button as CButton,
+  propNames
 } from "@chakra-ui/react"
-import { ColorModeSwitcher } from "./ColorModeSwitcher"
-import { Logo } from "./Logo"
 import { Button } from "./components/button"
+import { ScrollContainer, ScrollItem } from "./components/scrollcontainer"
+import Nft from "./components/nft"
 
+function MainPageContainer(props: any) {
+  return (
+    <Container maxW='container.lg' color='white' zIndex="10" textAlign="center" overflowY="hidden">{props.children}</Container>
+  )
+}
 
-/*
-
-<Box>
-            <StatGroup>
-              <Stat>
-                <StatLabel>Sent</StatLabel>
-                <StatNumber>345,670</StatNumber>
-                <StatHelpText>
-                  <StatArrow type='increase' />
-      23.36%
-    </StatHelpText>
-              </Stat>
-
-              <Stat>
-                <StatLabel>Clicked</StatLabel>
-                <StatNumber>45</StatNumber>
-                <StatHelpText>
-                  <StatArrow type='decrease' />
-      9.05%
-    </StatHelpText>
-              </Stat>
-            </StatGroup>
-          </Box>
-          */
 export const App = () => (
   <ChakraProvider theme={theme}>
     <Box fontSize="xl" style={{ backgroundColor: "rgb(88 101 242)" }}>
-      <Container maxW='100%' color='white'>
-        <Box
-          zIndex="1"
-          boxShadow="xl"
-          borderRadius="6"
-          minW="100%"
-          minH="50px"
-          textAlign="center"
-          backgroundColor="blue.700"
-        >
-        </Box>
-      </Container>
-      <Grid minH="50vh" p={3}>
-        {/* <ColorModeSwitcher justifySelf="flex-end" /> */}
-
-        <VStack spacing={8}>
+      <Grid minH="40vh" p={3}>
+        <VStack spacing={8} >
           <Container maxW='container.lg' color='white'>
             <Box bottom="20px">
-              <Text fontSize="6xl" fontWeight="bold" color="white" textAlign="center">            IMAGINE A PLACE...</Text>
+              <Text fontSize="6xl" fontWeight="bold" color="white" textAlign="center" fontFamily="verdana">IMAGINE A PLACE</Text>
               <Text fontSize="2xl" color="white">
                 ...where you can belong to a school club, a gaming group, or a worldwide art community. Where just you and a handful of friends can spend time together. A place that makes it easy to talk every day and hang out more often.
             </Text>
             </Box>
           </Container>
-          <Container maxW='container.lg' color='white' zIndex="10" textAlign="center">
-            <Button onClick={() => { alert('hola amigo') }}>Stake NFT</Button>
-            <Button typ="black" marginLeft="10px">Open account</Button>
+          <Container maxW='container.lg' color='white' zIndex="15" textAlign="center">
+            <Button onClick={() => { alert('hola amigo') }}>Stake</Button>
+            <Button typ="black" marginLeft="10px">Create stacking platform</Button>
           </Container>
-          {/* <Container maxW='container.lg' color='white' zIndex="1" position="relative">
+          <Container maxW='container.lg' color='white' zIndex="1" position="relative">
             <Box
               zIndex="1"
               position="absolute"
@@ -88,9 +57,65 @@ export const App = () => (
               textAlign="center"
               backgroundColor="whiteAlpha.300"
             >
+               <MainPageContainer>
+            <ScrollContainer>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+            </ScrollContainer>
+          </MainPageContainer>
+          <MainPageContainer>
+            <ScrollContainer>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+              <ScrollItem>
+                <Nft />
+              </ScrollItem>
+            </ScrollContainer>
+          </MainPageContainer>
 
             </Box>
-          </Container> */}
+          </Container>
 
         </VStack>
       </Grid>
