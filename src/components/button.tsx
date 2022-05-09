@@ -30,7 +30,7 @@ export function Button(props: ButtonProps | SbuttonArgs | any) {
 
     return <CButton
         textAlign="center"
-        px={8}
+        px={12}
         py={3}
         cursor="pointer"
         borderRadius="50"
