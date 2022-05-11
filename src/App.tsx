@@ -51,6 +51,10 @@ function SmallNftBlock(props: any) {
   )
 }
 
+function HistoryActionNftLink(props: any) {
+  return <Image cursor="pointer" src={getFakeNftImage()} borderRadius="6px" width="46px" />
+}
+
 export function App() {
 
   const objects = [
@@ -76,6 +80,21 @@ export function App() {
     ]
   }
 
+  function newAction(operation: string) {
+    return {
+      performer: "skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY",
+      operation: operation,
+      date: new Date()
+    }
+  }
+
+  let activityFeed = [
+    newAction("staked"),
+    newAction("staked"),
+    newAction("withdrawn"),
+    newAction("claimed")
+  ];
+
   return (<ChakraProvider theme={theme}>
     <Box fontSize="xl" style={{ backgroundColor: "rgb(88 101 242)" }}>
       <Grid minH="10vh" p={3}>
@@ -90,7 +109,7 @@ export function App() {
           </Container>
           <Container maxW='container.lg' color='white' zIndex="15" textAlign="center">
             <Button onClick={() => { alert('hola amigo') }}>Stake</Button>
-            <Button typ="black" marginLeft="10px">Create stacking platform</Button>
+            <Button typ="black" marginLeft="10px">Claim pending rewards</Button>
           </Container>
           <MainPageContainer>
             <HStack spacing={8} alignItems="flex-start">
@@ -99,7 +118,7 @@ export function App() {
                   <Text fontWeight="bold">Okay Bears</Text>
                   <Image src={getFakeNftImage()} borderRadius="6px" width="250px" boxShadow="dark" />
                   <HistoryAction backgroundColor="white" color="black">
-                    <HStack justify="center"> 
+                    <HStack justify="center">
                       <Stat value={info.itemsAvailable}>Total</Stat>
                       <Stat value={info.totalStacked}>Staked</Stat>
                       <Stat value={info.percentStaked} units="%">Percent</Stat>
@@ -130,20 +149,18 @@ export function App() {
                     </SmallNftBlock>
                   </HStack>
                   <Text fontSize="sm" fontWeight="bold">Activity feed</Text>
-                  <HistoryAction>
-                    <Stat value={info.itemsAvailable} units="">
-                      Earnings per NFT
-                    </Stat>
-                  </HistoryAction>
-                  <HistoryAction>
-                    <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> staked
-                  </HistoryAction>
-                  <HistoryAction>
-                    <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> withdrawed
-                  </HistoryAction>
-                  <HistoryAction>
-                    <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> claimed
-                  </HistoryAction>
+                  {activityFeed.map((object, i) => <HistoryAction>
+                    <HStack justifyContent="flex-end" key={i}>
+                      <Box justifySelf="flex-start" textAlign="left">
+                        at {object.date.toUTCString()}
+                        <Address addr={object.performer} />
+                        <Text>{object.operation}</Text>
+                      </Box>
+                      <Box __css={{ marginLeft: "auto" }}>
+                        <HistoryActionNftLink />
+                      </Box>
+                    </HStack>
+                  </HistoryAction>)}
                 </VStack>
               </Box>
               <Box>
@@ -161,10 +178,9 @@ export function App() {
                     </SmallNftBlock>
                   </HStack>
                   <Text fontSize="sm" fontWeight="bold">Activity feed</Text>
+
                   <HistoryAction>
-                    <Stat value={info.itemsAvailable} units="">
-                      Earnings per NFT
-                    </Stat>
+                    <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> staked
                   </HistoryAction>
                   <HistoryAction>
                     <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> staked
