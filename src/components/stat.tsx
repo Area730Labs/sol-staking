@@ -8,11 +8,11 @@ export interface StatProps extends JSX.ElementChildrenAttribute{
 
 export function Stat(props: StatProps) {
 
-    const measureUnit = props.units ?? "%";
+    const measureUnit = props.units ?? "";
     const align = props.align ?? "left";
 
     return (<Box textAlign={align}>
-        <Text fontSize="sm" fontWeight="bold">{props.children}</Text>
-        <Text>{props.value}{measureUnit}</Text>
+        <Text fontSize="sm">{props.children}</Text>
+        <Text fontWeight="bold" fontSize="md">{props.value}{measureUnit}</Text>
     </Box>)
 }

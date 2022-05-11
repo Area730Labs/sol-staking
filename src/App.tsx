@@ -10,12 +10,15 @@ import {
   Button as CButton,
   Image,
   HStack,
+  Skeleton,
 } from "@chakra-ui/react"
 import { Button } from "./components/button"
 import { ScrollContainer, ScrollItem } from "./components/scrollcontainer"
 import Nft, { getFakeNftImage } from "./components/nft"
 import StakingPlatform from "./components/stacking"
 import { Stat } from "./components/stat"
+import HistoryAction from "./components/historyaction"
+import Address from "./components/address"
 
 function MainPageContainer(props: any) {
   return (
@@ -38,6 +41,10 @@ function SmallNftBlock(props: any) {
       cursor="pointer"
       fontSize="xs"
       fontWeight="bold"
+      transition='all 0.2s  ease'
+      _hover={{
+        boxShadow: "xl"
+      }}
     >
       {props.children}
     </Box>
@@ -50,16 +57,24 @@ export function App() {
     {},
     {},
     {},
-
   ];
 
   let info = {
     totalStacked: 3450,
     itemsAvailable: 10000,
     percentStaked: 0,
+    rewardPerDayPerNft: 3.38
   };
 
   info.percentStaked = (info.totalStacked / info.itemsAvailable) * 100;
+
+
+  let userInfo = {
+    totalStacked: 7,
+    staked: [
+      {}, {}, {}
+    ]
+  }
 
   return (<ChakraProvider theme={theme}>
     <Box fontSize="xl" style={{ backgroundColor: "rgb(88 101 242)" }}>
@@ -83,11 +98,26 @@ export function App() {
                 <VStack alignItems="flex-start">
                   <Text fontWeight="bold">Okay Bears</Text>
                   <Image src={getFakeNftImage()} borderRadius="6px" width="250px" boxShadow="dark" />
+                  <HistoryAction backgroundColor="white" color="black">
+                    <HStack justify="center"> 
+                      <Stat value={info.itemsAvailable}>Total</Stat>
+                      <Stat value={info.totalStacked}>Staked</Stat>
+                      <Stat value={info.percentStaked} units="%">Percent</Stat>
+                    </HStack>
+                  </HistoryAction>
+                </VStack>
+              </Box>
+              <Box>
+                <VStack textAlign="center" >
+                  <Text fontSize="sm" fontWeight="bold">Rewards</Text>
+                  <Image src="https://www.orca.so/static/media/samo.e4c98a37.png"></Image>
+                  <Text fontWeight="bold">{info.rewardPerDayPerNft}/day SAMO</Text>
+                  <Text>per NFT</Text>
                 </VStack>
               </Box>
               <Box>
                 <VStack alignItems="flex-start">
-                  <Text fontSize="sm" fontWeight="bold">Staked</Text>
+                  <Text fontSize="sm" fontWeight="bold">All staked</Text>
                   <HStack>
                     {objects.map((object, i) => <SmallNftBlock key={i}>
                       <StakedSmallNft />
@@ -99,32 +129,53 @@ export function App() {
                       </Box>
                     </SmallNftBlock>
                   </HStack>
-
-                  <HStack>
+                  <Text fontSize="sm" fontWeight="bold">Activity feed</Text>
+                  <HistoryAction>
                     <Stat value={info.itemsAvailable} units="">
-                      Items
+                      Earnings per NFT
                     </Stat>
-                    <Stat value={info.totalStacked} units="">
-                      Staked
-                    </Stat>
-                    <Stat value="50">
-                      Percent
-                    </Stat>
-                  </HStack>
+                  </HistoryAction>
+                  <HistoryAction>
+                    <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> staked
+                  </HistoryAction>
+                  <HistoryAction>
+                    <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> withdrawed
+                  </HistoryAction>
+                  <HistoryAction>
+                    <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> claimed
+                  </HistoryAction>
                 </VStack>
               </Box>
               <Box>
-                <HStack>
-                  <Stat value={info.itemsAvailable} units="">
-                    Earnings per NFT
+                <VStack alignItems="flex-start">
+                  <Text fontSize="sm" fontWeight="bold">Your position</Text>
+                  <HStack>
+                    {userInfo.staked.map((object, i) => <SmallNftBlock key={i}>
+                      <StakedSmallNft />
+                    </SmallNftBlock>)}
+                    <SmallNftBlock>
+                      <Box paddingTop="18px">
+                        <Text>+{userInfo.totalStacked - userInfo.staked.length}</Text>
+                        <Text>more</Text>
+                      </Box>
+                    </SmallNftBlock>
+                  </HStack>
+                  <Text fontSize="sm" fontWeight="bold">Activity feed</Text>
+                  <HistoryAction>
+                    <Stat value={info.itemsAvailable} units="">
+                      Earnings per NFT
                     </Stat>
-                  <Stat value={info.totalStacked} units="">
-                    Staked
-                    </Stat>
-                  <Stat value="50">
-                    Percent
-                    </Stat>
-                </HStack>
+                  </HistoryAction>
+                  <HistoryAction>
+                    <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> staked
+                  </HistoryAction>
+                  <HistoryAction>
+                    <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> withdrawed
+                  </HistoryAction>
+                  <HistoryAction>
+                    <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> claimed
+                  </HistoryAction>
+                </VStack>
               </Box>
             </HStack>
           </MainPageContainer>
