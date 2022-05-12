@@ -11,6 +11,7 @@ import {
   Image,
   HStack,
   Skeleton,
+  Tooltip,
 } from "@chakra-ui/react"
 import { Button } from "./components/button"
 import { ScrollContainer, ScrollItem } from "./components/scrollcontainer"
@@ -19,6 +20,7 @@ import StakingPlatform from "./components/stacking"
 import { Stat } from "./components/stat"
 import HistoryAction from "./components/historyaction"
 import Address from "./components/address"
+import Countup from "./components/countup"
 
 function MainPageContainer(props: any) {
   return (
@@ -96,33 +98,41 @@ export function App() {
   ];
 
   // const [counter, setCounter] = React.useState(0);
-  const [pendingRewards, setPr] = React.useState(63.35);
+  let [pendingRewards, setPr] = React.useState(63.35);
+
+  (window as any).setPR = setPr;
 
   // React.useEffect(() => {
   //   setInterval(function () {
-  //     setPr(pendingRewards+(Math.random()*5));
+
+  //     const newPendingRewards = pendingRewards+(Math.random()*5);
+  //     console.log('new pending rewards : ',newPendingRewards)
+  //     setPr(newPendingRewards);
+
   //   },5000)
   // })
+
+  console.log('redrawn a component, pr = ',pendingRewards)
 
   return (<ChakraProvider theme={theme}>
     <Box fontSize="xl" style={{ backgroundColor: "rgb(88 101 242)" }}>
       <Grid minH="10vh" p={3}>
         <VStack spacing={8} >
           <Container maxW='container.lg' color='white'>
-            <Box bottom="20px">
-              <Text fontSize="6xl" fontWeight="bold" color="white" textAlign="center" fontFamily="verdana">staking for everyone</Text>
-              <Text fontSize="2xl" color="white">
-                ...where you can belong to a school club, a gaming group, or a worldwide art community. Where just you and a handful of friends can spend time together. A place that makes it easy to talk every day and hang out more often.
-            </Text>
+            <Box bottom="20px" textAlign="center" pt="10">
+              <Text fontSize="6xl" fontWeight="bold" color="white" textAlign="center" fontFamily="helvetica">
+                <Countup number={123883393} /> SAMO</Text>
+              <Text fontSize="2xl" color="white">claimed</Text>
             </Box>
           </Container>
           <Container maxW='container.lg' color='white' zIndex="15" textAlign="center">
             <Button onClick={() => { alert('hola amigo') }}>Stake</Button>
             <Box display="inline-block" position="relative">
               <Button typ="black" marginLeft="10px">Claim pending rewards</Button>
-              <Box position="absolute" right="-50px" top="-32px" >
-                <Box borderRadius="25px" backgroundColor="rgb(237,41,57)" p="2" px="4">+{pendingRewards} SAMO</Box>
-              </Box>
+              {pendingRewards > 0 ?
+                <Box position="absolute" right="-50px" top="-32px" >
+                  <Box borderRadius="25px" backgroundColor="rgb(237,41,57)" p="2" px="4">+<Countup float="true" number={pendingRewards} timems="300" /> SAMO</Box>
+                </Box> : null}
             </Box>
           </Container>
           <MainPageContainer>
@@ -164,16 +174,18 @@ export function App() {
                   </HStack>
                   <Text fontSize="sm" fontWeight="bold">Activity feed</Text>
                   {activityFeed.map((object, i) => <HistoryAction>
-                    <HStack justifyContent="flex-end" key={i}>
-                      <Box justifySelf="flex-start" textAlign="left">
-                        at {object.date.toUTCString()}
+                    <Tooltip label={object.date.toUTCString()} fontSize='md'>
+                      <HStack justifyContent="flex-end" key={i}>
+                        <Box justifySelf="flex-start" textAlign="left">
+                          at
                         <Address addr={object.performer} />
-                        <Text>{object.operation}</Text>
-                      </Box>
-                      <Box __css={{ marginLeft: "auto" }}>
-                        <HistoryActionNftLink />
-                      </Box>
-                    </HStack>
+                          <Text>{object.operation}</Text>
+                        </Box>
+                        <Box __css={{ marginLeft: "auto" }}>
+                          <HistoryActionNftLink />
+                        </Box>
+                      </HStack>
+                    </Tooltip>
                   </HistoryAction>)}
                 </VStack>
               </Box>
