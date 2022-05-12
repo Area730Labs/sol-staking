@@ -95,6 +95,15 @@ export function App() {
     newAction("claimed")
   ];
 
+  // const [counter, setCounter] = React.useState(0);
+  const [pendingRewards, setPr] = React.useState(63.35);
+
+  // React.useEffect(() => {
+  //   setInterval(function () {
+  //     setPr(pendingRewards+(Math.random()*5));
+  //   },5000)
+  // })
+
   return (<ChakraProvider theme={theme}>
     <Box fontSize="xl" style={{ backgroundColor: "rgb(88 101 242)" }}>
       <Grid minH="10vh" p={3}>
@@ -109,7 +118,12 @@ export function App() {
           </Container>
           <Container maxW='container.lg' color='white' zIndex="15" textAlign="center">
             <Button onClick={() => { alert('hola amigo') }}>Stake</Button>
-            <Button typ="black" marginLeft="10px">Claim pending rewards</Button>
+            <Box display="inline-block" position="relative">
+              <Button typ="black" marginLeft="10px">Claim pending rewards</Button>
+              <Box position="absolute" right="-50px" top="-32px" >
+                <Box borderRadius="25px" backgroundColor="rgb(237,41,57)" p="2" px="4">+{pendingRewards} SAMO</Box>
+              </Box>
+            </Box>
           </Container>
           <MainPageContainer>
             <HStack spacing={8} alignItems="flex-start">
