@@ -48,7 +48,6 @@ export default function Countup(props: NumberWithIncreaseArgs | any) {
         if (maxVal > 0) {
 
             const diff = maxVal - prevMaxVal;
-
             const diffPercent = diff / prevMaxVal;
 
             let stepsToUse = steps;
@@ -68,7 +67,7 @@ export default function Countup(props: NumberWithIncreaseArgs | any) {
 
                 console.log(`using ${stepsToUse}/${steps} steps. diff is ${diff}. diff percent is ${diffPercent}%`);
             }
-            
+
             const sleepTime = timeToUse / stepsToUse;
             const valueFraction = roundFunction(diff / stepsToUse);
 
