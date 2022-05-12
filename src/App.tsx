@@ -12,6 +12,7 @@ import {
   HStack,
   Skeleton,
   Tooltip,
+  propNames,
 } from "@chakra-ui/react"
 import { Button } from "./components/button"
 import { ScrollContainer, ScrollItem } from "./components/scrollcontainer"
@@ -21,6 +22,8 @@ import { Stat } from "./components/stat"
 import HistoryAction from "./components/historyaction"
 import Address from "./components/address"
 import Countup from "./components/countup"
+
+import { createDefaultContext, ThemeContext } from "./state/theme"
 
 function MainPageContainer(props: any) {
   return (
@@ -33,6 +36,11 @@ function StakedSmallNft(props: any) {
 }
 
 function SmallNftBlock(props: any) {
+
+  // const [withProps] = useTheme();
+  // const style = withProps(props);
+
+
   return (
     <Box color="blue"
       backgroundColor="whiteAlpha.800"
@@ -56,6 +64,21 @@ function SmallNftBlock(props: any) {
 function HistoryActionNftLink(props: any) {
   return <Image cursor="pointer" src={getFakeNftImage()} borderRadius="6px" width="46px" />
 }
+
+function InfoColumn(props: any) {
+  return (<VStack
+    alignItems="flex-start"
+    borderRadius="6px"
+    transition='all 0.2s  ease'
+    p="3"
+    _hover={{
+      backgroundColor: "rgb(13 15 53 / 60%)"
+    }}
+  >
+    {props.children}
+  </VStack>)
+}
+
 
 export function App() {
 
@@ -102,17 +125,17 @@ export function App() {
 
   (window as any).setPR = setPr;
 
-  // React.useEffect(() => {
-  //   setInterval(function () {
+  React.useEffect(() => {
+    setInterval(function () {
 
-  //     const newPendingRewards = pendingRewards+(Math.random()*5);
-  //     console.log('new pending rewards : ',newPendingRewards)
-  //     setPr(newPendingRewards);
+      const newPendingRewards = pendingRewards + (Math.random() * 5);
+      console.log('new pending rewards : ', newPendingRewards)
+      setPr(newPendingRewards);
 
-  //   },5000)
-  // })
+    }, 5000)
+  })
 
-  console.log('redrawn a component, pr = ',pendingRewards)
+  console.log('redrawn a component, pr = ', pendingRewards)
 
   return (<ChakraProvider theme={theme}>
     <Box fontSize="xl" style={{ backgroundColor: "rgb(88 101 242)" }}>
@@ -136,7 +159,7 @@ export function App() {
             </Box>
           </Container>
           <MainPageContainer>
-            <HStack spacing={8} alignItems="flex-start">
+            <HStack spacing={4} alignItems="flex-start">
               <Box>
                 <VStack alignItems="flex-start">
                   <Text fontWeight="bold">Okay Bears</Text>
@@ -159,7 +182,7 @@ export function App() {
                 </VStack>
               </Box>
               <Box>
-                <VStack alignItems="flex-start">
+                <InfoColumn>
                   <Text fontSize="sm" fontWeight="bold">All staked</Text>
                   <HStack>
                     {objects.map((object, i) => <SmallNftBlock key={i}>
@@ -187,10 +210,10 @@ export function App() {
                       </HStack>
                     </Tooltip>
                   </HistoryAction>)}
-                </VStack>
+                </InfoColumn>
               </Box>
               <Box>
-                <VStack alignItems="flex-start">
+                <InfoColumn>
                   <Text fontSize="sm" fontWeight="bold">Your position</Text>
                   <HStack>
                     {userInfo.staked.map((object, i) => <SmallNftBlock key={i}>
@@ -217,7 +240,7 @@ export function App() {
                   <HistoryAction>
                     <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> claimed
                   </HistoryAction>
-                </VStack>
+                </InfoColumn>
               </Box>
             </HStack>
           </MainPageContainer>
