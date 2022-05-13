@@ -81,9 +81,38 @@ function InfoColumn(props: any) {
   </VStack>)
 }
 
+function RewardImage(props: any) {
+  return <Box
+    height="100px"
+    width="100px"
+    borderRadius="50%"
+    p="1"
+    backgroundColor="white"
+    overflow="hidden"
+    position="relative"
+    boxShadow="xl"
+    transition="all .2s ease "
+    // cursor="pointer"
+    _hover={{
+      boxShadow: "dark-lg",
+      // p:0
+    }}
+  >
+    <Box
+      position="absolute"
+      backgroundImage={"url("+props.img+")"}
+      width="92px"
+      backgroundSize="100%"
+      backgroundPosition="center"
+      height="92px"
+      borderRadius="50%"
+    ></Box>
+  </Box>
+}
+
 function PendingRewards(props: any) {
 
-  let {pendingRewards} = useAppContext();
+  let { pendingRewards } = useAppContext();
 
   return <Box position="absolute" right="-50px" top="-32px" >
     <Box
@@ -136,7 +165,7 @@ export function App() {
     newAction("claimed")
   ];
 
-
+  const rewardImage = "https://www.orca.so/static/media/samo.e4c98a37.png" //https://img-cdn.magiceden.dev/rs:fill:400:400:0:0/plain/https://bafybeicifnldmpywwt43opvbwuanglybhnmalu3pi6pvajq2rj2ezqccym.ipfs.dweb.link/2741.png?ext=png";
 
   // const [counter, setCounter] = React.useState(0);
 
@@ -188,7 +217,7 @@ export function App() {
                 <Box>
                   <VStack textAlign="center" >
                     <Text fontSize="sm" fontWeight="bold">Rewards</Text>
-                    <Image src="https://www.orca.so/static/media/samo.e4c98a37.png"></Image>
+                    <RewardImage img={rewardImage} />
                     <Text fontWeight="bold">{info.rewardPerDayPerNft}/day SAMO</Text>
                     <Text>per NFT</Text>
                   </VStack>

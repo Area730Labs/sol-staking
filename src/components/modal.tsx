@@ -59,8 +59,6 @@ export default function Modal(props: any) {
 
     const result = useMemo(() => {
 
-        console.log(`redrawing component ...  op : ${JSON.stringify(styles)}`);
-
         return <Box>
             <Button onClick={() => {
                 setVisible(true);
@@ -90,7 +88,7 @@ export default function Modal(props: any) {
                     width="40vw"
                     borderRadius="6px"
                     p="8"
-                    height="200px"
+                    height="400px"
                     backgroundColor="white"
                     color="black"
                     zIndex="101"
