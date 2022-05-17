@@ -1,6 +1,7 @@
 import { useDisclosure } from "@chakra-ui/hooks";
 import { Box, Flex } from "@chakra-ui/layout";
-import { propNames } from "@chakra-ui/styled-system";
+import { propNames, SystemStyleObject } from "@chakra-ui/styled-system";
+import { ChakraProps } from "@chakra-ui/system";
 import { SlideFade } from "@chakra-ui/transition";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "./button";
@@ -12,9 +13,17 @@ interface ModalStyles {
     // animationLength: number
 }
 
-export default function Modal(props: any) {
+export interface ModalProps {
+    visible : boolean
+    setVisible : any
+}
 
-    const [visible, setVisible] = useState<boolean>(false);
+
+export default function Modal(props: ModalStyles & any ) {
+
+    const visible = props.visible 
+    const setVisible = props.setVisible
+
     const [actualVisible, setAvisible] = useState(false);
     const [firstInit, setFirstInit] = useState<boolean>(true);
 
@@ -60,10 +69,6 @@ export default function Modal(props: any) {
     const result = useMemo(() => {
 
         return <Box>
-            <Button onClick={() => {
-                setVisible(true);
-            }}>Show modal</Button>
-
             <Flex
                 display={actualVisible ? "flex" : "none"}
                 position="fixed"

@@ -7,11 +7,18 @@ export interface AppContextType {
 
     pendingRewards: number
     setPendingRewards: any
+
+    // modal state
+    modalVisible: boolean,
+    setModalVisible: any
+
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
 
 export function AppProvider({ children }: { children: ReactNode; }) {
+
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
 
     const [styles, setStyles] = useState<SystemStyleObject>({
         borderRadius: "6px"
@@ -41,12 +48,14 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             withProps,
             styles,
             pendingRewards,
-            setPendingRewards
+            setPendingRewards,
+            modalVisible,
+            setModalVisible
         } as AppContextType;
 
         return curCtx
 
-    }, [styles, pendingRewards]);
+    }, [styles, pendingRewards, modalVisible]);
 
     return (
         <AppContext.Provider value={memoedValue}>

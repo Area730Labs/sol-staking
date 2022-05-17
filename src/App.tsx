@@ -100,7 +100,7 @@ function RewardImage(props: any) {
   >
     <Box
       position="absolute"
-      backgroundImage={"url("+props.img+")"}
+      backgroundImage={"url(" + props.img + ")"}
       width="92px"
       backgroundSize="100%"
       backgroundPosition="center"
@@ -108,6 +108,17 @@ function RewardImage(props: any) {
       borderRadius="50%"
     ></Box>
   </Box>
+}
+
+
+function AppMainModal() {
+  const { modalVisible, setModalVisible } = useAppContext();
+  return <Modal visible={modalVisible} setVisible={setModalVisible}>Wait untill tx is confirmed</Modal>
+}
+
+function StakeButton() {
+  const { setModalVisible } = useAppContext();
+  return <Button onClick={() => { setModalVisible(true); }}>Stake</Button>
 }
 
 function PendingRewards(props: any) {
@@ -167,21 +178,9 @@ export function App() {
 
   const rewardImage = "https://www.orca.so/static/media/samo.e4c98a37.png" //https://img-cdn.magiceden.dev/rs:fill:400:400:0:0/plain/https://bafybeicifnldmpywwt43opvbwuanglybhnmalu3pi6pvajq2rj2ezqccym.ipfs.dweb.link/2741.png?ext=png";
 
-  // const [counter, setCounter] = React.useState(0);
-
-  // React.useEffect(() => {
-  //   setInterval(function () {
-
-  //     const newPendingRewards = pendingRewards + (Math.random() * 5);
-  //     console.log('new pending rewards : ', newPendingRewards)
-  //     setPr(newPendingRewards);
-
-  //   }, 5000)
-  // })
-
   return <ChakraProvider theme={theme}>
     <AppProvider>
-      <Modal>Wait untill tx is confirmed</Modal>
+      <AppMainModal />
       <Box fontSize="xl" style={{ backgroundColor: "rgb(88 101 242)" }}>
         <Grid minH="10vh" p={3}>
           <VStack spacing={8} >
@@ -193,7 +192,7 @@ export function App() {
               </Box>
             </Container>
             <Container maxW='container.lg' color='white' zIndex="15" textAlign="center">
-              <Button onClick={() => { alert('hola amigo') }}>Stake</Button>
+              <StakeButton />
               <Box display="inline-block" position="relative">
                 <Button typ="black" marginLeft="10px">Claim pending rewards</Button>
                 <PendingRewards />
