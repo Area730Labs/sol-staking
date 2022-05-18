@@ -5,6 +5,17 @@
   "dependencies": {
     "@chakra-ui/icons": "^1.1.7",
     "@chakra-ui/react": "^1.8.8",
+    "@jup-ag/math": "^1.0.0-beta.24",
+    "@solana/wallet-adapter-base": "^0.9.5",
+    "@solana/wallet-adapter-phantom": "^0.9.3",
+    "@solana/web3.js": "^1.42.0",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "react-icons": "^3.0.0",
+    "react-toastify": "^9.0.1",
+    "typescript": "^4.3.5"
+  },
+  "devDependencies": {
     "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
     "@testing-library/jest-dom": "^5.9.0",
@@ -15,11 +26,7 @@
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
     "framer-motion": "^4.0.0",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "react-icons": "^3.0.0",
     "react-scripts": "5.0.1",
-    "typescript": "^4.3.5",
     "web-vitals": "^0.2.2"
   },
   "scripts": {

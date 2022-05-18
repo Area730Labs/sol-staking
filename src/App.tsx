@@ -27,6 +27,14 @@ import Countup from "./components/countup"
 
 import { AppProvider, useAppContext, useStyles } from "./state/app"
 import Modal from "./components/modal"
+import { PublicKey } from "@solana/web3.js"
+
+import { getAllNfts } from "./blockchain/nfts"
+import * as phantom from "@solana/wallet-adapter-phantom";
+
+// toasts
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify';
 
 function MainPageContainer(props: any) {
   return (
@@ -117,7 +125,42 @@ function AppMainModal() {
 }
 
 function StakeButton() {
-  const { setModalVisible } = useAppContext();
+
+  const { setModalVisible, updateNftsList, nftsInWallet, setModalContent, wallet, setWalletAdapter } = useAppContext();
+
+  React.useEffect(() => {
+    if (wallet == null) {
+
+      let phantomWallet = new phantom.PhantomWalletAdapter();
+
+      phantomWallet.on("connect", () => {
+        setWalletAdapter(phantomWallet);
+        toast("wallet connected");
+
+
+        if (nftsInWallet == null || nftsInWallet.length == 0) {
+          updateNftsList();
+          toast.warn("updating nft list")
+        } else {
+          toast.warn("nfts not empty nor null")
+        }
+
+      });
+
+      phantomWallet.on("disconnect", () => {
+        setWalletAdapter(null);
+        toast("wallet disconnected");
+      })
+
+      phantomWallet.connect();
+    }
+
+  }, [wallet]);
+
+  React.useEffect(function () {
+    setModalContent(<Text>Hola amigo, this is {nftsInWallet.length} nft selector</Text>)
+  }, [nftsInWallet]);
+
   return <Button onClick={() => { setModalVisible(true); }}>Stake</Button>
 }
 
@@ -179,8 +222,19 @@ export function App() {
   const rewardImage = "https://www.orca.so/static/media/samo.e4c98a37.png" //https://img-cdn.magiceden.dev/rs:fill:400:400:0:0/plain/https://bafybeicifnldmpywwt43opvbwuanglybhnmalu3pi6pvajq2rj2ezqccym.ipfs.dweb.link/2741.png?ext=png";
 
   return <ChakraProvider theme={theme}>
+    <ToastContainer
+      position="bottom-right"
+      autoClose={3000}
+      hideProgressBar
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+    />
     <AppProvider>
-      <AppMainModal />
+      <AppMainModal/>
       <Box fontSize="xl" style={{ backgroundColor: "rgb(88 101 242)" }}>
         <Grid minH="10vh" p={3}>
           <VStack spacing={8} >
@@ -188,7 +242,7 @@ export function App() {
               <Box bottom="20px" textAlign="center" pt="10">
                 <Text fontSize="6xl" fontWeight="bold" color="white" textAlign="center" fontFamily="helvetica">
                   <Countup number={123883393} /> SAMO</Text>
-                <Text fontSize="2xl" color="white">claimed</Text>
+                <Text fontSize="2xl" color="white">total claimed</Text>
               </Box>
             </Container>
             <Container maxW='container.lg' color='white' zIndex="15" textAlign="center">
