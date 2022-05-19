@@ -1,4 +1,5 @@
 import { Box, Image } from '@chakra-ui/react'
+import appTheme from "../state/theme"
 
 export function getFakeNftImage() : string {
     const srcs = [
@@ -19,7 +20,7 @@ export default function Nft(props: any) {
     return (
         <Box boxSize='sm' width="100%" backgroundColor="white">
             <Box>
-                <Image src={getFakeNftImage()} borderRadius="6px" />
+                <Image src={getFakeNftImage()} borderRadius={appTheme.borderRadius}/>
             </Box>
         </Box>
     )

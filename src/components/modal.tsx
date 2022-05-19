@@ -5,7 +5,7 @@ import { ChakraProps } from "@chakra-ui/system";
 import { SlideFade } from "@chakra-ui/transition";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "./button";
-
+import appTheme from "../state/theme"
 
 interface ModalStyles {
     opacity: number
@@ -73,7 +73,7 @@ export default function Modal(props: ModalStyles & any ) {
                 display={actualVisible ? "flex" : "none"}
                 position="fixed"
                 width="100vw"
-                borderRadius="6px"
+                borderRadius={appTheme.borderRadius}
                 p="8"
                 height="100vh"
                 backgroundColor="blackAlpha.700"
@@ -91,7 +91,7 @@ export default function Modal(props: ModalStyles & any ) {
                     margin="auto"
                     position="relative"
                     width="40vw"
-                    borderRadius="6px"
+                    borderRadius={appTheme.borderRadius}
                     p="8"
                     height="400px"
                     backgroundColor="white"

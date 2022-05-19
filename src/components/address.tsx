@@ -1,6 +1,7 @@
 import { Box, Link } from "@chakra-ui/layout"
 import { ReactJSXElementAttributesProperty } from "@emotion/react/types/jsx-namespace"
 import { JsxAttribute } from "typescript";
+import appTheme from "../state/theme"
 
 export interface AddressArgs {
     addr: string
@@ -22,7 +23,7 @@ export default function Address(props: AddressArgs | any) {
     return <Link href={"https://solscan.io/address/" + props.addr}>
         <Box p={1.5}
             border="1px solid green"
-            borderRadius="6px"
+            borderRadius={appTheme.borderRadius}
             display="inline"
         >{linkText}</Box>
     </Link>

@@ -6,10 +6,9 @@ import Nft from "../types/Nft";
 import { getAllNfts } from "../blockchain/nfts";
 import { toast } from 'react-toastify';
 
-export interface AppContextType {
+import nftsAvailable from '../data/nfts.json'
 
-    styles: SystemStyleObject
-    withProps: (props: SystemStyleObject) => CSSObject
+export interface AppContextType {
 
     pendingRewards: number
     setPendingRewards: any
@@ -39,20 +38,9 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
     const [userNfts, updateNfts] = useState<Nft[]>([] as Nft[]);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
-    const [modalContent,setModalContent] = useState<JSX.Element|null>(null);
+    const [modalContent, setModalContent] = useState<JSX.Element | null>(null);
 
     const [solanaNode, setSolanaNode] = useState<string>("https://ssc-dao.genesysgo.net")
-
-    // app styles
-    // remove ?
-    const [styles, setStyles] = useState<SystemStyleObject>({
-        borderRadius: "6px"
-    });
-
-    function withProps(extraStyles: SystemStyleObject) {
-        const newStyles = Object.assign(styles, extraStyles);
-        return newStyles;
-    }
 
     const [pendingRewards, setPendingRewards] = useState<number>(62.35);
     const [connectedWallet, setWallet] = useState<WalletAdapter | null>(null);
@@ -63,23 +51,33 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
     function updateNftsList() {
         if (connectedWallet != null) {
-            
+
             toast("getting list of nfts");
             getAllNfts(web3Handler, connectedWallet?.publicKey as web3.PublicKey).then(function (resp) {
-                updateNfts(resp);
+
+                // whitelist by data available
+                let items = new Array<Nft>();
+                for (var it of resp) {
+
+                    const found = (nftsAvailable as any)[it.address.toBase58()];
+
+                    if (found != null) {
+                        items.push(found)
+                    }
+                }
+
+                updateNfts(items);
+                toast.error(`Got ${items.length} items`)
             });
-           
+
         } else {
-            console.warn('unable to get new list of nfts, pubkey is empty. No wallet connected?')
+            toast.error('unable to get new list of nfts, pubkey is empty. No wallet connected?')
         }
     }
 
     const memoedValue = useMemo(() => {
 
         const curCtx = {
-            withProps,
-            styles,
-
 
             // app modal
             modalVisible,
@@ -104,7 +102,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
         return curCtx
 
-    }, [styles, pendingRewards, modalVisible, web3Handler, userNfts, modalContent]);
+    }, [pendingRewards, modalVisible, web3Handler, userNfts, modalContent]);
 
     return (
         <AppContext.Provider value={memoedValue}>
@@ -125,10 +123,4 @@ export function useAppContext() {
     }
 
     return app;
-}
-
-
-export function useStyles(props: SystemStyleObject) {
-    const s = useAppContext();
-    return s.withProps(props)
 }

@@ -1,4 +1,5 @@
 import { Box } from "@chakra-ui/layout";
+import appTheme from "../state/theme"
 
 export default function HistoryAction(props: any) {
 
@@ -8,7 +9,7 @@ export default function HistoryAction(props: any) {
     return <Box
         minW="100%"
         height="64px"
-        borderRadius="6px"
+        borderRadius={appTheme.borderRadius}
         textAlign="center"
         cursor="pointer"
         fontSize="xs"

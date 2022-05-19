@@ -1,6 +1,7 @@
 import { Image } from "@chakra-ui/image";
 import { Box, HStack, Text, VStack } from "@chakra-ui/layout"
 import Nft, { getFakeNftImage } from "./nft"
+import appTheme from "../state/theme"
 
 export default function StakingPlatform(props: any) {
 
@@ -17,7 +18,7 @@ export default function StakingPlatform(props: any) {
     >
         <HStack spacing={2}>
             <Box p="5" >
-                <Image src={imgSrc} borderRadius="6px" height="140px" />
+                <Image src={imgSrc} borderRadius={appTheme.borderRadius} height="140px" />
             </Box>
             <Box p="5">
                 {/* <VStack spacing={0}> */}

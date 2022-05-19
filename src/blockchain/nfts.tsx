@@ -13,7 +13,11 @@ export async function getAllNfts(connection: solana.Connection, owner: solana.Pu
     let result = [];
 
     for (var acc of accounts.value) {
-        result.push(acc.account.data.parsed)
+        result.push({
+            address: new solana.PublicKey(acc.account.data.parsed.address),
+            name : acc.account.data.parsed.name,
+            image : ""
+        } as Nft)
     }
 
     return result;

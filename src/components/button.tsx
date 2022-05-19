@@ -48,10 +48,17 @@ export function Button(props: ButtonProps | SbuttonArgs | any) {
 
     sizes.set("default", default_style);
 
-    sizes.set("small", {
+    sizes.set("sm", {
         px: 6,
         py: 1,
         fontSize: "sm",
+        boxShadow: "xl",
+        bRadius: 50
+    } as ButtonStyle);
+    sizes.set("md", {
+        px: 9,
+        py: 2,
+        fontSize: "lg",
         boxShadow: "xl",
         bRadius: 50
     } as ButtonStyle);
