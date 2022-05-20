@@ -72,6 +72,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                             name: found.name,
                             address: new web3.PublicKey(found.address),
                             image: found.image,
+                            props: found.props,
                         })
                     }
                 }

@@ -10,7 +10,10 @@ const styles = {
     },
     borderRadius: "6px",
     transition: "all 0.2s ease",
-    selectedBorderColor : "black"
+    selectedBorderColor : "black",
+    stressColor: "rgb(237,41,57)",
+    stressColor2: "#FFCC00"
+
 
 }
 
