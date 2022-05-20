@@ -4,7 +4,7 @@ import * as spl from '@solana/spl-token'
 import Nft from '../types/Nft'
 
 
-export async function getAllNfts(connection: solana.Connection, owner: solana.PublicKey): Promise<Nft[]> {
+export async function getAllNfts(connection: solana.Connection, owner: solana.PublicKey): Promise<solana.PublicKey[]> {
 
     const accounts = await connection.getParsedTokenAccountsByOwner(owner, {
         programId: spl.TOKEN_PROGRAM_ID
@@ -13,11 +13,7 @@ export async function getAllNfts(connection: solana.Connection, owner: solana.Pu
     let result = [];
 
     for (var acc of accounts.value) {
-        result.push({
-            address: new solana.PublicKey(acc.account.data.parsed.address),
-            name : acc.account.data.parsed.name,
-            image : ""
-        } as Nft)
+        result.push(new solana.PublicKey(acc.account.data.parsed.info.mint))
     }
 
     return result;

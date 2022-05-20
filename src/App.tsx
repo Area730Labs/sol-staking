@@ -19,7 +19,7 @@ import {
 } from "@chakra-ui/react"
 import { Button } from "./components/button"
 import { ScrollContainer, ScrollItem } from "./components/scrollcontainer"
-import Nft, { getFakeNftImage } from "./components/nft"
+import { getFakeNftImage } from "./components/nft"
 import StakingPlatform from "./components/stacking"
 import { Stat } from "./components/stat"
 import HistoryAction from "./components/historyaction"
@@ -40,6 +40,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import appTheme from "./state/theme"
 
 import { CheckIcon } from '@chakra-ui/icons'
+import Nft from "./types/Nft"
+import { isTemplateExpression } from "typescript"
 
 function MainPageContainer(props: any) {
   return (
@@ -125,41 +127,36 @@ function RewardImage(props: any) {
 
 
 function AppMainModal() {
-  const { modalVisible, setModalVisible } = useAppContext();
-  return <Modal visible={modalVisible} setVisible={setModalVisible}>Wait untill tx is confirmed</Modal>
+  const { modalVisible, setModalVisible, modalContent } = useAppContext();
+  return <Modal
+    visible={modalVisible}
+    setVisible={setModalVisible}>
+    {modalContent}
+  </Modal>
 }
 
 function StakeButton() {
 
-  const { setModalVisible, updateNftsList, nftsInWallet, setModalContent, wallet, setWalletAdapter } = useAppContext();
+  const { updateNftsList, nftsInWallet, setModalContent, setModalVisible, wallet, setWalletAdapter } = useAppContext();
 
   const [fetched, setFetched] = React.useState<boolean>(false);
 
-  React.useEffect(() => {
+  // React.useEffect(() => {
+  //   if (wallet != null) {
+  //     setModalVisible(false);
+  //   }
+  // }, [wallet])
+
+  function stakeHandler() {
 
     if (wallet == null) {
-
-      let phantomWallet = new phantom.PhantomWalletAdapter();
-
-      phantomWallet.on("readyStateChange", (newState) => {
-        console.log('newState => ', newState)
-        phantomWallet.connect();
-      });
-
-      phantomWallet.on("connect", () => {
-
-        setWalletAdapter(phantomWallet);
-        toast.info("wallet connected");
-
-      });
-
-      phantomWallet.on("disconnect", () => {
-        setWalletAdapter(null);
-        // clean nfts in wallet too
-        toast.info("wallet disconnected");
-      })
-
-
+      setModalContent(<Box>
+        <Text fontSize="xl">Connect your wallet first</Text>
+        <WalletConnectButton onConnect={() => {
+          updateNftsList()
+        }} />
+      </Box>)
+      setModalVisible(true);
     } else {
       if (!fetched) {
         setFetched(true)
@@ -169,14 +166,32 @@ function StakeButton() {
         }
       }
     }
+  }
 
+  React.useEffect(() => {
+
+    let phantomWallet = new phantom.PhantomWalletAdapter();
+
+    phantomWallet.on("readyStateChange", (newState) => {
+      console.log('newState => ', newState)
+      phantomWallet.connect();
+    });
+
+    phantomWallet.on("connect", () => {
+
+      setWalletAdapter(phantomWallet);
+      toast.info("wallet connected");
+
+    });
+
+    phantomWallet.on("disconnect", () => {
+      setWalletAdapter(null);
+      // clean nfts in wallet too
+      toast.info("wallet disconnected");
+    })
   }, [wallet]);
 
-  React.useEffect(function () {
-    setModalContent(<Text>Hola amigo, this is {nftsInWallet.length} nft selector</Text>)
-  }, [nftsInWallet]);
-
-  return <Button onClick={() => { setModalVisible(true); }}>Stake</Button>
+  return <Button onClick={() => { stakeHandler() }}>Stake</Button>
 }
 
 function PendingRewards(props: any) {
@@ -193,8 +208,57 @@ function PendingRewards(props: any) {
   </Box>
 }
 
+interface WalletConnectButtonProps {
+  onConnect?: () => void
+}
 
-function NftSelection(props: any) {
+function WalletConnectButton(props: WalletConnectButtonProps) {
+
+  const { setWalletAdapter,nftsSelector } = useAppContext();
+
+
+  const walletConnectButtonHandler = function () {
+
+    let phantomWallet = new phantom.PhantomWalletAdapter();
+
+
+    nftsSelector.current.scrollIntoView()    
+
+    phantomWallet.connect().then(() => {
+
+
+      if (phantomWallet.connected) {
+        toast.info('wallet is connected');
+        setWalletAdapter(phantomWallet);
+
+        if (props.onConnect != null) {
+          props.onConnect();
+        }
+      } else {
+        toast.warn("unable to connect to wallet")
+      }
+
+    }).catch((e) => {
+      toast.warn('unable to get phantom wallet connected')
+    });
+
+  }
+
+  return <Button
+    typ="black"
+    marginLeft="10px"
+    onClick={walletConnectButtonHandler}
+  >Connect wallet</Button>
+}
+
+interface NftSelectionProps {
+  item: Nft
+  borderSize?: number
+
+}
+
+
+function NftSelection(props: NftSelectionProps | any) {
 
   const borderSize = props.borderSize ?? 4;
   const [selected, setSelected] = React.useState<boolean>(false);
@@ -215,6 +279,8 @@ function NftSelection(props: any) {
     }
   }, [selected]);
 
+  const nftInfo = props.item;
+
   return <GridItem
     cursor="pointer"
     w='100%'
@@ -234,17 +300,26 @@ function NftSelection(props: any) {
     {selected ? <Box
       color="black"
       borderRadius="50%"
+      border={`${borderSize}px solid black`}
+      borderColor={appTheme.themeColor}
       backgroundColor="white"
       display="inline-block"
       position="absolute"
-      left="10px"
-      top="10px"
+      left="15px"
+      top="15px"
       p="2"
       px="3"
     >
       <CheckIcon />
     </Box> : null}
 
+    <Box p="2"
+      overflow="hidden"
+      textAlign="left"
+    >
+      <Image src={nftInfo.image} borderRadius={appTheme.borderRadius} />
+      <Text marginTop="2" marginBottom="2">{nftInfo.name}</Text>
+    </Box>
     {/* <Button
       position="absolute"
       left="50%"
@@ -257,11 +332,11 @@ function NftSelection(props: any) {
 
 function NftsInWalletSelector() {
 
-  const { nftsInWallet } = useAppContext();
+  const { nftsInWallet,nftsSelector } = useAppContext();
 
-  return <Grid templateColumns='repeat(4, 1fr)' gap={4}>
-    {nftsInWallet.map(() => {
-      return <NftSelection position="relative">
+  return <Grid ref={nftsSelector} templateColumns={['repeat(2, 1fr)', 'repeat(3,1fr)', 'repeat(4, 1fr)']} gap={4}>
+    {nftsInWallet.map((it, idx) => {
+      return <NftSelection key={idx} item={it} position="relative">
       </NftSelection>
     })}
   </Grid>
@@ -323,7 +398,7 @@ export function App() {
     />
     <AppProvider>
       <AppMainModal />
-      <Box fontSize="xl" style={{ backgroundColor: appTheme.themeColor }}>
+      <Box fontSize="xl" style={{ backgroundColor: appTheme.themeColor }} scrollBehavior="smooth">
         <Grid minH="10vh" p={3}>
           <VStack spacing={8} >
             <Container maxW='container.lg' color='white'>

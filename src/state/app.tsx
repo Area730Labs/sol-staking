@@ -1,5 +1,5 @@
 import { SystemStyleObject, CSSObject } from "@chakra-ui/styled-system";
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as web3 from '@solana/web3.js'
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import Nft from "../types/Nft";
@@ -30,12 +30,15 @@ export interface AppContextType {
     // user 
     nftsInWallet: Nft[],
     updateNftsList: any
+    nftsSelector: any
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
 
 export function AppProvider({ children }: { children: ReactNode; }) {
 
+    const nftsSelector = useRef(null);
+    
     const [userNfts, updateNfts] = useState<Nft[]>([] as Nft[]);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalContent, setModalContent] = useState<JSX.Element | null>(null);
@@ -53,16 +56,23 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         if (connectedWallet != null) {
 
             toast("getting list of nfts");
+
             getAllNfts(web3Handler, connectedWallet?.publicKey as web3.PublicKey).then(function (resp) {
+
+                toast.info("start processing items with whitelist")
 
                 // whitelist by data available
                 let items = new Array<Nft>();
                 for (var it of resp) {
 
-                    const found = (nftsAvailable as any)[it.address.toBase58()];
+                    const found = (nftsAvailable as any)[it.toBase58()];
 
                     if (found != null) {
-                        items.push(found)
+                        items.push({
+                            name: found.name,
+                            address: new web3.PublicKey(found.address),
+                            image: found.image,
+                        })
                     }
                 }
 
@@ -79,6 +89,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
         const curCtx = {
 
+
             // app modal
             modalVisible,
             setModalVisible,
@@ -89,6 +100,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             // user wallet nfts
             nftsInWallet: userNfts,
             updateNftsList,
+            nftsSelector,
+
             // rewards  
             pendingRewards,
             setPendingRewards,
@@ -117,7 +130,7 @@ export function useAppContext() {
     const app = useContext(AppContext)
 
     if (!app) {
-        throw Error(
+        toast.error(
             "useAppContext: `app` is undefined. Seems you forgot to wrap your app in `<AppProvider />`",
         )
     }

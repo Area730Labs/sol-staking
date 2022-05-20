@@ -90,7 +90,7 @@ export default function Modal(props: ModalStyles & any ) {
                 <Box
                     margin="auto"
                     position="relative"
-                    width="40vw"
+                    // width="40vw"
                     borderRadius={appTheme.borderRadius}
                     p="8"
                     height="400px"
