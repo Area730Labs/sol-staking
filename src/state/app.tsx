@@ -6,7 +6,7 @@ import Nft from "../types/Nft";
 import { getAllNfts } from "../blockchain/nfts";
 import { toast } from 'react-toastify';
 
-import nftsAvailable from '../data/nfts.json'
+import nftsAvailable from '../data/nfts'
 
 export interface AppContextType {
 

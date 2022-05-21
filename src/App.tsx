@@ -29,7 +29,7 @@ import Countup from "./components/countup"
 
 import { AppProvider, useAppContext } from "./state/app"
 import Modal from "./components/modal"
-import { PublicKey } from "@solana/web3.js"
+import { PublicKey, TransactionInstruction } from "@solana/web3.js"
 
 import { getAllNfts } from "./blockchain/nfts"
 import * as phantom from "@solana/wallet-adapter-phantom";
@@ -44,6 +44,9 @@ import { CheckIcon } from '@chakra-ui/icons'
 import Nft from "./types/Nft"
 import { isTemplateExpression } from "typescript"
 import { getStakeMultiplyer } from "./data/uitls"
+import Fadeable from "./components/fadeable"
+import { createStakeNftIx } from "./blockchain/staking"
+import { WalletAdapter } from "@solana/wallet-adapter-base"
 
 function MainPageContainer(props: any) {
   return (
@@ -360,10 +363,13 @@ function NftSelection(props: NftSelectionProps & any) {
 
 function NftsInWalletSelector() {
 
-  const { nftsInWallet, nftsSelector } = useAppContext();
+  const { nftsInWallet, nftsSelector, wallet } = useAppContext();
 
   const [selectedItems, setSelectedItems] = React.useState<{ [key: string]: boolean }>({});
   const [selectedItemsCount, setSelectedItemsCount] = React.useState(0);
+
+  const [selectedItemsPopupVisible, setSelectedPopupVisible] = React.useState(false);
+
 
   function selectionHandler(item: Nft, state: boolean) {
 
@@ -381,12 +387,29 @@ function NftsInWalletSelector() {
   }
 
   function stakeSelectedItems() {
+
+    let instructions = [] as TransactionInstruction[];
+
     for (var it in selectedItems) {
       console.log(`generate stake transaction for item : ${it}`)
+
+      instructions.push(createStakeNftIx(new PublicKey(it), wallet as WalletAdapter));
     }
 
     toast.info("transaction generation ... ")
+
+
+
   }
+
+  React.useEffect(() => {
+    if (selectedItemsCount > 0) {
+      setSelectedPopupVisible(true)
+    } else {
+      setSelectedPopupVisible(false);
+    }
+  }, [selectedItemsCount]);
+
 
   return <Box position="relative">
     <Grid ref={nftsSelector} templateColumns={['repeat(2, 1fr)', 'repeat(3,1fr)', 'repeat(4, 1fr)']} gap={4}>
@@ -401,7 +424,11 @@ function NftsInWalletSelector() {
       })}
     </Grid>
 
-    {selectedItemsCount > 0 ? <Box
+    <Fadeable
+
+      visible={selectedItemsPopupVisible}
+      fadesize={7}
+
       position="fixed" bottom="20px"
       left="0"
       right="0"
@@ -429,7 +456,7 @@ function NftsInWalletSelector() {
 
       </Button>
       {/* <Button>Cancel</Button> */}
-    </Box> : null}
+    </Fadeable>
   </Box>
 }
 
@@ -601,7 +628,6 @@ export function App() {
       <Box backgroundColor={appTheme.themeColor}>
         <MainPageContainer paddingY="10" paddingBottom="40">
           <NftsInWalletSelector />
-
         </MainPageContainer>
       </Box>
     </AppProvider>
