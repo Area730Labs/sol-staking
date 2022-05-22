@@ -396,6 +396,7 @@ function NftsInWalletSelector() {
       instructions.push(createStakeNftIx(new PublicKey(it), wallet as WalletAdapter));
     }
 
+    
     toast.info("transaction generation ... ")
 
 

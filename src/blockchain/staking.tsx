@@ -2,8 +2,8 @@
 import { PublicKey, TransactionInstruction } from "@solana/web3.js"
 import Nft from "../types/Nft"
 import { buildLeaves } from "./helpers";
-import { stakeNft, StakeNftAccounts, StakeNftArgs } from "./idl/instructions"
-import { StakeNftBumps } from "./idl/types"
+import { stakeNft, StakeNftAccounts, StakeNftArgs } from "../idl/instructions/stakeNft"
+import { StakeNftBumps } from "../idl/types/StakeNftBumps"
 import data from "../data/nfts"
 import { MerkleTree } from "./helpers/merkleTree";
 import { WalletAdapter } from "@solana/wallet-adapter-base";

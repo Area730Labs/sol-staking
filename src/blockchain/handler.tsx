@@ -12,6 +12,8 @@ class TxHandler {
         this.connection = c;
         this.wallet = w;
         this.mints = mints;
+
+        console.log(X.PROGRAM_ID)
     }
 
     private async createTxObject(): Promise<Transaction> {
@@ -19,6 +21,7 @@ class TxHandler {
         const hash = await this.connection.getLatestBlockhash();
         const transactionObject = new Transaction({ lastValidBlockHeight: hash.lastValidBlockHeight, feePayer: this.wallet.publicKey } as TransactionBlockhashCtor);
         return transactionObject;
+
     }
 
 /*

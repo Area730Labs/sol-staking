@@ -37,46 +37,6 @@ export const assertFail = async (pendingTx: Promise<any>, error?: string) => {
   if (success) throw new Error("Should have failed");
 };
 
-export const airdropUsers = async (
-  users: web3.Signer[],
-  provider: Provider,
-  options?: { amount?: number }
-) => {
-  await Promise.all(
-    users.map(
-      (keypair) =>
-        new Promise(async (resolve) => {
-          const airdrop = await provider.connection.requestAirdrop(
-            keypair.publicKey,
-            options?.amount || 5 * 10 ** 9
-          );
-          await provider.connection.confirmTransaction(airdrop);
-          resolve(true);
-        })
-    )
-  );
-};
-
-export const airdropNft: (
-  user: web3.Signer,
-  provider: Provider
-) => Promise<[Token, web3.PublicKey]> = async (user, provider) => {
-  let mint = await Token.createMint(
-    provider.connection,
-    user,
-    user.publicKey,
-    null,
-    0,
-    TOKEN_PROGRAM_ID
-  );
-
-  let account = await mint.createAccount(user.publicKey);
-
-  await mint.mintTo(account, user, [], 1);
-
-  return [mint, account];
-};
-
 export const buildLeaves = (
   data: Nft[]
 ) => {

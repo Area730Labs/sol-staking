@@ -1,4 +1,3 @@
-import { BN, web3 } from "@project-serum/anchor";
 import { keccak_256 } from "js-sha3";
 
 export class MerkleTree {
