@@ -65,9 +65,20 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                 let items = new Array<Nft>();
                 for (var it of resp) {
 
-                    const found = (nftsAvailable as any)[it.toBase58()];
+                    let found =  null; 
+                    const addr = it.toBase58();
+
+                    for (var item of nftsAvailable) {
+                        if (addr == item.address) {
+                            found = item;
+                            break;
+                        }
+                    }
 
                     if (found != null) {
+
+                        console.log("found")
+
                         items.push({
                             name: found.name,
                             address: new web3.PublicKey(found.address),

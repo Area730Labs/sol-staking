@@ -45,8 +45,9 @@ import Nft from "./types/Nft"
 import { isTemplateExpression } from "typescript"
 import { getStakeMultiplyer } from "./data/uitls"
 import Fadeable from "./components/fadeable"
-import { createStakeNftIx } from "./blockchain/staking"
 import { WalletAdapter } from "@solana/wallet-adapter-base"
+import { createStakeNftIx } from "./blockchain/instructions"
+import nfts from "./data/nfts"
 
 function MainPageContainer(props: any) {
   return (
@@ -398,9 +399,6 @@ function NftsInWalletSelector() {
 
     
     toast.info("transaction generation ... ")
-
-
-
   }
 
   React.useEffect(() => {

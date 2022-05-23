@@ -12,8 +12,6 @@ class TxHandler {
         this.connection = c;
         this.wallet = w;
         this.mints = mints;
-
-        console.log(X.PROGRAM_ID)
     }
 
     private async createTxObject(): Promise<Transaction> {

@@ -6,8 +6,8 @@ import {
   Token,
   ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import { MerkleTree } from "./merkleTree";
-import Nft from "../../types/Nft";
+import { Nft } from "../types";
+import {Buffer} from "buffer"
 
 export const findAssociatedAddress = async (
   owner: web3.PublicKey,
