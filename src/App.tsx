@@ -49,6 +49,7 @@ import { WalletAdapter } from "@solana/wallet-adapter-base"
 import { createStakeNftIx } from "./blockchain/instructions"
 import nfts from "./data/nfts"
 import { TxHandler } from "./blockchain/handler"
+import { info } from "console"
 
 function MainPageContainer(props: any) {
   return (
@@ -268,7 +269,7 @@ function WalletConnectButton(props: WalletConnectButtonProps) {
 interface NftSelectionProps {
   item: Nft
   borderSize?: number
-  onSelect?: { (pubkey: Nft, state: boolean): void }
+  onSelect?: { (pubkey: Nft, state: boolean): boolean }
 }
 
 
@@ -281,13 +282,15 @@ function NftSelection(props: NftSelectionProps & any) {
 
     const newState = !selected;
 
-    if (!selected) {
-      setSelected(true);
-    } else {
-      setSelected(false);
-    }
+    const shouldSelect = props?.onSelect(props.item, newState);
 
-    props?.onSelect(props.item, newState);
+    if (shouldSelect) {
+      if (!selected) {
+        setSelected(true);
+      } else {
+        setSelected(false);
+      }
+    }
 
   }
 
@@ -372,20 +375,31 @@ function NftsInWalletSelector() {
 
   const [selectedItemsPopupVisible, setSelectedPopupVisible] = React.useState(false);
 
+  const max_selection = 4;
 
-  function selectionHandler(item: Nft, state: boolean) {
+  function selectionHandler(item: Nft, state: boolean): boolean {
 
-    let nsi = selectedItems;
-
-    if (!state) {
-      delete nsi[item.address.toBase58()];
-      setSelectedItemsCount(selectedItemsCount - 1);
+    if (state && selectedItemsCount == max_selection) {
+    
+      toast.warn("max item selected, deselect first")
+      
+      return false;
     } else {
-      nsi[item.address.toBase58()] = true;
-      setSelectedItemsCount(selectedItemsCount + 1);
-    }
 
-    setSelectedItems(nsi);
+      let nsi = selectedItems;
+
+      if (!state) {
+        delete nsi[item.address.toBase58()];
+        setSelectedItemsCount(selectedItemsCount - 1);
+      } else {
+        nsi[item.address.toBase58()] = true;
+        setSelectedItemsCount(selectedItemsCount + 1);
+      }
+
+      setSelectedItems(nsi);
+
+      return true;
+    }
   }
 
   function stakeSelectedItems() {
@@ -399,7 +413,7 @@ function NftsInWalletSelector() {
 
     toast.info("transaction generation finished ... ")
 
-    const txhandler = new TxHandler(solanaConnection,wallet,[]);
+    const txhandler = new TxHandler(solanaConnection, wallet, []);
     txhandler.sendTransaction(instructions);
 
   }
