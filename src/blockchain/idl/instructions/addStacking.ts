@@ -1,11 +1,11 @@
 import { TransactionInstruction, PublicKey } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
+import { InitializeStakingBumps, InitializeStakingBumpsFields } from "../types/InitializeStakingBumps"
 
 export interface AddStackingArgs {
-  bumps: types.InitializeStakingBumpsFields
+  bumps: InitializeStakingBumpsFields
   baseWeeklyEmissions: BN
   stackingType: number
   subscription: number
@@ -28,7 +28,7 @@ export interface AddStackingAccounts {
 }
 
 export const layout = borsh.struct([
-  types.InitializeStakingBumps.layout("bumps"),
+  InitializeStakingBumps.layout("bumps"),
   borsh.u64("baseWeeklyEmissions"),
   borsh.u8("stackingType"),
   borsh.u8("subscription"),
@@ -57,7 +57,7 @@ export function addStacking(
   const buffer = Buffer.alloc(1000)
   const len = layout.encode(
     {
-      bumps: types.InitializeStakingBumps.toEncodable(args.bumps),
+      bumps: InitializeStakingBumps.toEncodable(args.bumps),
       baseWeeklyEmissions: args.baseWeeklyEmissions,
       stackingType: args.stackingType,
       subscription: args.subscription,

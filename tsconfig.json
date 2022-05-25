@@ -10,7 +10,7 @@
     "esModuleInterop": true,
     "module": "commonjs",
     "moduleResolution": "node",
-    // "resolveJsonModule": true,
+    "resolveJsonModule": true,
     "isolatedModules": false,
     "downlevelIteration": true,
     "allowSyntheticDefaultImports": true,

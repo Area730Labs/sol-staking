@@ -19,8 +19,8 @@ export interface StakeNftAccounts {
   stakerNftAccount: PublicKey
   escrowNftAccount: PublicKey
   tokenProgram: PublicKey
-  clock: PublicKey
-  rent: PublicKey
+  // clock: PublicKey
+  // rent: PublicKey
   systemProgram: PublicKey
 }
 
@@ -40,8 +40,8 @@ export function stakeNft(args: StakeNftArgs, accounts: StakeNftAccounts) {
     { pubkey: accounts.stakerNftAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.escrowNftAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
-    { pubkey: accounts.clock, isSigner: false, isWritable: false },
-    { pubkey: accounts.rent, isSigner: false, isWritable: false },
+    // { pubkey: accounts.clock, isSigner: false, isWritable: false },
+    // { pubkey: accounts.rent, isSigner: false, isWritable: false },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
   ]
   const identifier = Buffer.from([38, 27, 66, 46, 69, 65, 151, 219])

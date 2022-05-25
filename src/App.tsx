@@ -48,6 +48,7 @@ import Fadeable from "./components/fadeable"
 import { WalletAdapter } from "@solana/wallet-adapter-base"
 import { createStakeNftIx } from "./blockchain/instructions"
 import nfts from "./data/nfts"
+import { TxHandler } from "./blockchain/handler"
 
 function MainPageContainer(props: any) {
   return (
@@ -364,7 +365,7 @@ function NftSelection(props: NftSelectionProps & any) {
 
 function NftsInWalletSelector() {
 
-  const { nftsInWallet, nftsSelector, wallet } = useAppContext();
+  const { nftsInWallet, nftsSelector, wallet, solanaConnection } = useAppContext();
 
   const [selectedItems, setSelectedItems] = React.useState<{ [key: string]: boolean }>({});
   const [selectedItemsCount, setSelectedItemsCount] = React.useState(0);
@@ -393,12 +394,14 @@ function NftsInWalletSelector() {
 
     for (var it in selectedItems) {
       console.log(`generate stake transaction for item : ${it}`)
-
       instructions.push(createStakeNftIx(new PublicKey(it), wallet as WalletAdapter));
     }
 
-    
-    toast.info("transaction generation ... ")
+    toast.info("transaction generation finished ... ")
+
+    const txhandler = new TxHandler(solanaConnection,wallet,[]);
+    txhandler.sendTransaction(instructions);
+
   }
 
   React.useEffect(() => {

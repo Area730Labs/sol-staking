@@ -1,13 +1,13 @@
 import { TransactionInstruction, PublicKey } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
+import { PlatformBumps, PlatformBumpsFields } from "../types/PlatformBumps"
 
 export interface AddPlatformConfigArgs {
   freeStakingWithdrawFee: BN
   subscriptionPrice: BN
-  bumps: types.PlatformBumpsFields
+  bumps: PlatformBumpsFields
 }
 
 export interface AddPlatformConfigAccounts {
@@ -21,7 +21,7 @@ export interface AddPlatformConfigAccounts {
 export const layout = borsh.struct([
   borsh.u64("freeStakingWithdrawFee"),
   borsh.u64("subscriptionPrice"),
-  types.PlatformBumps.layout("bumps"),
+  PlatformBumps.layout("bumps"),
 ])
 
 export function addPlatformConfig(
@@ -41,7 +41,7 @@ export function addPlatformConfig(
     {
       freeStakingWithdrawFee: args.freeStakingWithdrawFee,
       subscriptionPrice: args.subscriptionPrice,
-      bumps: types.PlatformBumps.toEncodable(args.bumps),
+      bumps: PlatformBumps.toEncodable(args.bumps),
     },
     buffer
   )
