@@ -14,7 +14,7 @@ export interface StakeNftAccounts {
     stakerNftAccount: PublicKey;
     escrowNftAccount: PublicKey;
     tokenProgram: PublicKey;
-    clock: PublicKey;
+    // clock: PublicKey;
     rent: PublicKey;
     systemProgram: PublicKey;
 }

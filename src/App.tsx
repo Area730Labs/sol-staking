@@ -50,6 +50,8 @@ import { createStakeNftIx } from "./blockchain/instructions"
 import nfts from "./data/nfts"
 import { TxHandler } from "./blockchain/handler"
 import { info } from "console"
+import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token"
+import CreateMintButton, { DevButtons } from "./dev"
 
 function MainPageContainer(props: any) {
   return (
@@ -380,9 +382,9 @@ function NftsInWalletSelector() {
   function selectionHandler(item: Nft, state: boolean): boolean {
 
     if (state && selectedItemsCount == max_selection) {
-    
+
       toast.warn("max item selected, deselect first")
-      
+
       return false;
     } else {
 
@@ -548,6 +550,7 @@ export function App() {
                 <Button typ="black" marginLeft="10px">Claim pending rewards</Button>
                 <PendingRewards />
               </Box>
+              <DevButtons/>
             </Container>
             <MainPageContainer>
               <HStack spacing={4} alignItems="flex-start">

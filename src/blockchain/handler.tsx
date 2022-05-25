@@ -1,5 +1,5 @@
-import { BaseMessageSignerWalletAdapter, WalletAdapter } from "@solana/wallet-adapter-base";
-import { Connection, Transaction, TransactionBlockhashCtor, TransactionInstruction, TransactionSignature } from "@solana/web3.js";
+import { BaseMessageSignerWalletAdapter, SendTransactionOptions, WalletAdapter } from "@solana/wallet-adapter-base";
+import { Connection, Signer, Transaction, TransactionBlockhashCtor, TransactionInstruction, TransactionSignature } from "@solana/web3.js";
 import { toast } from "react-toastify";
 import { Toast } from "react-toastify/dist/components";
 import Nft from "../types/Nft";
@@ -177,7 +177,7 @@ class TxHandler {
         }*/
 
 
-    async sendTransaction(instructions: TransactionInstruction[]): Promise<TransactionSignature> {
+    async sendTransaction(instructions: TransactionInstruction[], signers?: Signer[]): Promise<TransactionSignature> {
 
         const tx = await this.createTxObject();
 
@@ -185,7 +185,13 @@ class TxHandler {
             tx.add(txIx);
         }
 
-        return this.wallet.sendTransaction(tx, this.connection);
+        if (signers != null && signers.length > 0) {
+            return this.wallet.sendTransaction(tx, this.connection, {
+                signers: signers,
+            } as SendTransactionOptions);
+        } else {
+            return this.wallet.sendTransaction(tx, this.connection);
+        }
     }
 
 

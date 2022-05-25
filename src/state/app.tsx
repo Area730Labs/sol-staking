@@ -43,7 +43,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalContent, setModalContent] = useState<JSX.Element | null>(null);
 
-    const [solanaNode, setSolanaNode] = useState<string>("https://ssc-dao.genesysgo.net")
+    const [solanaNode, setSolanaNode] = useState<string>("https://api.devnet.solana.com")//https://ssc-dao.genesysgo.net")
 
     const [pendingRewards, setPendingRewards] = useState<number>(62.35);
     const [connectedWallet, setWallet] = useState<WalletAdapter | null>(null);

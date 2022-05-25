@@ -111,6 +111,9 @@ export function createPlatformConfig(wallet: WalletAdapter): TransactionInstruct
     const [configAccount, configBump] = getProgramPDA("config");
     const [escrowAccount, escrowBump] = getProgramPDA("escrow");
 
+    console.log('create platform config with owner : ',configAccount.toBase58())
+    console.log('escrow',escrowAccount.toBase58())
+
     const platformConfigIx = addPlatformConfig({
         freeStakingWithdrawFee: new BN(LAMPORTS_PER_SOL * 0.05),
         subscriptionPrice: new BN(LAMPORTS_PER_SOL * 2),
@@ -122,6 +125,7 @@ export function createPlatformConfig(wallet: WalletAdapter): TransactionInstruct
         owner: wallet.publicKey,
         treasuryWallet: wallet.publicKey,
         platformConfig: configAccount,
+        adminWallet: wallet.publicKey,
         systemProgram: SystemProgram.programId,
     } as AddPlatformConfigAccounts)
 
