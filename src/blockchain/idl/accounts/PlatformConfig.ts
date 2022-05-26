@@ -1,11 +1,11 @@
 import { PublicKey, Connection } from "@solana/web3.js"
 import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
+import { PlatformBumpsFields,PlatformBumpsJSON,PlatformBumps } from "../types/PlatformBumps"
 
 export interface PlatformConfigFields {
-  bumps: types.PlatformBumpsFields
+  bumps: PlatformBumpsFields
   freeStakingWithdrawFee: BN
   subscriptionPrice: BN
   treasuryWallet: PublicKey
@@ -13,7 +13,7 @@ export interface PlatformConfigFields {
 }
 
 export interface PlatformConfigJSON {
-  bumps: types.PlatformBumpsJSON
+  bumps: PlatformBumpsJSON
   freeStakingWithdrawFee: string
   subscriptionPrice: string
   treasuryWallet: string
@@ -21,7 +21,7 @@ export interface PlatformConfigJSON {
 }
 
 export class PlatformConfig {
-  readonly bumps: types.PlatformBumps
+  readonly bumps: PlatformBumps
   readonly freeStakingWithdrawFee: BN
   readonly subscriptionPrice: BN
   readonly treasuryWallet: PublicKey
@@ -32,7 +32,7 @@ export class PlatformConfig {
   ])
 
   static readonly layout = borsh.struct([
-    types.PlatformBumps.layout("bumps"),
+    PlatformBumps.layout("bumps"),
     borsh.u64("freeStakingWithdrawFee"),
     borsh.u64("subscriptionPrice"),
     borsh.publicKey("treasuryWallet"),
@@ -40,7 +40,7 @@ export class PlatformConfig {
   ])
 
   constructor(fields: PlatformConfigFields) {
-    this.bumps = new types.PlatformBumps({ ...fields.bumps })
+    this.bumps = new PlatformBumps({ ...fields.bumps })
     this.freeStakingWithdrawFee = fields.freeStakingWithdrawFee
     this.subscriptionPrice = fields.subscriptionPrice
     this.treasuryWallet = fields.treasuryWallet
@@ -89,7 +89,7 @@ export class PlatformConfig {
     const dec = PlatformConfig.layout.decode(data.slice(8))
 
     return new PlatformConfig({
-      bumps: types.PlatformBumps.fromDecoded(dec.bumps),
+      bumps: PlatformBumps.fromDecoded(dec.bumps),
       freeStakingWithdrawFee: dec.freeStakingWithdrawFee,
       subscriptionPrice: dec.subscriptionPrice,
       treasuryWallet: dec.treasuryWallet,
@@ -109,7 +109,7 @@ export class PlatformConfig {
 
   static fromJSON(obj: PlatformConfigJSON): PlatformConfig {
     return new PlatformConfig({
-      bumps: types.PlatformBumps.fromJSON(obj.bumps),
+      bumps: PlatformBumps.fromJSON(obj.bumps),
       freeStakingWithdrawFee: new BN(obj.freeStakingWithdrawFee),
       subscriptionPrice: new BN(obj.subscriptionPrice),
       treasuryWallet: new PublicKey(obj.treasuryWallet),

@@ -1,8 +1,8 @@
 import { PublicKey, Connection } from "@solana/web3.js"
 import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
+import { InitializeStakingBumpsFields,InitializeStakingBumpsJSON,InitializeStakingBumps } from "../types/InitializeStakingBumps"
 
 export interface StakingConfigFields {
   alias: PublicKey
@@ -10,7 +10,7 @@ export interface StakingConfigFields {
   owner: PublicKey
   withdrawFee: BN
   distributionType: number
-  bumps: types.InitializeStakingBumpsFields
+  bumps: InitializeStakingBumpsFields
   escrow: PublicKey
   mint: PublicKey
   rewardsAccount: PublicKey
@@ -29,7 +29,7 @@ export interface StakingConfigJSON {
   owner: string
   withdrawFee: string
   distributionType: number
-  bumps: types.InitializeStakingBumpsJSON
+  bumps:InitializeStakingBumpsJSON
   escrow: string
   mint: string
   rewardsAccount: string
@@ -48,7 +48,7 @@ export class StakingConfig {
   readonly owner: PublicKey
   readonly withdrawFee: BN
   readonly distributionType: number
-  readonly bumps: types.InitializeStakingBumps
+  readonly bumps: InitializeStakingBumps
   readonly escrow: PublicKey
   readonly mint: PublicKey
   readonly rewardsAccount: PublicKey
@@ -70,7 +70,7 @@ export class StakingConfig {
     borsh.publicKey("owner"),
     borsh.u64("withdrawFee"),
     borsh.u8("distributionType"),
-    types.InitializeStakingBumps.layout("bumps"),
+    InitializeStakingBumps.layout("bumps"),
     borsh.publicKey("escrow"),
     borsh.publicKey("mint"),
     borsh.publicKey("rewardsAccount"),
@@ -89,7 +89,7 @@ export class StakingConfig {
     this.owner = fields.owner
     this.withdrawFee = fields.withdrawFee
     this.distributionType = fields.distributionType
-    this.bumps = new types.InitializeStakingBumps({ ...fields.bumps })
+    this.bumps = new InitializeStakingBumps({ ...fields.bumps })
     this.escrow = fields.escrow
     this.mint = fields.mint
     this.rewardsAccount = fields.rewardsAccount
@@ -149,7 +149,7 @@ export class StakingConfig {
       owner: dec.owner,
       withdrawFee: dec.withdrawFee,
       distributionType: dec.distributionType,
-      bumps: types.InitializeStakingBumps.fromDecoded(dec.bumps),
+      bumps: InitializeStakingBumps.fromDecoded(dec.bumps),
       escrow: dec.escrow,
       mint: dec.mint,
       rewardsAccount: dec.rewardsAccount,
@@ -191,7 +191,7 @@ export class StakingConfig {
       owner: new PublicKey(obj.owner),
       withdrawFee: new BN(obj.withdrawFee),
       distributionType: obj.distributionType,
-      bumps: types.InitializeStakingBumps.fromJSON(obj.bumps),
+      bumps: InitializeStakingBumps.fromJSON(obj.bumps),
       escrow: new PublicKey(obj.escrow),
       mint: new PublicKey(obj.mint),
       rewardsAccount: new PublicKey(obj.rewardsAccount),

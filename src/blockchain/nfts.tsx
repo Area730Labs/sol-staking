@@ -13,7 +13,9 @@ export async function getAllNfts(connection: solana.Connection, owner: solana.Pu
     let result = [];
 
     for (var acc of accounts.value) {
-        result.push(new solana.PublicKey(acc.account.data.parsed.info.mint))
+        if (acc.account.data.parsed.info.tokenAmount.amount === "1") {
+            result.push(new solana.PublicKey(acc.account.data.parsed.info.mint))
+        }
     }
 
     return result;

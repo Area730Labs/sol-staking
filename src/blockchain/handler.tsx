@@ -1,5 +1,5 @@
 import { BaseMessageSignerWalletAdapter, SendTransactionOptions, WalletAdapter } from "@solana/wallet-adapter-base";
-import { Connection, Signer, Transaction, TransactionBlockhashCtor, TransactionInstruction, TransactionSignature } from "@solana/web3.js";
+import { Connection, RpcResponseAndContext, Signer, SimulatedTransactionResponse, Transaction, TransactionBlockhashCtor, TransactionInstruction, TransactionSignature } from "@solana/web3.js";
 import { toast } from "react-toastify";
 import { Toast } from "react-toastify/dist/components";
 import Nft from "../types/Nft";
@@ -192,6 +192,17 @@ class TxHandler {
         } else {
             return this.wallet.sendTransaction(tx, this.connection);
         }
+    }
+
+    async simulate(instructions: TransactionInstruction[], signers?: Signer[]): Promise<RpcResponseAndContext<SimulatedTransactionResponse>> {
+
+        const tx = await this.createTxObject();
+
+        for (var txIx of instructions) {
+            tx.add(txIx);
+        }
+
+        return this.connection.simulateTransaction(tx, signers, null);
     }
 
 

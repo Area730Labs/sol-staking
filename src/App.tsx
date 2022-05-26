@@ -7,21 +7,12 @@ import {
   Grid,
   theme,
   Container,
-  Button as CButton,
   Image,
   HStack,
-  Skeleton,
   Tooltip,
-  propNames,
-  useTheme,
-  useDisclosure,
-  GridItem,
-  Flex,
 } from "@chakra-ui/react"
 import { Button } from "./components/button"
-import { ScrollContainer, ScrollItem } from "./components/scrollcontainer"
 import { getFakeNftImage } from "./components/nft"
-import StakingPlatform from "./components/stacking"
 import { Stat } from "./components/stat"
 import HistoryAction from "./components/historyaction"
 import Address from "./components/address"
@@ -29,9 +20,6 @@ import Countup from "./components/countup"
 
 import { AppProvider, useAppContext } from "./state/app"
 import Modal from "./components/modal"
-import { PublicKey, TransactionInstruction } from "@solana/web3.js"
-
-import { getAllNfts } from "./blockchain/nfts"
 import * as phantom from "@solana/wallet-adapter-phantom";
 
 // toasts
@@ -39,19 +27,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 
 import appTheme from "./state/theme"
+import { DevButtons } from "./dev"
 
-import { CheckIcon } from '@chakra-ui/icons'
-import Nft from "./types/Nft"
-import { isTemplateExpression } from "typescript"
-import { getStakeMultiplyer } from "./data/uitls"
-import Fadeable from "./components/fadeable"
-import { WalletAdapter } from "@solana/wallet-adapter-base"
-import { createStakeNftIx } from "./blockchain/instructions"
-import nfts from "./data/nfts"
-import { TxHandler } from "./blockchain/handler"
-import { info } from "console"
-import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token"
-import CreateMintButton, { DevButtons } from "./dev"
+import {WalletConnectButton} from "./components/walletconnect"
+import NftsInWalletSelector from "./stake"
 
 function MainPageContainer(props: any) {
   return (
@@ -225,258 +204,6 @@ function PendingRewards(props: any) {
   </Box>
 }
 
-interface WalletConnectButtonProps {
-  onConnect?: () => void
-}
-
-function WalletConnectButton(props: WalletConnectButtonProps) {
-
-  const { setWalletAdapter, nftsSelector } = useAppContext();
-
-
-  const walletConnectButtonHandler = function () {
-
-    let phantomWallet = new phantom.PhantomWalletAdapter();
-
-
-    nftsSelector.current.scrollIntoView()
-
-    phantomWallet.connect().then(() => {
-
-
-      if (phantomWallet.connected) {
-        toast.info('wallet is connected');
-        setWalletAdapter(phantomWallet);
-
-        if (props.onConnect != null) {
-          props.onConnect();
-        }
-      } else {
-        toast.warn("unable to connect to wallet")
-      }
-
-    }).catch((e) => {
-      toast.warn('unable to get phantom wallet connected')
-    });
-
-  }
-
-  return <Button
-    typ="black"
-    marginLeft="10px"
-    onClick={walletConnectButtonHandler}
-  >Connect wallet</Button>
-}
-
-interface NftSelectionProps {
-  item: Nft
-  borderSize?: number
-  onSelect?: { (pubkey: Nft, state: boolean): boolean }
-}
-
-
-function NftSelection(props: NftSelectionProps & any) {
-
-  const borderSize = props.borderSize ?? 4;
-  const [selected, setSelected] = React.useState<boolean>(false);
-
-  function clickHandler() {
-
-    const newState = !selected;
-
-    const shouldSelect = props?.onSelect(props.item, newState);
-
-    if (shouldSelect) {
-      if (!selected) {
-        setSelected(true);
-      } else {
-        setSelected(false);
-      }
-    }
-
-  }
-
-  const border = React.useMemo(() => {
-    if (!selected) {
-      return `${borderSize}px solid white`
-    } else {
-      return `${borderSize}px solid ${appTheme.selectedBorderColor}`
-    }
-  }, [selected]);
-
-  const nftInfo = props.item;
-
-  const stakeMultiplyer = getStakeMultiplyer(nftInfo);
-
-  return <GridItem
-    cursor="pointer"
-    // ='100%'
-    w="100%"
-    maxH='280px'
-    borderRadius={appTheme.borderRadius}
-    boxShadow="xl"
-    border={border}
-    transition={appTheme.transition}
-    _hover={{
-      boxShadow: "dark-lg",
-      border: `${borderSize}px solid black`
-    }}
-    backgroundColor={"white"}//appTheme.themeColor}
-    onClick={clickHandler}
-    {...props}
-  >
-    {selected ? <Box
-      color="black"
-      borderRadius="50%"
-      border={`${borderSize}px solid black`}
-      borderColor={appTheme.themeColor}
-      backgroundColor="white"
-      display="inline-block"
-      position="absolute"
-      left="15px"
-      top="15px"
-      p="2"
-      px="3"
-    >
-      <CheckIcon />
-    </Box> : null}
-
-    <Box p="2.5"
-      paddingBottom="4"
-      overflow="hidden"
-      textAlign="left"
-    >
-      <Box overflowY="hidden">
-        <Image margin="0 auto" maxH={["100px", "150px", "200px"]} maxW={["100px", "150px", "200px"]} src={nftInfo.image} borderRadius={appTheme.borderRadius} />
-      </Box>
-      <Text width="100%" marginTop="2" color="black" marginBottom="2">{nftInfo.name}</Text>
-    </Box>
-
-    {stakeMultiplyer > 1 ? <Box
-      borderRadius="20px"
-      background={appTheme.stressColor}
-      boxShadow="dark-lg"
-      color="white"
-      fontWeight="bold"
-      p="2"
-      position="absolute"
-      right="-10px"
-      top="-15px"
-    >x{stakeMultiplyer}</Box> : null}
-
-    {props.children}
-  </GridItem>
-}
-
-function NftsInWalletSelector() {
-
-  const { nftsInWallet, nftsSelector, wallet, solanaConnection } = useAppContext();
-
-  const [selectedItems, setSelectedItems] = React.useState<{ [key: string]: boolean }>({});
-  const [selectedItemsCount, setSelectedItemsCount] = React.useState(0);
-
-  const [selectedItemsPopupVisible, setSelectedPopupVisible] = React.useState(false);
-
-  const max_selection = 4;
-
-  function selectionHandler(item: Nft, state: boolean): boolean {
-
-    if (state && selectedItemsCount == max_selection) {
-
-      toast.warn("max item selected, deselect first")
-
-      return false;
-    } else {
-
-      let nsi = selectedItems;
-
-      if (!state) {
-        delete nsi[item.address.toBase58()];
-        setSelectedItemsCount(selectedItemsCount - 1);
-      } else {
-        nsi[item.address.toBase58()] = true;
-        setSelectedItemsCount(selectedItemsCount + 1);
-      }
-
-      setSelectedItems(nsi);
-
-      return true;
-    }
-  }
-
-  function stakeSelectedItems() {
-
-    let instructions = [] as TransactionInstruction[];
-
-    for (var it in selectedItems) {
-      console.log(`generate stake transaction for item : ${it}`)
-      instructions.push(createStakeNftIx(new PublicKey(it), wallet as WalletAdapter));
-    }
-
-    toast.info("transaction generation finished ... ")
-
-    const txhandler = new TxHandler(solanaConnection, wallet, []);
-    txhandler.sendTransaction(instructions);
-
-  }
-
-  React.useEffect(() => {
-    if (selectedItemsCount > 0) {
-      setSelectedPopupVisible(true)
-    } else {
-      setSelectedPopupVisible(false);
-    }
-  }, [selectedItemsCount]);
-
-
-  return <Box position="relative">
-    <Grid ref={nftsSelector} templateColumns={['repeat(2, 1fr)', 'repeat(3,1fr)', 'repeat(4, 1fr)']} gap={4}>
-      {nftsInWallet.map((it, idx) => {
-        return <NftSelection
-          key={idx}
-          item={it}
-          position="relative"
-          onSelect={selectionHandler}
-        >
-        </NftSelection>
-      })}
-    </Grid>
-
-    <Fadeable
-
-      visible={selectedItemsPopupVisible}
-      fadesize={7}
-
-      position="fixed" bottom="20px"
-      left="0"
-      right="0"
-
-      margin="0 auto"
-
-      width={["100%", "350px", "500px"]}
-      zIndex="20"
-      backgroundColor="whiteAlpha.900"
-      alignSelf="stretch"
-      color="black"
-      p="4"
-      borderRadius={appTheme.borderRadius}>
-
-      <Button typ="black" onClick={stakeSelectedItems} >Stake selected <Box
-        display="inline"
-        right="-15px"
-        top="-15px"
-        p="1"
-        px="2.5"
-        width="8"
-        backgroundColor={appTheme.stressColor}
-        borderRadius="50%"
-      >{selectedItemsCount}</Box>
-
-      </Button>
-      {/* <Button>Cancel</Button> */}
-    </Fadeable>
-  </Box>
-}
 
 export function App() {
 

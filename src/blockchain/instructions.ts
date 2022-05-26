@@ -19,7 +19,7 @@ import { addPlatformConfig, AddPlatformConfigAccounts, AddPlatformConfigArgs } f
 import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 
-function getMerkleTree(): MerkleTree {
+export function getMerkleTree(): MerkleTree {
 
     const leaves = buildLeaves(
         nftsRaw.map((e, i) => ({
@@ -111,9 +111,6 @@ export function createPlatformConfig(wallet: WalletAdapter): TransactionInstruct
     const [configAccount, configBump] = getProgramPDA("config");
     const [escrowAccount, escrowBump] = getProgramPDA("escrow");
 
-    console.log('create platform config with owner : ',configAccount.toBase58())
-    console.log('escrow',escrowAccount.toBase58())
-
     const platformConfigIx = addPlatformConfig({
         freeStakingWithdrawFee: new BN(LAMPORTS_PER_SOL * 0.05),
         subscriptionPrice: new BN(LAMPORTS_PER_SOL * 2),
@@ -136,36 +133,45 @@ export function createPlatformConfig(wallet: WalletAdapter): TransactionInstruct
 export function createStackingPlatform(
     rewardsMint: PublicKey,
     platformOwner: PublicKey,
-    baseEmissions: BN
+    baseEmissions: BN,
+    whitelist: MerkleTree
 ): TransactionInstruction {
 
     const alias = new Keypair();
 
     const [stakingConfig, sconfBump] = calcAddressWithSeed("staking", alias.publicKey);
 
+    const [configAddress, configBump] = getProgramPDA("config");
+    const [escrowAddress, escrowBump] = getProgramPDA("escrow");
+    
+    console.log("rewards mint",rewardsMint.toBase58())
+
     const [rewardsAccount, rewardsBump] = PublicKey.findProgramAddressSync(
         [Buffer.from("rewards", 'utf8'), alias.publicKey.toBuffer(), rewardsMint.toBuffer()], new PublicKey(config.program_id)
     );
 
+    console.log("config", configAddress.toBase58());
+    console.log("escrow", escrowAddress.toBase58());
+    console.log("rewards",rewardsAccount.toBase58())
+
     const now = new Date();
-    const tree = getMerkleTree();
 
     const args = {
         bumps: {
             rewards: rewardsBump,
             staking: sconfBump,
-            escrow: 0,
+            escrow: escrowBump,
         } as InitializeStakingBumps,
         baseWeeklyEmissions: baseEmissions, // emission per nft per week
         stackingType: 0,
         subscription: 1,
         start: new BN(now.getTime()),
-        root: tree.getRootArray(),
+        root: whitelist.getRootArray(),
     } as AddStackingArgs
 
     const accounts = {
         alias: alias.publicKey,
-        platformConfig: new PublicKey(config.platform_config),
+        platformConfig: configAddress,
         treasuryWallet: new PublicKey(config.treasury_wallet),
         stakingConfig: stakingConfig,
         escrow: new PublicKey(config.escrow),
