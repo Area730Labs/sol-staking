@@ -3,11 +3,10 @@ import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useSt
 import * as web3 from '@solana/web3.js'
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import Nft from "../types/Nft";
-import { getAllNfts } from "../blockchain/nfts";
 import { toast } from 'react-toastify';
 
-import nftsAvailable from '../data/nfts'
 import config from '../config.json'
+import { getNftsInWalletCached } from "./user";
 
 export interface AppContextType {
 
@@ -53,38 +52,10 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     function updateNftsList() {
         if (connectedWallet != null) {
 
-            getAllNfts(web3Handler, connectedWallet?.publicKey as web3.PublicKey).then(function (resp) {
-
-                // whitelist by data available
-                let items = new Array<Nft>();
-                for (var it of resp) {
-
-                    let found = null;
-                    const addr = it.toBase58();
-
-                    for (var item of nftsAvailable) {
-                        if (addr == item.address) {
-                            found = item;
-                            break;
-                        }
-                    }
-
-                    if (found != null) {
-
-                        console.log("found")
-
-                        items.push({
-                            name: found.name,
-                            address: new web3.PublicKey(found.address),
-                            image: found.image,
-                            props: found.props,
-                        })
-                    }
-                }
-
+            getNftsInWalletCached(connectedWallet.publicKey as web3.PublicKey, web3Handler).then(items => {
                 updateNfts(items);
                 toast.error(`Got ${items.length} items`)
-            });
+            })
 
         } else {
             toast.error('unable to get new list of nfts, pubkey is empty. No wallet connected?')
@@ -94,7 +65,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     const memoedValue = useMemo(() => {
 
         const curCtx = {
-
 
             // app modal
             modalVisible,

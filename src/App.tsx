@@ -143,8 +143,6 @@ function StakeButton() {
 
   const { setPendingRewards } = useAppContext();
 
-  const [fetched, setFetched] = React.useState<boolean>(false);
-
   function stakeHandler() {
 
     if (wallet == null) {
@@ -156,11 +154,8 @@ function StakeButton() {
       </Box>)
       setModalVisible(true);
     } else {
-      if (!fetched) {
-        if (nftsInWallet == null || nftsInWallet.length == 0) {
-          setFetched(true)
-          updateNftsList();
-        }
+      if (nftsInWallet == null || nftsInWallet.length == 0) {
+        updateNftsList();
       }
     }
   }

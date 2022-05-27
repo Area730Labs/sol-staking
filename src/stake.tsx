@@ -6,7 +6,7 @@ import Nft from "./types/Nft";
 import { createStakeNftIx } from "./blockchain/instructions"
 import { TxHandler } from "./blockchain/handler"
 import { WalletAdapter } from "@solana/wallet-adapter-base";
-import { Box } from "@chakra-ui/layout";
+import { Box, GridItem } from "@chakra-ui/layout";
 import { Grid } from "@chakra-ui/layout";
 import { NftSelection } from "./components/nftselection";
 import Fadeable from "./components/fadeable";
@@ -79,6 +79,25 @@ export default function NftsInWalletSelector() {
         }
     }, [selectedItemsCount]);
 
+    const nftsPlaceholders = [];
+
+
+
+    if (nftsInWallet.length < 4) {    
+        for (var i = 0; i < (4 - nftsInWallet.length); i++) {
+
+            console.warn('pushing a placehodelr')
+
+            nftsPlaceholders.push(<GridItem
+                key={i}
+                cursor="pointer"
+                w="100%"
+                maxH='280px'
+                borderRadius={appTheme.borderRadius}
+                transition={appTheme.transition}
+                backgroundColor={"whiteAlpha.100"}></GridItem>)
+        }
+    }
 
     return <Box position="relative">
         <Grid templateColumns={['repeat(2, 1fr)', 'repeat(3,1fr)', 'repeat(4, 1fr)']} gap={4}>
@@ -91,7 +110,9 @@ export default function NftsInWalletSelector() {
                 >
                 </NftSelection>
             })}
-            {/* {nftsInWallet.length < 4?:null} */}
+            {nftsPlaceholders.map((it, idx) => {
+                return it;
+            })}
         </Grid>
 
         <Fadeable

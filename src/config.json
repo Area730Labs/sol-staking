@@ -10,6 +10,8 @@
      "reward_token_decimals" : 1000000000,
 
      "caching" : {
-          "staked_nfts" : 600
+          "staked_nfts" : 600,
+          "platform": 3600,
+          "wallet_nfts": 60
      }
 }

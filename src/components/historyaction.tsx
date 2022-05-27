@@ -13,7 +13,7 @@ export default function HistoryAction(props: any) {
         textAlign="center"
         cursor="pointer"
         fontSize="xs"
-        boxShadow="md"
+        // boxShadow="md"
         backgroundColor={bg}
         p={p}
         transition='all 0.4s  ease'
