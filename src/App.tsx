@@ -31,8 +31,12 @@ import { DevButtons } from "./dev"
 
 import { WalletConnectButton } from "./components/walletconnect"
 import NftsInWalletSelector from "./stake"
-import { getStakedNfts } from "./blockchain/nfts"
 import { WalletReadyState } from "@solana/wallet-adapter-base"
+import { PublicKey } from "@solana/web3.js"
+
+import config from "./config.json"
+import { getPlatformInfo } from "./state/platform"
+import { getStakedNftsCached } from "./state/user"
 
 function MainPageContainer(props: any) {
   return (
@@ -137,6 +141,8 @@ function StakeButton() {
 
   const { updateNftsList, nftsInWallet, setModalContent, setModalVisible, wallet, setWalletAdapter, solanaConnection } = useAppContext();
 
+  const { setPendingRewards } = useAppContext();
+
   const [fetched, setFetched] = React.useState<boolean>(false);
 
   function stakeHandler() {
@@ -192,8 +198,29 @@ function StakeButton() {
       }
     } else {
 
-      getStakedNfts(solanaConnection, wallet.publicKey);
+      getStakedNftsCached(solanaConnection, wallet.publicKey).then(async (staked) => {
 
+        console.warn('got stacked nfts', staked)
+
+        const pinfo = await getPlatformInfo(false, solanaConnection, new PublicKey(config.stacking_config));
+
+        // calc income 
+        let income = 0;
+        const income_token_decimals = 1000000000;
+
+        let income_per_minute = pinfo.basicDailyIncome / (24 * 60);
+
+        const curTimestamp = (new Date()).getTime() / 1000;
+
+        for (var it of staked) {
+          const diff = (curTimestamp - it.lastClaim.toNumber()) / 60;
+          if (diff > 0) {
+            income += diff * income_per_minute;
+          }
+        }
+
+        setPendingRewards(income / income_token_decimals);
+      });
     }
 
   }, [wallet]);
@@ -206,12 +233,14 @@ function PendingRewards(props: any) {
   let { pendingRewards } = useAppContext();
 
   return <Box position="absolute" right="-50px" top="-32px" >
-    <Box
-      borderRadius="25px"
-      backgroundColor="rgb(237,41,57)"
-      p="2"
-      px="4"
-    >+<Countup float="true" number={pendingRewards} timems="300" /> SAMO</Box>
+    {pendingRewards > 0 ?
+      <Box
+        borderRadius="25px"
+        backgroundColor="rgb(237,41,57)"
+        p="2"
+        px="4"
+      >+<Countup float="true" number={pendingRewards} timems="300" /> {config.reward_token_name}</Box>
+      : null}
   </Box>
 }
 
@@ -278,7 +307,7 @@ export function App() {
             <Container maxW='container.lg' color='white'>
               <Box bottom="20px" textAlign="center" pt="10">
                 <Text fontSize="6xl" fontWeight="bold" color="white" textAlign="center" fontFamily="helvetica">
-                  <Countup number={123883393} /> SAMO</Text>
+                  <Countup number={123883393} /> {config.reward_token_name}</Text>
                 <Text fontSize="2xl" color="white">total claimed</Text>
               </Box>
             </Container>
@@ -309,7 +338,7 @@ export function App() {
                   <VStack textAlign="center" >
                     <Text fontSize="sm" fontWeight="bold">Rewards</Text>
                     <RewardImage img={rewardImage} />
-                    <Text fontWeight="bold">{info.rewardPerDayPerNft}/day SAMO</Text>
+                    <Text fontWeight="bold">{info.rewardPerDayPerNft}/day {config.reward_token_name}</Text>
                     <Text>per NFT</Text>
                   </VStack>
                 </Box>

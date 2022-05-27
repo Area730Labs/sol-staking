@@ -9,15 +9,12 @@ export interface WalletConnectButtonProps {
 
 export function WalletConnectButton(props: WalletConnectButtonProps) {
 
-    const { setWalletAdapter, nftsSelector } = useAppContext();
+    const { setWalletAdapter } = useAppContext();
 
 
     const walletConnectButtonHandler = function () {
 
         let phantomWallet = new phantom.PhantomWalletAdapter();
-
-
-        nftsSelector.current.scrollIntoView()
 
         phantomWallet.connect().then(() => {
 

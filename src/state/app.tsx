@@ -31,14 +31,11 @@ export interface AppContextType {
     // user 
     nftsInWallet: Nft[],
     updateNftsList: any
-    nftsSelector: any
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
 
 export function AppProvider({ children }: { children: ReactNode; }) {
-
-    const nftsSelector = useRef(null);
 
     const [userNfts, updateNfts] = useState<Nft[]>([] as Nft[]);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -46,7 +43,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
     const [solanaNode, setSolanaNode] = useState<string>(config.cluster_url)
 
-    const [pendingRewards, setPendingRewards] = useState<number>(62.35);
+    const [pendingRewards, setPendingRewards] = useState<number>(0);
     const [connectedWallet, setWallet] = useState<WalletAdapter | null>(null);
 
     const web3Handler = useMemo(() => {
@@ -109,7 +106,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             // user wallet nfts
             nftsInWallet: userNfts,
             updateNftsList,
-            nftsSelector,
 
             // rewards  
             pendingRewards,

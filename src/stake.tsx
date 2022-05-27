@@ -13,11 +13,10 @@ import Fadeable from "./components/fadeable";
 
 import appTheme from "./state/theme"
 import { Button } from "./components/button";
-import { getStakedNfts } from "./blockchain/nfts";
 
 export default function NftsInWalletSelector() {
 
-    const { nftsInWallet, nftsSelector, wallet, solanaConnection } = useAppContext();
+    const { nftsInWallet, wallet, solanaConnection } = useAppContext();
 
     const [selectedItems, setSelectedItems] = React.useState<{ [key: string]: boolean }>({});
     const [selectedItemsCount, setSelectedItemsCount] = React.useState(0);
@@ -27,18 +26,7 @@ export default function NftsInWalletSelector() {
     const max_selection = 4;
 
     if (wallet != null) {
-
         console.log('getting staked nfts ... ')
-
-        getStakedNfts(solanaConnection, wallet.publicKey).then((result) => {
-
-            console.log('got result')
-
-            for (var it of result) {
-                console.log(`staked item: ${it.mint.toBase58()}`)
-            }
-        });
-
     }
 
     function selectionHandler(item: Nft, state: boolean): boolean {
@@ -93,7 +81,7 @@ export default function NftsInWalletSelector() {
 
 
     return <Box position="relative">
-        <Grid ref={nftsSelector} templateColumns={['repeat(2, 1fr)', 'repeat(3,1fr)', 'repeat(4, 1fr)']} gap={4}>
+        <Grid templateColumns={['repeat(2, 1fr)', 'repeat(3,1fr)', 'repeat(4, 1fr)']} gap={4}>
             {nftsInWallet.map((it, idx) => {
                 return <NftSelection
                     key={idx}
