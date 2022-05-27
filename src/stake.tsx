@@ -14,6 +14,8 @@ import Fadeable from "./components/fadeable";
 import appTheme from "./state/theme"
 import { Button } from "./components/button";
 
+import config from "./config.json"
+
 export default function NftsInWalletSelector() {
 
     const { nftsInWallet, wallet, solanaConnection } = useAppContext();
@@ -23,7 +25,7 @@ export default function NftsInWalletSelector() {
 
     const [selectedItemsPopupVisible, setSelectedPopupVisible] = React.useState(false);
 
-    const max_selection = 4;
+    const max_selection = config.max_items_per_stake;
 
     if (wallet != null) {
         console.log('getting staked nfts ... ')
@@ -59,12 +61,14 @@ export default function NftsInWalletSelector() {
         let instructions = [] as TransactionInstruction[];
 
         for (var it in selectedItems) {
-            console.log(`generate stake transaction for item : ${it}`)
             instructions.push(createStakeNftIx(new PublicKey(it), wallet as WalletAdapter));
         }
 
         const txhandler = new TxHandler(solanaConnection, wallet, []);
         txhandler.sendTransaction(instructions).then((sig) => {
+
+            toast.warn("need to clear cache for staked items + nfts in wallet")
+
             toast.info(`tx: ${sig}`)
         }).catch((e) => {
             toast.error(`Unable to stake: ${e.message}`)
@@ -81,13 +85,12 @@ export default function NftsInWalletSelector() {
 
     const nftsPlaceholders = [];
 
+    const maxPerRow = config.max_nfts_per_row;
 
-
-    if (nftsInWallet.length < 4) {    
-        for (var i = 0; i < (4 - nftsInWallet.length); i++) {
-
-            console.warn('pushing a placehodelr')
-
+    // fill the row with placeholders
+    // @todo use nft layout 
+    if (nftsInWallet && nftsInWallet.length < maxPerRow) {    
+        for (var i = 0; i < (maxPerRow - nftsInWallet.length); i++) {
             nftsPlaceholders.push(<GridItem
                 key={i}
                 cursor="pointer"
@@ -101,7 +104,7 @@ export default function NftsInWalletSelector() {
 
     return <Box position="relative">
         <Grid templateColumns={['repeat(2, 1fr)', 'repeat(3,1fr)', 'repeat(4, 1fr)']} gap={4}>
-            {nftsInWallet.map((it, idx) => {
+            {nftsInWallet && nftsInWallet.map((it, idx) => {
                 return <NftSelection
                     key={idx}
                     item={it}

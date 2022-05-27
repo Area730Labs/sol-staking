@@ -1,7 +1,7 @@
 import { SystemStyleObject, CSSObject } from "@chakra-ui/styled-system";
 import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as web3 from '@solana/web3.js'
-import { WalletAdapter } from "@solana/wallet-adapter-base";
+import { WalletAdapter, WalletReadyState } from "@solana/wallet-adapter-base";
 import Nft from "../types/Nft";
 import { toast } from 'react-toastify';
 
@@ -39,7 +39,7 @@ const AppContext = createContext<AppContextType>({} as AppContextType);
 
 export function AppProvider({ children }: { children: ReactNode; }) {
 
-    const [userNfts, updateNfts] = useState<Nft[]>([] as Nft[]);
+    const [userNfts, updateNfts] = useState<Nft[]>([]);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalContent, setModalContent] = useState<JSX.Element | null>(null);
 
@@ -55,7 +55,9 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
     // initialization
     useEffect(() => {
-        if (connectedWallet != null) {
+        if (connectedWallet != null && connectedWallet.connected) {
+
+            console.log('wallet is connected',connectedWallet)
 
             // probably just use useMemo
             getStakedNftsCached(web3Handler, connectedWallet.publicKey).then((stakedNfts) => {

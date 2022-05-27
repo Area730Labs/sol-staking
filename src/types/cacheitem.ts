@@ -1,4 +1,6 @@
 
+import config from "../config.json"
+
 /**
  * interface to use when putting data into storage
  */
@@ -25,6 +27,10 @@ export default interface CacheItem {
  * @param args cache key parts 
  */
 export async function getOrConstruct<T>(force: boolean,key: string, constructor: { (): Promise<T> }, validitySeconds: number, ...args: string[]): Promise<T> {
+
+    if (!force && config.disable_cache) {
+        force = true;
+    }
 
     // ts
     const curTime = new Date().getTime() / 1000;

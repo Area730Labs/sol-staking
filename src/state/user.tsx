@@ -77,9 +77,10 @@ export function getNftsInWalletCached(wallet: PublicKey, connection: Connection,
                     props: found.props,
                 })
             }
-
-            return items;
         }
+
+        return items;
+
     });
 
 }

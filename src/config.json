@@ -13,5 +13,10 @@
           "staked_nfts" : 600,
           "platform": 3600,
           "wallet_nfts": 60
-     }
+     },
+     "disable_cache": true,
+     "max_items_per_stake" : 4,
+     "max_nfts_per_row": 4
+
+
 }

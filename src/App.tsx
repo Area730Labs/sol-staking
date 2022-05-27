@@ -307,7 +307,7 @@ export function App() {
     />
     <AppProvider>
       <AppMainModal />
-      <Box fontSize="xl" backgroundColor={appTheme.themeColor} scrollBehavior="smooth">
+      <Box fontSize="xl" backgroundColor={appTheme.themeColor}>
         <Grid minH="10vh" p={3}>
           <VStack spacing={8} >
             <Container maxW='container.lg' color='white'>
