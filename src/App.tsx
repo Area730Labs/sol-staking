@@ -29,8 +29,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import appTheme from "./state/theme"
 import { DevButtons } from "./dev"
 
-import {WalletConnectButton} from "./components/walletconnect"
+import { WalletConnectButton } from "./components/walletconnect"
 import NftsInWalletSelector from "./stake"
+import { getStakedNfts } from "./blockchain/nfts"
+import { WalletReadyState } from "@solana/wallet-adapter-base"
 
 function MainPageContainer(props: any) {
   return (
@@ -133,15 +135,9 @@ function AppMainModal() {
 
 function StakeButton() {
 
-  const { updateNftsList, nftsInWallet, setModalContent, setModalVisible, wallet, setWalletAdapter } = useAppContext();
+  const { updateNftsList, nftsInWallet, setModalContent, setModalVisible, wallet, setWalletAdapter, solanaConnection } = useAppContext();
 
   const [fetched, setFetched] = React.useState<boolean>(false);
-
-  // React.useEffect(() => {
-  //   if (wallet != null) {
-  //     setModalVisible(false);
-  //   }
-  // }, [wallet])
 
   function stakeHandler() {
 
@@ -155,9 +151,8 @@ function StakeButton() {
       setModalVisible(true);
     } else {
       if (!fetched) {
-        setFetched(true)
-
         if (nftsInWallet == null || nftsInWallet.length == 0) {
+          setFetched(true)
           updateNftsList();
         }
       }
@@ -166,25 +161,41 @@ function StakeButton() {
 
   React.useEffect(() => {
 
-    let phantomWallet = new phantom.PhantomWalletAdapter();
+    if (wallet == null) {
+      let phantomWallet = new phantom.PhantomWalletAdapter();
 
-    phantomWallet.on("readyStateChange", (newState) => {
-      console.log('newState => ', newState)
-      phantomWallet.connect();
-    });
+      phantomWallet.on("readyStateChange", (newState) => {
+        console.log('newState => ', newState)
 
-    phantomWallet.on("connect", () => {
+        if (!(phantomWallet.connected || phantomWallet.connecting)) {
+          phantomWallet.connect();
+        }
+      });
 
-      setWalletAdapter(phantomWallet);
-      toast.info("wallet connected");
+      phantomWallet.on("connect", () => {
+        setWalletAdapter(phantomWallet);
+        toast.info("wallet connected");
+      });
 
-    });
+      phantomWallet.on("disconnect", () => {
+        setWalletAdapter(null);
+        // clean nfts in wallet too
+        toast.info("wallet disconnected");
+      })
 
-    phantomWallet.on("disconnect", () => {
-      setWalletAdapter(null);
-      // clean nfts in wallet too
-      toast.info("wallet disconnected");
-    })
+      let currentWalletState = phantomWallet.readyState;
+      console.log('current wallet state = ', currentWalletState);
+
+      if (currentWalletState === WalletReadyState.Installed || currentWalletState === WalletReadyState.Loadable) {
+        toast.warn('wallet installed or loadable')
+        phantomWallet.connect()
+      }
+    } else {
+
+      getStakedNfts(solanaConnection, wallet.publicKey);
+
+    }
+
   }, [wallet]);
 
   return <Button onClick={() => { stakeHandler() }}>Stake</Button>
@@ -277,7 +288,7 @@ export function App() {
                 <Button typ="black" marginLeft="10px">Claim pending rewards</Button>
                 <PendingRewards />
               </Box>
-              <DevButtons/>
+              <DevButtons />
             </Container>
             <MainPageContainer>
               <HStack spacing={4} alignItems="flex-start">

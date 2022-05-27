@@ -7,6 +7,7 @@ import { getAllNfts } from "../blockchain/nfts";
 import { toast } from 'react-toastify';
 
 import nftsAvailable from '../data/nfts'
+import config from '../config.json'
 
 export interface AppContextType {
 
@@ -38,34 +39,30 @@ const AppContext = createContext<AppContextType>({} as AppContextType);
 export function AppProvider({ children }: { children: ReactNode; }) {
 
     const nftsSelector = useRef(null);
-    
+
     const [userNfts, updateNfts] = useState<Nft[]>([] as Nft[]);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalContent, setModalContent] = useState<JSX.Element | null>(null);
 
-    const [solanaNode, setSolanaNode] = useState<string>("https://api.devnet.solana.com")//https://ssc-dao.genesysgo.net")
+    const [solanaNode, setSolanaNode] = useState<string>(config.cluster_url)
 
     const [pendingRewards, setPendingRewards] = useState<number>(62.35);
     const [connectedWallet, setWallet] = useState<WalletAdapter | null>(null);
 
     const web3Handler = useMemo(() => {
-        return new web3.Connection(solanaNode, 'finalized');
+        return new web3.Connection(solanaNode, 'confirmed');
     }, [solanaNode]);
 
     function updateNftsList() {
         if (connectedWallet != null) {
 
-            toast("getting list of nfts");
-
             getAllNfts(web3Handler, connectedWallet?.publicKey as web3.PublicKey).then(function (resp) {
-
-                toast.info("start processing items with whitelist")
 
                 // whitelist by data available
                 let items = new Array<Nft>();
                 for (var it of resp) {
 
-                    let found =  null; 
+                    let found = null;
                     const addr = it.toBase58();
 
                     for (var item of nftsAvailable) {
@@ -127,7 +124,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
         return curCtx
 
-    }, [pendingRewards, modalVisible, web3Handler, userNfts, modalContent]);
+    }, [pendingRewards, modalVisible, web3Handler, userNfts, modalContent, connectedWallet]);
 
     return (
         <AppContext.Provider value={memoedValue}>

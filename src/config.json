@@ -3,6 +3,7 @@
      "treasury_wallet": "ft7JZKLj5yNjvRwW2zbQVSvf25MVUHrHuXiqyzKDPvX",
      "stacking_config": "6kjHhghGaMEWByzhjVKg9eH2guTKtcUjphWuCtebn2cz",
      "escrow": "GoVdRBBar4NsaALK1mtR3hv2zT67btBxBhbcny5x9tSU",
-     "program_id" : "HDmvmVjbr4d2TTdWSfevBK2uyiAy4A3FrBMNFd9uQoZ5"
+     "program_id" : "HDmvmVjbr4d2TTdWSfevBK2uyiAy4A3FrBMNFd9uQoZ5",
+     "cluster_url" : "https://api.devnet.solana.com"
 
 }

@@ -13,6 +13,7 @@ import Fadeable from "./components/fadeable";
 
 import appTheme from "./state/theme"
 import { Button } from "./components/button";
+import { getStakedNfts } from "./blockchain/nfts";
 
 export default function NftsInWalletSelector() {
 
@@ -24,6 +25,21 @@ export default function NftsInWalletSelector() {
     const [selectedItemsPopupVisible, setSelectedPopupVisible] = React.useState(false);
 
     const max_selection = 4;
+
+    if (wallet != null) {
+
+        console.log('getting staked nfts ... ')
+
+        getStakedNfts(solanaConnection, wallet.publicKey).then((result) => {
+
+            console.log('got result')
+
+            for (var it of result) {
+                console.log(`staked item: ${it.mint.toBase58()}`)
+            }
+        });
+
+    }
 
     function selectionHandler(item: Nft, state: boolean): boolean {
 
@@ -87,6 +103,7 @@ export default function NftsInWalletSelector() {
                 >
                 </NftSelection>
             })}
+            {/* {nftsInWallet.length < 4?:null} */}
         </Grid>
 
         <Fadeable
