@@ -139,7 +139,7 @@ function AppMainModal() {
 
 function StakeButton() {
 
-  const { updateNftsList, nftsInWallet, setModalContent, setModalVisible, wallet, setWalletAdapter, solanaConnection } = useAppContext();
+  const { setModalContent, setModalVisible, wallet, setWalletAdapter, solanaConnection } = useAppContext();
 
   const { setPendingRewards } = useAppContext();
 
@@ -148,15 +148,9 @@ function StakeButton() {
     if (wallet == null) {
       setModalContent(<Box>
         <Text fontSize="xl">Connect your wallet first</Text>
-        <WalletConnectButton onConnect={() => {
-          updateNftsList()
-        }} />
+        <WalletConnectButton />
       </Box>)
       setModalVisible(true);
-    } else {
-      if (nftsInWallet == null || nftsInWallet.length == 0) {
-        updateNftsList();
-      }
     }
   }
 
@@ -221,6 +215,23 @@ function StakeButton() {
   }, [wallet]);
 
   return <Button onClick={() => { stakeHandler() }}>Stake</Button>
+}
+
+function ClaimPendingRewardsButton() {
+
+  const { stackedNfts } = useAppContext();
+
+  function claimPendingRewardsHandler() {
+
+
+    toast.info(`creating claim tx for ${stackedNfts.length}`)
+
+    for (var it of stackedNfts) {
+      // it.
+    }
+  }
+
+  return (<Button typ="black" marginLeft="10px" onClick={claimPendingRewardsHandler}>Claim pending rewards</Button>)
 }
 
 function PendingRewards(props: any) {
@@ -309,7 +320,7 @@ export function App() {
             <Container maxW='container.lg' color='white' zIndex="15" textAlign="center">
               <StakeButton />
               <Box display="inline-block" position="relative">
-                <Button typ="black" marginLeft="10px">Claim pending rewards</Button>
+                <ClaimPendingRewardsButton />
                 <PendingRewards />
               </Box>
               <DevButtons />

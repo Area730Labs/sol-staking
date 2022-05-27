@@ -22,13 +22,19 @@ export async function getStakedNftsCached(solanaConnection: Connection, wallet: 
             }
 
             result.push(properObject);
-
         }
 
         return result;
     });
 }
-
+/**
+ * @todo add cache invalidation
+ * 
+ * @param wallet 
+ * @param connection 
+ * @param force 
+ * @returns 
+ */
 export function getNftsInWalletCached(wallet: PublicKey, connection: Connection, force: boolean = false): Promise<Nft[]> {
     return getOrConstruct<PublicKey[]>(force, "wallet_nfts", async () => {
         return getAllNfts(connection, wallet);

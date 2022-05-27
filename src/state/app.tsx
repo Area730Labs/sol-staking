@@ -6,7 +6,8 @@ import Nft from "../types/Nft";
 import { toast } from 'react-toastify';
 
 import config from '../config.json'
-import { getNftsInWalletCached } from "./user";
+import { getNftsInWalletCached, getStakedNftsCached } from "./user";
+import { StakingReceipt } from "../blockchain/idl/accounts/StakingReceipt";
 
 export interface AppContextType {
 
@@ -29,7 +30,9 @@ export interface AppContextType {
 
     // user 
     nftsInWallet: Nft[],
-    updateNftsList: any
+    // updateNftsList: any
+    stackedNfts: StakingReceipt[]
+    updateStakedNfts: { (items: StakingReceipt[]): void }
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
@@ -42,6 +45,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
     const [solanaNode, setSolanaNode] = useState<string>(config.cluster_url)
 
+    const [stackedNfts, updateStakedNfts] = useState<StakingReceipt[]>([]);
     const [pendingRewards, setPendingRewards] = useState<number>(0);
     const [connectedWallet, setWallet] = useState<WalletAdapter | null>(null);
 
@@ -49,18 +53,25 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         return new web3.Connection(solanaNode, 'confirmed');
     }, [solanaNode]);
 
-    function updateNftsList() {
+    // initialization
+    useEffect(() => {
         if (connectedWallet != null) {
+
+            // probably just use useMemo
+            getStakedNftsCached(web3Handler, connectedWallet.publicKey).then((stakedNfts) => {
+                updateStakedNfts(stakedNfts);
+            });
 
             getNftsInWalletCached(connectedWallet.publicKey as web3.PublicKey, web3Handler).then(items => {
                 updateNfts(items);
-                toast.error(`Got ${items.length} items`)
+                toast.error(`Got ${items.length} nfts`)
             })
 
         } else {
-            toast.error('unable to get new list of nfts, pubkey is empty. No wallet connected?')
+            updateStakedNfts([]);
+            updateNfts([]);
         }
-    }
+    }, [connectedWallet]);
 
     const memoedValue = useMemo(() => {
 
@@ -75,7 +86,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
             // user wallet nfts
             nftsInWallet: userNfts,
-            updateNftsList,
+            stackedNfts,
+            updateStakedNfts,
 
             // rewards  
             pendingRewards,
@@ -90,7 +102,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
         return curCtx
 
-    }, [pendingRewards, modalVisible, web3Handler, userNfts, modalContent, connectedWallet]);
+    }, [pendingRewards, modalVisible, web3Handler, userNfts, modalContent, connectedWallet, stackedNfts]);
 
     return (
         <AppContext.Provider value={memoedValue}>

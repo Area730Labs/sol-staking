@@ -17,6 +17,7 @@ import BN from "bn.js"
 import { toast } from "react-toastify";
 import { addPlatformConfig, AddPlatformConfigAccounts, AddPlatformConfigArgs } from "./idl/instructions/addPlatformConfig";
 import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { StakingReceipt } from "./idl/accounts/StakingReceipt";
 
 
 export function getMerkleTree(): MerkleTree {
@@ -48,7 +49,7 @@ function findAssociatedTokenAddress(
     )[0];
 }
 
-function createStakeNftIx(mint: PublicKey, owner: WalletAdapter): TransactionInstruction {
+export function createStakeNftIx(mint: PublicKey, owner: WalletAdapter): TransactionInstruction {
 
     const tree = getMerkleTree();
 
@@ -129,7 +130,6 @@ export function createPlatformConfig(wallet: WalletAdapter): TransactionInstruct
     return platformConfigIx;
 }
 
-
 export function createStackingPlatform(
     rewardsMint: PublicKey,
     platformOwner: PublicKey,
@@ -187,5 +187,10 @@ export function createStackingPlatform(
     return addStacking(args, accounts);
 }
 
-
-export { createStakeNftIx };
+/**
+ * 
+ * @param stackingReceipt item to collect rewards of  
+ */
+export function createClaimIx(stackingReceipt : StakingReceipt): TransactionInstruction {
+    return {} as TransactionInstruction;
+}
