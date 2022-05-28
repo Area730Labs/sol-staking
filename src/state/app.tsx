@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import config from '../config.json'
 import { getNftsInWalletCached, getStakedNftsCached } from "./user";
 import { StakingReceipt } from "../blockchain/idl/accounts/StakingReceipt";
+import { TxHandler } from "../blockchain/handler";
 
 export interface AppContextType {
 
@@ -57,7 +58,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     useEffect(() => {
         if (connectedWallet != null && connectedWallet.connected) {
 
-            console.log('wallet is connected',connectedWallet)
+            console.log('wallet is connected', connectedWallet)
 
             // probably just use useMemo
             getStakedNftsCached(web3Handler, connectedWallet.publicKey).then((stakedNfts) => {

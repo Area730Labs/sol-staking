@@ -10,6 +10,7 @@ import { PlatformConfig } from "./blockchain/idl/accounts/PlatformConfig";
 import { createPlatformConfig, createStackingPlatform, getMerkleTree } from "./blockchain/instructions";
 import { Button } from "./components/button";
 import { useAppContext } from "./state/app";
+import config from "./config.json"
 
 export default function CreateMintButton() {
 
@@ -76,6 +77,39 @@ export function DevButtons() {
         });
     }
 
+    function mintToTreasury() {
+
+        const value = prompt("enter token amount");
+        const valueInt = parseInt(value);
+
+        const tokenWithDecimals = valueInt * config.reward_token_decimals;
+
+        const ixs = [];
+
+        const mintIx = Token.createMintToInstruction(
+            TOKEN_PROGRAM_ID,
+            new PublicKey(config.rewards_mint),
+            new PublicKey(config.rewards_token_account),
+            wallet.publicKey,
+            [],
+            tokenWithDecimals
+        )
+
+        ixs.push(mintIx);
+
+        const txhandler = new TxHandler(solanaConnection, wallet, []);
+
+        txhandler.sendTransaction(ixs).then((signature) => {
+            // console.log(`got transaction: ${signature}`)
+            toast.info('platform created !')
+        }).catch((e) => {
+            console.log('mint info ', e)
+            toast.error(`unable to send create mint instruction: ${e.message}`)
+        });
+
+
+    }
+
     if (wallet != null) {
         return <Box py="8">
             <Button onClick={() => {
@@ -98,6 +132,7 @@ export function DevButtons() {
             }}>Global Init</Button>
             <Button onClick={platformCreationButton}>Create platform</Button>
             <CreateMintButton />
+            <Button onClick={mintToTreasury}>Mint Tokens</Button>
         </Box>
     } else {
         return null;

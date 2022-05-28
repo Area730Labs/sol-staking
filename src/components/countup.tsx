@@ -65,7 +65,7 @@ export default function Countup(props: NumberWithIncreaseArgs | any) {
                     timeToUse = roundInt(timeTotal * diffPercent);
                 }
 
-                console.log(`using ${stepsToUse}/${steps} steps. diff is ${diff}. diff percent is ${diffPercent}%`);
+                // console.log(`using ${stepsToUse}/${steps} steps. diff is ${diff}. diff percent is ${diffPercent}%`);
             }
 
             const sleepTime = timeToUse / stepsToUse;

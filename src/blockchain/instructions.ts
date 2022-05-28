@@ -1,13 +1,14 @@
 
-import { Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, Transaction, TransactionInstruction } from "@solana/web3.js"
-import { buildLeaves } from "./helpers";
+import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, Transaction, TransactionInstruction } from "@solana/web3.js"
+import { buildLeaves, findAssociatedAddress } from "./helpers";
 import { MerkleTree } from "./helpers/merkleTree";
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { stakeNft, StakeNftAccounts, StakeNftArgs } from "./idl/instructions/stakeNft";
 import { addStacking, AddStackingAccounts, AddStackingArgs } from "./idl/instructions/addStacking";
 import { InitializeStakingBumps } from "./idl/types/InitializeStakingBumps"
 
-import { PlatformBumps, StakeNftBumps } from "./idl/types";
+import { PlatformBumps } from "./idl/types/PlatformBumps";
+import { StakeNftBumps } from "./idl/types/StakeNftBumps"
 import { Nft } from "./types";
 
 import nftsRaw from "../data/nfts"
@@ -18,6 +19,11 @@ import { toast } from "react-toastify";
 import { addPlatformConfig, AddPlatformConfigAccounts, AddPlatformConfigArgs } from "./idl/instructions/addPlatformConfig";
 import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { StakingReceipt } from "./idl/accounts/StakingReceipt";
+import { unstakeNft, UnstakeNftAccounts } from "./idl/instructions/unstakeNft";
+import { StakeOwner } from "./idl/types/StakeOwner";
+import { createStakeOwner, CreateStakeOwnerAccounts } from "./idl/instructions/createStakeOwner";
+import { claimLight, ClaimLightAccounts } from "./idl/instructions/claimLight";
+import { claimStakeOwner, ClaimStakeOwnerAccounts } from "./idl/instructions/claimStakeOwner";
 
 
 export function getMerkleTree(): MerkleTree {
@@ -99,6 +105,15 @@ export function calcAddressWithSeed(seed: string, address: PublicKey): [PublicKe
     );
 }
 
+export function calcAddressWithTwoSeeds(seed: string, seed2: Buffer, address: PublicKey): [PublicKey, number] {
+    const buffers = [Buffer.from(seed, 'utf8'), seed2, address.toBuffer()];
+
+    return PublicKey.findProgramAddressSync(
+        buffers, new PublicKey(config.program_id)
+    );
+}
+
+
 export function getProgramPDA(seed: string): [PublicKey, number] {
     const buffers = [Buffer.from(seed, 'utf8')];
 
@@ -143,8 +158,7 @@ export function createStackingPlatform(
 
     const [configAddress, configBump] = getProgramPDA("config");
     const [escrowAddress, escrowBump] = getProgramPDA("escrow");
-    
-    console.log("rewards mint",rewardsMint.toBase58())
+
 
     const [rewardsAccount, rewardsBump] = PublicKey.findProgramAddressSync(
         [Buffer.from("rewards", 'utf8'), alias.publicKey.toBuffer(), rewardsMint.toBuffer()], new PublicKey(config.program_id)
@@ -152,7 +166,7 @@ export function createStackingPlatform(
 
     console.log("config", configAddress.toBase58());
     console.log("escrow", escrowAddress.toBase58());
-    console.log("rewards",rewardsAccount.toBase58())
+    console.log("rewards", rewardsAccount.toBase58())
 
     const now = new Date();
 
@@ -191,6 +205,75 @@ export function createStackingPlatform(
  * 
  * @param stackingReceipt item to collect rewards of  
  */
-export function createClaimIx(stackingReceipt : StakingReceipt): TransactionInstruction {
-    return {} as TransactionInstruction;
+function createClaimIx(stackingReceipt: StakingReceipt, stakeOwner: PublicKey): TransactionInstruction {
+
+    const [stakingReceiptAddr, bump] = calcAddressWithSeed("receipt", stackingReceipt.mint);
+
+    const accounts = {
+        staker: stackingReceipt.staker,
+        stakingConfig: new PublicKey(config.stacking_config),
+        stakeOwner: stakeOwner,
+        stakingReceipt: stakingReceiptAddr
+    } as ClaimLightAccounts;
+
+    return claimLight(accounts);
 }
+
+function createStakeOwnerIx(staker: PublicKey, stakeOwner: PublicKey): TransactionInstruction {
+
+    const accounts = {
+        staker: staker,
+        stakingConfig: new PublicKey(config.stacking_config),
+        stakeOwner: stakeOwner,
+        // rent: SYSVAR_RENT_PUBKEY,
+        systemProgram: SystemProgram.programId
+    } as CreateStakeOwnerAccounts;
+
+    return createStakeOwner(accounts);
+}
+
+function createClaimStakeOwnerIx(staker: PublicKey, stakeOwner: PublicKey, mint: PublicKey): TransactionInstruction {
+
+
+    const [rewards, bumpRewards] = calcAddressWithTwoSeeds("rewards", new PublicKey(config.stacking_config_alias).toBuffer(), mint);
+    console.log("rewards token account", rewards.toBase58())
+
+    const stakerAccount = findAssociatedTokenAddress(staker, mint);
+
+    const accounts = {
+        staker: staker,
+        platformConfig: new PublicKey(config.platform_config),
+        stakingConfig: new PublicKey(config.stacking_config),
+        stakeOwner: stakeOwner,
+        escrow: new PublicKey(config.escrow),
+        rewardsMint: mint,
+        stakerRewardsAccount: stakerAccount,
+        stakingRewardsAccount: rewards,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId
+    } as ClaimStakeOwnerAccounts;
+
+    return claimStakeOwner(accounts);
+}
+
+function createUnstakeNftIx(receipt: StakingReceipt): TransactionInstruction {
+
+    const stakerAccount = findAssociatedTokenAddress(receipt.staker, receipt.mint)
+    const [stakingDeposit, depositBump] = calcAddressWithSeed("deposit", receipt.mint);
+    const [stakingReceipt, receiptBump] = calcAddressWithSeed("receipt", receipt.mint);
+
+    const accounts = {
+        staker: receipt.staker,
+        stakingConfig: new PublicKey(config.stacking_config),
+        escrow: new PublicKey(config.escrow),
+        receipt: stakingReceipt,
+        mint: receipt.mint,
+        stakerNftAccount: stakerAccount,
+        escrowNftAccount: stakingDeposit,
+        tokenProgram: TOKEN_PROGRAM_ID,
+    } as UnstakeNftAccounts;
+
+    return unstakeNft(accounts);
+}
+
+export { createUnstakeNftIx, createClaimIx, createStakeOwnerIx, createClaimStakeOwnerIx }

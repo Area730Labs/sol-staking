@@ -37,19 +37,11 @@ import { PublicKey } from "@solana/web3.js"
 import config from "./config.json"
 import { getPlatformInfo } from "./state/platform"
 import { getStakedNftsCached } from "./state/user"
-
-function MainPageContainer(props: any) {
-  return (
-    <Container
-      maxW='container.lg'
-      color='white'
-      zIndex="10"
-      textAlign="center"
-      overflowY="hidden"
-      {...props}>{props.children}
-    </Container>
-  )
-}
+import { calcAddressWithTwoSeeds, createStakeOwnerIx, createClaimIx, createClaimStakeOwnerIx } from "./blockchain/instructions"
+import { TxHandler } from "./blockchain/handler"
+import { StakeOwner } from "./blockchain/idl/types/StakeOwner"
+import MainPageContainer from "./components/mainpagecontainer"
+import { claimStakeOwner } from "./blockchain/idl/instructions/claimStakeOwner"
 
 function StakedSmallNft(props: any) {
   return <Image cursor="pointer" src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="64px" />
@@ -141,7 +133,7 @@ function StakeButton() {
 
   const { setModalContent, setModalVisible, wallet, setWalletAdapter, solanaConnection } = useAppContext();
 
-  const { setPendingRewards } = useAppContext();
+  const { setPendingRewards, pendingRewards } = useAppContext();
 
   function stakeHandler() {
 
@@ -153,6 +145,36 @@ function StakeButton() {
       setModalVisible(true);
     }
   }
+
+  React.useEffect(() => {
+    /*setInterval(() => {
+      if (wallet != null) {
+        getStakedNftsCached(solanaConnection, wallet.publicKey).then(async (staked) => {
+
+          console.warn('got stacked nfts', staked)
+
+          const pinfo = await getPlatformInfo(false, solanaConnection, new PublicKey(config.stacking_config));
+
+          // calc income 
+          let income = 0;
+          const income_token_decimals = 1000000000;
+
+          let income_per_minute = pinfo.basicDailyIncome / (24 * 60);
+
+          const curTimestamp = (new Date()).getTime() / 1000;
+
+          for (var it of staked) {
+            const diff = (curTimestamp - it.lastClaim.toNumber()) / 60;
+            if (diff > 0) {
+              income += diff * income_per_minute;
+            }
+          }
+
+          setPendingRewards(income / income_token_decimals);
+        });
+      }
+    }, 15000)*/
+  })
 
   React.useEffect(() => {
 
@@ -186,7 +208,6 @@ function StakeButton() {
         phantomWallet.connect()
       }
     } else {
-
       getStakedNftsCached(solanaConnection, wallet.publicKey).then(async (staked) => {
 
         console.warn('got stacked nfts', staked)
@@ -219,17 +240,43 @@ function StakeButton() {
 
 function ClaimPendingRewardsButton() {
 
-  const { stackedNfts } = useAppContext();
+  const { stackedNfts, wallet, solanaConnection } = useAppContext();
 
   function claimPendingRewardsHandler() {
 
-
     toast.info(`creating claim tx for ${stackedNfts.length}`)
 
-    for (var it of stackedNfts) {
-      // it.
-    }
+    let ixs = [];
+
+    // check if stake owner is created before
+    const [stakeOwnerAddress, bump] = calcAddressWithTwoSeeds(
+      "stake_owner",
+      new PublicKey(config.stacking_config_alias).toBuffer(),
+      stackedNfts[0].staker
+    )
+
+    StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeOwnerInfo) => {
+
+      if (stakeOwnerInfo == null) {
+        ixs.push(createStakeOwnerIx(wallet.publicKey, stakeOwnerAddress));
+      }
+
+      for (var it of stackedNfts) {
+        ixs.push(createClaimIx(it, stakeOwnerAddress))
+      }
+
+      ixs.push(createClaimStakeOwnerIx(wallet.publicKey,stakeOwnerAddress,new PublicKey(config.rewards_mint)));
+
+      const txhandler = new TxHandler(solanaConnection, wallet, []);
+
+      txhandler.sendTransaction(ixs).then((signature) => {
+        toast.info(`got transaction: ${signature}`)
+      }).catch((e) => {
+        toast.error(`unable to send unstake instruction: ${e.message}`)
+      });
+    });
   }
+
 
   return (<Button typ="black" marginLeft="10px" onClick={claimPendingRewardsHandler}>Claim pending rewards</Button>)
 }
