@@ -41,7 +41,7 @@ export function getMerkleTree(): MerkleTree {
     return tree;
 }
 
-function findAssociatedTokenAddress(
+export function findAssociatedTokenAddress(
     walletAddress: PublicKey,
     tokenMintAddress: PublicKey
 ): PublicKey {
@@ -235,9 +235,6 @@ function createStakeOwnerIx(staker: PublicKey, stakeOwner: PublicKey): Transacti
 function createClaimStakeOwnerIx(staker: PublicKey, stakeOwner: PublicKey, mint: PublicKey): TransactionInstruction {
 
 
-    const [rewards, bumpRewards] = calcAddressWithTwoSeeds("rewards", new PublicKey(config.stacking_config_alias).toBuffer(), mint);
-    console.log("rewards token account", rewards.toBase58())
-
     const stakerAccount = findAssociatedTokenAddress(staker, mint);
 
     const accounts = {
@@ -248,7 +245,7 @@ function createClaimStakeOwnerIx(staker: PublicKey, stakeOwner: PublicKey, mint:
         escrow: new PublicKey(config.escrow),
         rewardsMint: mint,
         stakerRewardsAccount: stakerAccount,
-        stakingRewardsAccount: rewards,
+        stakingRewardsAccount: new PublicKey(config.rewards_token_account),
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId
     } as ClaimStakeOwnerAccounts;

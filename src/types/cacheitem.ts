@@ -18,7 +18,12 @@ export default interface CacheItem {
     data: any
 }
 
+export function constructCacheKey(key: string, args: string[]): string {
+    const delimiter = "_"
 
+    const keyValue = key + delimiter + args.join(delimiter);
+    return keyValue
+}
 /**
  * 
  * @param key prefix for cache key
@@ -26,7 +31,7 @@ export default interface CacheItem {
  * @param validitySeconds cache time 
  * @param args cache key parts 
  */
-export async function getOrConstruct<T>(force: boolean,key: string, constructor: { (): Promise<T> }, validitySeconds: number, ...args: string[]): Promise<T> {
+export async function getOrConstruct<T>(force: boolean, key: string, constructor: { (): Promise<T> }, validitySeconds: number, ...args: string[]): Promise<T> {
 
     if (!force && config.disable_cache) {
         force = true;
@@ -37,13 +42,11 @@ export async function getOrConstruct<T>(force: boolean,key: string, constructor:
 
     // constrcut key
 
-    const delimiter = "_"
-
-    const keyValue = key + delimiter + args.join(delimiter);
+    const keyValue = constructCacheKey(key, args);
 
     const strkey = localStorage.getItem(keyValue)
-    
-    let construct  = false;
+
+    let construct = false;
     if (strkey == null) {
         construct = true;
     } else {
@@ -68,7 +71,7 @@ export async function getOrConstruct<T>(force: boolean,key: string, constructor:
         localStorage.setItem(keyValue, cacheObject);
 
         return newObject;
-    } 
+    }
 
 
 }

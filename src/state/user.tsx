@@ -2,10 +2,11 @@ import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { StakingReceipt, StakingReceiptJSON } from "../blockchain/idl/accounts/StakingReceipt";
 import { getAllNfts, getStakedNfts } from "../blockchain/nfts";
-import { getOrConstruct } from "../types/cacheitem";
+import { constructCacheKey, getOrConstruct } from "../types/cacheitem";
 import config from "../config.json"
 import Nft from "../types/Nft";
 import nftsAvailable from '../data/nfts'
+import { calcAddressWithTwoSeeds } from "../blockchain/instructions";
 
 export async function getStakedNftsCached(solanaConnection: Connection, wallet: PublicKey, force: boolean = false,): Promise<StakingReceipt[]> {
     return getOrConstruct<StakingReceipt[]>(force, "staked_by", async () => {
@@ -27,6 +28,47 @@ export async function getStakedNftsCached(solanaConnection: Connection, wallet: 
         return result;
     });
 }
+
+export function cleanCacheUponStake(wallet: PublicKey) {
+
+    const keys = [wallet.toBase58()];
+
+    {
+        const cacheKey = constructCacheKey("wallet_nfts", keys);
+        localStorage.removeItem(cacheKey);
+    }
+
+    {
+        const cacheKey = constructCacheKey("staked_by", keys);
+        localStorage.removeItem(cacheKey);
+    }
+
+}
+
+
+export function getStakeOwnerForWallet(wallet: PublicKey): Promise<PublicKey> {
+
+    return getOrConstruct<PublicKey>(false, "stake_owner_addr", () => {
+
+        const [stakeOwnerAddress, bump] = calcAddressWithTwoSeeds(
+            "stake_owner",
+            new PublicKey(config.stacking_config_alias).toBuffer(),
+            wallet
+        )
+
+        return Promise.resolve(stakeOwnerAddress);
+    }, 86400 * 365, wallet.toBase58()).then((val) => {
+        if (typeof val == "string") {
+            return new PublicKey(val);
+        } else {
+            return val;
+        }
+    });
+
+
+}
+
+
 /**
  * @todo add cache invalidation
  * 

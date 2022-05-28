@@ -32,16 +32,18 @@ import { DevButtons } from "./dev"
 import { WalletConnectButton } from "./components/walletconnect"
 import NftsInWalletSelector from "./stake"
 import { WalletReadyState } from "@solana/wallet-adapter-base"
-import { PublicKey } from "@solana/web3.js"
+import { PublicKey, SystemProgram } from "@solana/web3.js"
 
 import config from "./config.json"
 import { getPlatformInfo } from "./state/platform"
-import { getStakedNftsCached } from "./state/user"
-import { calcAddressWithTwoSeeds, createStakeOwnerIx, createClaimIx, createClaimStakeOwnerIx } from "./blockchain/instructions"
+import { getStakedNftsCached, getStakeOwnerForWallet } from "./state/user"
+import { calcAddressWithTwoSeeds, createStakeOwnerIx, createClaimIx, createClaimStakeOwnerIx, findAssociatedTokenAddress, createUnstakeNftIx } from "./blockchain/instructions"
 import { TxHandler } from "./blockchain/handler"
 import { StakeOwner } from "./blockchain/idl/types/StakeOwner"
 import MainPageContainer from "./components/mainpagecontainer"
 import { claimStakeOwner } from "./blockchain/idl/instructions/claimStakeOwner"
+import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, TOKEN_PROGRAM_ID } from "@solana/spl-token"
+import { unstakeNft } from "./blockchain/idl/instructions/unstakeNft"
 
 function StakedSmallNft(props: any) {
   return <Image cursor="pointer" src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="64px" />
@@ -214,9 +216,12 @@ function StakeButton() {
 
         const pinfo = await getPlatformInfo(false, solanaConnection, new PublicKey(config.stacking_config));
 
+        const stakeOwnerAddress = await getStakeOwnerForWallet(wallet.publicKey);
+
+        const stake_owner = await StakeOwner.fetch(solanaConnection, stakeOwnerAddress);
+
         // calc income 
         let income = 0;
-        const income_token_decimals = 1000000000;
 
         let income_per_minute = pinfo.basicDailyIncome / (24 * 60);
 
@@ -229,7 +234,12 @@ function StakeButton() {
           }
         }
 
-        setPendingRewards(income / income_token_decimals);
+        let incomeNewValue = income / config.reward_token_decimals;
+        if (stake_owner != null) {
+          incomeNewValue += stake_owner.balance.toNumber()/config.reward_token_decimals;
+        }
+
+        setPendingRewards(incomeNewValue);
       });
     }
 
@@ -242,30 +252,44 @@ function ClaimPendingRewardsButton() {
 
   const { stackedNfts, wallet, solanaConnection } = useAppContext();
 
-  function claimPendingRewardsHandler() {
-
-    toast.info(`creating claim tx for ${stackedNfts.length}`)
+  async function claimPendingRewardsHandler() {
 
     let ixs = [];
 
     // check if stake owner is created before
-    const [stakeOwnerAddress, bump] = calcAddressWithTwoSeeds(
-      "stake_owner",
-      new PublicKey(config.stacking_config_alias).toBuffer(),
-      stackedNfts[0].staker
-    )
+    const stakeOwnerAddress = await getStakeOwnerForWallet(wallet.publicKey);
 
-    StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeOwnerInfo) => {
+    const rewardsTokenMint = new PublicKey(config.rewards_mint);
+    const tokAcc = findAssociatedTokenAddress(wallet.publicKey, rewardsTokenMint);
+
+    StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeOwnerInfo: StakeOwner) => {
 
       if (stakeOwnerInfo == null) {
         ixs.push(createStakeOwnerIx(wallet.publicKey, stakeOwnerAddress));
       }
 
       for (var it of stackedNfts) {
+        // ixs.push(createUnstakeNftIx(it))
         ixs.push(createClaimIx(it, stakeOwnerAddress))
       }
 
-      ixs.push(createClaimStakeOwnerIx(wallet.publicKey,stakeOwnerAddress,new PublicKey(config.rewards_mint)));
+      // check if user has token account
+      return solanaConnection.getAccountInfo(tokAcc, "finalized");
+    }).then((item) => {
+      if (item == null) {
+        // not exists
+        ixs.push(Token.createAssociatedTokenAccountInstruction(
+          ASSOCIATED_TOKEN_PROGRAM_ID,
+          TOKEN_PROGRAM_ID,
+          rewardsTokenMint,
+          tokAcc,
+          wallet.publicKey,
+          wallet.publicKey
+        ));
+
+      }
+    }).then(() => {
+      ixs.push(createClaimStakeOwnerIx(wallet.publicKey, stakeOwnerAddress, rewardsTokenMint));
 
       const txhandler = new TxHandler(solanaConnection, wallet, []);
 
@@ -276,7 +300,6 @@ function ClaimPendingRewardsButton() {
       });
     });
   }
-
 
   return (<Button typ="black" marginLeft="10px" onClick={claimPendingRewardsHandler}>Claim pending rewards</Button>)
 }
