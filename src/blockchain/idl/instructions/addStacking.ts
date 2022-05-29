@@ -1,8 +1,10 @@
 import { TransactionInstruction, PublicKey } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
+import {InitializeStakingBumpsFields,InitializeStakingBumps} from "../types/InitializeStakingBumps" // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as types from "../types/Rule" // eslint-disable-line @typescript-eslint/no-unused-vars
+
 import { PROGRAM_ID } from "../programId"
-import { InitializeStakingBumps, InitializeStakingBumpsFields } from "../types/InitializeStakingBumps"
 
 export interface AddStackingArgs {
   bumps: InitializeStakingBumpsFields
@@ -10,6 +12,8 @@ export interface AddStackingArgs {
   stackingType: number
   subscription: number
   start: BN
+  multiplierRule: types.RuleFields
+  taxRule: types.RuleFields
   root: Array<number>
 }
 
@@ -33,6 +37,8 @@ export const layout = borsh.struct([
   borsh.u8("stackingType"),
   borsh.u8("subscription"),
   borsh.i64("start"),
+  types.Rule.layout("multiplierRule"),
+  types.Rule.layout("taxRule"),
   borsh.array(borsh.u8(), 32, "root"),
 ])
 
@@ -62,6 +68,8 @@ export function addStacking(
       stackingType: args.stackingType,
       subscription: args.subscription,
       start: args.start,
+      multiplierRule: types.Rule.toEncodable(args.multiplierRule),
+      taxRule: types.Rule.toEncodable(args.taxRule),
       root: args.root,
     },
     buffer

@@ -1,16 +1,19 @@
 {
+
+     "stacking_config_alias": "BTfmoQjqfPVd1WVHZ5bYdqsjUCsR1cVF2a9wpUq19LEp",
+     "stacking_config": "7DHH16d2GSTzR8HcJsRGQcqsyGpoQmyNEprDZ7gxcCih",
+     "rewards_token_account": "6aKeBE387cGqFB7ZSAJP7KortzMtchkSKdrfrWW8uzxS",
+
+     "rewards_mint": "5tgyTiconR365e9beKg8PiMiVje1e8bL6CU3tdYmz3my",
+
      "platform_config": "EKscV66g7uxuXPsQbsWwvaopdp16jbEe99yGFHQAaoeY",
      "treasury_wallet": "ft7JZKLj5yNjvRwW2zbQVSvf25MVUHrHuXiqyzKDPvX",
-     "stacking_config": "6kjHhghGaMEWByzhjVKg9eH2guTKtcUjphWuCtebn2cz",
      "escrow": "GoVdRBBar4NsaALK1mtR3hv2zT67btBxBhbcny5x9tSU",
      "program_id": "HDmvmVjbr4d2TTdWSfevBK2uyiAy4A3FrBMNFd9uQoZ5",
-     "rewards_mint": "5tgyTiconR365e9beKg8PiMiVje1e8bL6CU3tdYmz3my",
-     "rewards_token_account": "Gm58EQWukuSzVu698xVUmzqAq21VAMC7Lqy6QfBKwcdo",
-     "stacking_config_alias": "4rL7FvCEmfNdtphwkpSppZrSDhW2svccoyfRx8p6mNGt",
-     
+
      "cluster_url": "https://api.devnet.solana.com",
      "reward_token_name": "SAMO",
-     "reward_token_decimals": 1000000000,
+     "reward_token_decimals": 100000000000,
      "caching": {
           "staked_nfts": 600,
           "platform": 3600,

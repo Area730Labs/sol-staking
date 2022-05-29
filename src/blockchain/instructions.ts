@@ -24,6 +24,8 @@ import { StakeOwner } from "./idl/types/StakeOwner";
 import { createStakeOwner, CreateStakeOwnerAccounts } from "./idl/instructions/createStakeOwner";
 import { claimLight, ClaimLightAccounts } from "./idl/instructions/claimLight";
 import { claimStakeOwner, ClaimStakeOwnerAccounts } from "./idl/instructions/claimStakeOwner";
+import { Rule } from "./idl/types/Rule";
+import { Condition } from "./idl/types/Condition";
 
 
 export function getMerkleTree(): MerkleTree {
@@ -156,17 +158,22 @@ export function createStackingPlatform(
 
     const [stakingConfig, sconfBump] = calcAddressWithSeed("staking", alias.publicKey);
 
+    console.log("config alias: ",alias.publicKey.toBase58())
+
+
     const [configAddress, configBump] = getProgramPDA("config");
     const [escrowAddress, escrowBump] = getProgramPDA("escrow");
-
 
     const [rewardsAccount, rewardsBump] = PublicKey.findProgramAddressSync(
         [Buffer.from("rewards", 'utf8'), alias.publicKey.toBuffer(), rewardsMint.toBuffer()], new PublicKey(config.program_id)
     );
 
-    console.log("config", configAddress.toBase58());
+    console.log("rewards: ",rewardsAccount.toBase58())
+
+
+    console.log("staking config", stakingConfig.toBase58());
     console.log("escrow", escrowAddress.toBase58());
-    console.log("rewards", rewardsAccount.toBase58())
+    console.log("platform config",configAddress.toBase58())
 
     const now = new Date();
 
@@ -181,6 +188,50 @@ export function createStackingPlatform(
         subscription: 1,
         start: new BN(now.getTime()),
         root: whitelist.getRootArray(),
+        taxRule: {
+            steps: 7,
+            conds: [{
+                from: 0,
+                value: 60
+            },{
+                from: 2,
+                value: 50
+            },{
+                from: 3,
+                value: 40
+            },{
+                from: 4,
+                value: 30
+            },{
+                from: 5,
+                value: 20
+            },{
+                from: 6,
+                value: 10
+            },{
+                from: 7,
+                value: 0
+            }] as Condition[]
+        } as Rule,
+        multiplierRule: {
+            steps: 5,
+            conds: [{
+                from: 1,
+                value: 500 
+            },{
+                from: 4,
+                value: 230 
+            },{
+                from: 31,
+                value: 210 
+            },{
+                from: 101,
+                value: 180 
+            },{
+                from: 501,
+                value: 150 
+            }] as Condition[]
+        } as Rule
     } as AddStackingArgs
 
     const accounts = {

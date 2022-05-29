@@ -70,7 +70,7 @@ export function DevButtons() {
 
         txhandler.sendTransaction([ix]).then((signature) => {
             // console.log(`got transaction: ${signature}`)
-            toast.info('platform created !')
+            toast.info('platform created, look into logs for addresses !')
         }).catch((e) => {
             console.log('mint info ', e)
             toast.error(`unable to send create mint instruction: ${e.message}`)
@@ -101,7 +101,7 @@ export function DevButtons() {
 
         txhandler.sendTransaction(ixs).then((signature) => {
             // console.log(`got transaction: ${signature}`)
-            toast.info('platform created !')
+            toast.info('mint to treasury finished !')
         }).catch((e) => {
             console.log('mint info ', e)
             toast.error(`unable to send create mint instruction: ${e.message}`)
