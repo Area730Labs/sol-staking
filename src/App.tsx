@@ -10,9 +10,10 @@ import {
   Image,
   HStack,
   Tooltip,
+  Flex,
+  GridItem,
 } from "@chakra-ui/react"
 import { Button } from "./components/button"
-import { getFakeNftImage } from "./components/nft"
 import { Stat } from "./components/stat"
 import HistoryAction from "./components/historyaction"
 import Address from "./components/address"
@@ -30,7 +31,7 @@ import appTheme from "./state/theme"
 import { DevButtons } from "./dev"
 
 import { WalletConnectButton } from "./components/walletconnect"
-import NftsInWalletSelector from "./stake"
+import NftsSelector, { stakeSelectedItems, unstakeSelectedItems } from "./stake"
 import { WalletReadyState } from "@solana/wallet-adapter-base"
 import { PublicKey, SystemProgram } from "@solana/web3.js"
 
@@ -44,35 +45,14 @@ import MainPageContainer from "./components/mainpagecontainer"
 import { claimStakeOwner } from "./blockchain/idl/instructions/claimStakeOwner"
 import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, TOKEN_PROGRAM_ID } from "@solana/spl-token"
 import { unstakeNft } from "./blockchain/idl/instructions/unstakeNft"
+import { getFakeNftImage } from "./components/nft"
+import SmallStakedNftsList, { StakedSmallNft } from "./smallstakednftslist"
+import SmallNftBlock from "./smallnftblock"
+import { NftSelection } from "./components/nftselection"
+import { fromStakeReceipt } from "./types/Nft"
+import nfts from "./data/nfts"
+import EmptyRow from "./emptyrow"
 
-function StakedSmallNft(props: any) {
-  return <Image cursor="pointer" src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="64px" />
-}
-
-function SmallNftBlock(props: any) {
-
-  // const [withProps] = useTheme();
-  // const style = withProps(props);
-
-  return (
-    <Box color="blue"
-      backgroundColor="whiteAlpha.800"
-      width="64px"
-      height="64px"
-      borderRadius={appTheme.borderRadius}
-      textAlign="center"
-      cursor="pointer"
-      fontSize="xs"
-      fontWeight="bold"
-      transition='all 0.2s  ease'
-      _hover={{
-        boxShadow: "xl"
-      }}
-    >
-      {props.children}
-    </Box>
-  )
-}
 
 function HistoryActionNftLink(props: any) {
   return <Image cursor="pointer" src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="46px" />
@@ -133,11 +113,13 @@ function AppMainModal() {
 
 function StakeButton() {
 
-  const { setModalContent, setModalVisible, wallet, setWalletAdapter, solanaConnection } = useAppContext();
+  const { setModalContent, setModalVisible, wallet, setWalletAdapter, solanaConnection, setNftsTab } = useAppContext();
 
   const { setPendingRewards, pendingRewards } = useAppContext();
 
   function stakeHandler() {
+
+    setNftsTab("stake");
 
     if (wallet == null) {
       setModalContent(<Box>
@@ -236,13 +218,12 @@ function StakeButton() {
 
         let incomeNewValue = income / config.reward_token_decimals;
         if (stake_owner != null) {
-          incomeNewValue += stake_owner.balance.toNumber()/config.reward_token_decimals;
+          incomeNewValue += stake_owner.balance.toNumber() / config.reward_token_decimals;
         }
 
         setPendingRewards(incomeNewValue);
       });
     }
-
   }, [wallet]);
 
   return <Button onClick={() => { stakeHandler() }}>Stake</Button>
@@ -270,7 +251,7 @@ function ClaimPendingRewardsButton() {
 
       for (var it of stackedNfts) {
         // ixs.push(createUnstakeNftIx(it))
-        ixs.push(createClaimIx(it, stakeOwnerAddress))
+        ixs.push(createClaimIx(it.mint, it.staker, stakeOwnerAddress))
       }
 
       // check if user has token account
@@ -452,17 +433,7 @@ export function App() {
                 <Box>
                   <InfoColumn>
                     <Text fontSize="sm" fontWeight="bold">Your position</Text>
-                    <HStack>
-                      {userInfo.staked.map((object, i) => <SmallNftBlock key={i}>
-                        <StakedSmallNft />
-                      </SmallNftBlock>)}
-                      <SmallNftBlock>
-                        <Box paddingTop="18px">
-                          <Text>+{userInfo.totalStacked - userInfo.staked.length}</Text>
-                          <Text>more</Text>
-                        </Box>
-                      </SmallNftBlock>
-                    </HStack>
+                    <SmallStakedNftsList />
                     <Text fontSize="sm" fontWeight="bold">Activity feed</Text>
 
                     <HistoryAction>
@@ -488,10 +459,68 @@ export function App() {
         <svg id="visual" viewBox="0 0 1440 540" xmlns="http://www.w3.org/2000/svg" version="1.1"><path d="M0 170L34.3 164.8C68.7 159.7 137.3 149.3 205.8 149.5C274.3 149.7 342.7 160.3 411.2 170C479.7 179.7 548.3 188.3 617 187.5C685.7 186.7 754.3 176.3 823 179.8C891.7 183.3 960.3 200.7 1028.8 204.7C1097.3 208.7 1165.7 199.3 1234.2 188C1302.7 176.7 1371.3 163.3 1405.7 156.7L1440 150L1440 0L1405.7 0C1371.3 0 1302.7 0 1234.2 0C1165.7 0 1097.3 0 1028.8 0C960.3 0 891.7 0 823 0C754.3 0 685.7 0 617 0C548.3 0 479.7 0 411.2 0C342.7 0 274.3 0 205.8 0C137.3 0 68.7 0 34.3 0L0 0Z" fill="#5865f2"></path><path d="M0 124L34.3 128.3C68.7 132.7 137.3 141.3 205.8 143.7C274.3 146 342.7 142 411.2 141.8C479.7 141.7 548.3 145.3 617 144.2C685.7 143 754.3 137 823 136C891.7 135 960.3 139 1028.8 143.5C1097.3 148 1165.7 153 1234.2 155.3C1302.7 157.7 1371.3 157.3 1405.7 157.2L1440 157L1440 0L1405.7 0C1371.3 0 1302.7 0 1234.2 0C1165.7 0 1097.3 0 1028.8 0C960.3 0 891.7 0 823 0C754.3 0 685.7 0 617 0C548.3 0 479.7 0 411.2 0C342.7 0 274.3 0 205.8 0C137.3 0 68.7 0 34.3 0L0 0Z" fill="#4957ef"></path><path d="M0 81L34.3 90.3C68.7 99.7 137.3 118.3 205.8 127C274.3 135.7 342.7 134.3 411.2 130C479.7 125.7 548.3 118.3 617 109.3C685.7 100.3 754.3 89.7 823 89.5C891.7 89.3 960.3 99.7 1028.8 100.7C1097.3 101.7 1165.7 93.3 1234.2 91.5C1302.7 89.7 1371.3 94.3 1405.7 96.7L1440 99L1440 0L1405.7 0C1371.3 0 1302.7 0 1234.2 0C1165.7 0 1097.3 0 1028.8 0C960.3 0 891.7 0 823 0C754.3 0 685.7 0 617 0C548.3 0 479.7 0 411.2 0C342.7 0 274.3 0 205.8 0C137.3 0 68.7 0 34.3 0L0 0Z" fill="#404eed"></path><path d="M0 82L34.3 85C68.7 88 137.3 94 205.8 95.2C274.3 96.3 342.7 92.7 411.2 86C479.7 79.3 548.3 69.7 617 69.7C685.7 69.7 754.3 79.3 823 79.5C891.7 79.7 960.3 70.3 1028.8 70.2C1097.3 70 1165.7 79 1234.2 79.7C1302.7 80.3 1371.3 72.7 1405.7 68.8L1440 65L1440 0L1405.7 0C1371.3 0 1302.7 0 1234.2 0C1165.7 0 1097.3 0 1028.8 0C960.3 0 891.7 0 823 0C754.3 0 685.7 0 617 0C548.3 0 479.7 0 411.2 0C342.7 0 274.3 0 205.8 0C137.3 0 68.7 0 34.3 0L0 0Z" fill="#4957ef"></path><path d="M0 40L34.3 44C68.7 48 137.3 56 205.8 59.3C274.3 62.7 342.7 61.3 411.2 55.3C479.7 49.3 548.3 38.7 617 33.7C685.7 28.7 754.3 29.3 823 32.3C891.7 35.3 960.3 40.7 1028.8 43.5C1097.3 46.3 1165.7 46.7 1234.2 47.7C1302.7 48.7 1371.3 50.3 1405.7 51.2L1440 52L1440 0L1405.7 0C1371.3 0 1302.7 0 1234.2 0C1165.7 0 1097.3 0 1028.8 0C960.3 0 891.7 0 823 0C754.3 0 685.7 0 617 0C548.3 0 479.7 0 411.2 0C342.7 0 274.3 0 205.8 0C137.3 0 68.7 0 34.3 0L0 0Z" fill="#5865f2"></path></svg>
       </Box> */}
       <Box backgroundColor={appTheme.themeColor}>
-        <MainPageContainer paddingY="10" paddingBottom="40">
-          <NftsInWalletSelector />
-        </MainPageContainer>
+        <NftSelectorTabs />
       </Box>
     </AppProvider>
   </ChakraProvider>
+}
+
+
+function NftSelectorTabs() {
+
+  const { nftsTab, nftsInWallet, stackedNfts } = useAppContext();
+
+  const tabContents = React.useMemo(() => {
+
+    if (nftsTab === "stake") {
+      if (nftsInWallet.length) {
+        return <>
+          <Flex>
+            <Text fontWeight="bold" marginBottom="4">NFT'S IN YOUR WALLET</Text>
+          </Flex>
+          <NftsSelector items={nftsInWallet} actionHandler={stakeSelectedItems} actionLabel="Stake selected " />
+        </>
+      } else {
+        return <>
+          <Flex>
+            <Text fontWeight="bold" marginBottom="4">NFT'S IN YOUR WALLET</Text>
+          </Flex>
+          <Box position="relative">
+            <EmptyRow />
+            <Text fontSize="4xl" position="absolute" top="calc(40%)" left="0" right="0" >no NFT's to stake</Text>
+          </Box>
+        </>
+      }
+    } else if (nftsTab === "unstake") {
+
+      const items = stackedNfts.map((it, idx) => {
+        return fromStakeReceipt(it);
+      });
+
+      if (items.length > 0) {
+        return <>
+          <Flex>
+            <Text fontWeight="bold" marginBottom="4">YOUR STAKED NFT'S</Text>
+          </Flex>
+          <NftsSelector items={items} actionHandler={unstakeSelectedItems} actionLabel="Unstake selected " />
+        </>
+      } else {
+
+        return <>
+          <Flex>
+            <Text fontWeight="bold" marginBottom="4">YOUR STAKED NFT'S</Text>
+          </Flex>
+          <Box position="relative">
+            <EmptyRow />
+            <Text fontSize="4xl" position="absolute" top="calc(40%)" left="0" right="0" >no staked NFT's</Text>
+          </Box>
+        </>;
+      }
+    }
+
+  }, [nftsTab, nftsInWallet, stackedNfts])
+
+  return <MainPageContainer paddingY="10" paddingBottom="40">
+    {tabContents}
+  </MainPageContainer>
 }

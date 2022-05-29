@@ -34,6 +34,9 @@ export interface AppContextType {
     // updateNftsList: any
     stackedNfts: StakingReceipt[]
     updateStakedNfts: { (items: StakingReceipt[]): void }
+
+    nftsTab: "stake" | "unstake"
+    setNftsTab: { (tabl: string): void }
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
@@ -49,6 +52,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     const [stackedNfts, updateStakedNfts] = useState<StakingReceipt[]>([]);
     const [pendingRewards, setPendingRewards] = useState<number>(0);
     const [connectedWallet, setWallet] = useState<WalletAdapter | null>(null);
+
+    const [nftsTab, setNftsTab] = useState("stake");
 
     const web3Handler = useMemo(() => {
         return new web3.Connection(solanaNode, 'confirmed');
@@ -100,12 +105,15 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             solanaConnection: web3Handler,
             setSolanaNode,
             wallet: connectedWallet,
-            setWalletAdapter: setWallet
+            setWalletAdapter: setWallet,
+
+            nftsTab,
+            setNftsTab,
         } as AppContextType;
 
         return curCtx
 
-    }, [pendingRewards, modalVisible, web3Handler, userNfts, modalContent, connectedWallet, stackedNfts]);
+    }, [pendingRewards, modalVisible, web3Handler, userNfts, modalContent, connectedWallet, stackedNfts, nftsTab]);
 
     return (
         <AppContext.Provider value={memoedValue}>

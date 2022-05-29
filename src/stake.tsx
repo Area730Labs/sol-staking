@@ -1,13 +1,11 @@
-import { PublicKey, TransactionInstruction } from "@solana/web3.js";
-import React from "react";
+import { Connection, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { toast } from "react-toastify";
 import { useAppContext } from "./state/app"
 import Nft from "./types/Nft";
-import { createStakeNftIx } from "./blockchain/instructions"
+import { createClaimIx, createStakeNftIx, createStakeOwnerIx, createUnstakeNftIx } from "./blockchain/instructions"
 import { TxHandler } from "./blockchain/handler"
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { Box, GridItem } from "@chakra-ui/layout";
-import { Grid } from "@chakra-ui/layout";
 import { NftSelection } from "./components/nftselection";
 import Fadeable from "./components/fadeable";
 
@@ -15,17 +13,98 @@ import appTheme from "./state/theme"
 import { Button } from "./components/button";
 
 import config from "./config.json"
+import { getStakeOwnerForWallet } from "./state/user";
+import { StakeOwner } from "./blockchain/idl/types/StakeOwner";
+import NftSelectorGrid from "./components/nftselectorgrid";
+import React from "react";
 
-export default function NftsInWalletSelector() {
+export interface NftsSelectorProps {
+    items: Nft[]
 
-    const { nftsInWallet, wallet, solanaConnection } = useAppContext();
+    maxChunk?: number
+    maxSelectedMsg?: string
+
+    actionLabel: string
+    actionHandler: {
+        (
+            wallet: WalletAdapter,
+            solanaConnection: Connection,
+            selectedItems: { [key: string]: boolean }
+        ): void
+    }
+}
+
+export function stakeSelectedItems(
+    wallet: WalletAdapter,
+    solanaConnection: Connection,
+    selectedItems: { [key: string]: boolean }
+) {
+
+    let instructions = [] as TransactionInstruction[];
+
+    for (var it in selectedItems) {
+        instructions.push(createStakeNftIx(new PublicKey(it), wallet as WalletAdapter));
+    }
+
+    const txhandler = new TxHandler(solanaConnection, wallet, []);
+    txhandler.sendTransaction(instructions).then((sig) => {
+
+        toast.warn("need to clear cache for staked items + nfts in wallet")
+
+        toast.info(`tx: ${sig}`)
+    }).catch((e) => {
+        toast.error(`Unable to stake: ${e.message}`)
+    });
+}
+
+export async function unstakeSelectedItems(
+    wallet: WalletAdapter,
+    solanaConnection: Connection,
+    selectedItems: { [key: string]: boolean }
+) {
+
+    let instructions = [] as TransactionInstruction[];
+
+    const stakeOwnerAddress = await getStakeOwnerForWallet(wallet.publicKey);
+
+    StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeOwnerInfo: StakeOwner) => {
+
+        if (stakeOwnerInfo == null) {
+            instructions.push(createStakeOwnerIx(wallet.publicKey, stakeOwnerAddress));
+        }
+
+
+        for (var it in selectedItems) {
+
+            const mint = new PublicKey(it);
+
+            instructions.push(createClaimIx(mint, wallet.publicKey, stakeOwnerAddress))
+            instructions.push(createUnstakeNftIx(mint, wallet.publicKey));
+        }
+
+        const txhandler = new TxHandler(solanaConnection, wallet, []);
+        txhandler.sendTransaction(instructions).then((sig) => {
+
+            toast.warn("need to clear cache for staked items + nfts in wallet")
+
+            toast.info(`tx: ${sig}`)
+        }).catch((e) => {
+            toast.error(`Unable to stake: ${e.message}`)
+        });
+    });
+
+}
+
+export default function NftsSelector(props: NftsSelectorProps) {
+
+    const { wallet, solanaConnection } = useAppContext();
 
     const [selectedItems, setSelectedItems] = React.useState<{ [key: string]: boolean }>({});
     const [selectedItemsCount, setSelectedItemsCount] = React.useState(0);
-
     const [selectedItemsPopupVisible, setSelectedPopupVisible] = React.useState(false);
 
-    const max_selection = config.max_items_per_stake;
+    const action_label = props.actionLabel ?? ""
+    const max_selection = props.maxChunk ?? config.max_items_per_stake;
 
     if (wallet != null) {
         console.log('getting staked nfts ... ')
@@ -35,7 +114,7 @@ export default function NftsInWalletSelector() {
 
         if (state && selectedItemsCount == max_selection) {
 
-            toast.warn("max item selected, deselect first")
+            toast.warn(props.maxSelectedMsg ?? "max item selected, deselect first")
 
             return false;
         } else {
@@ -56,23 +135,8 @@ export default function NftsInWalletSelector() {
         }
     }
 
-    function stakeSelectedItems() {
-
-        let instructions = [] as TransactionInstruction[];
-
-        for (var it in selectedItems) {
-            instructions.push(createStakeNftIx(new PublicKey(it), wallet as WalletAdapter));
-        }
-
-        const txhandler = new TxHandler(solanaConnection, wallet, []);
-        txhandler.sendTransaction(instructions).then((sig) => {
-
-            toast.warn("need to clear cache for staked items + nfts in wallet")
-
-            toast.info(`tx: ${sig}`)
-        }).catch((e) => {
-            toast.error(`Unable to stake: ${e.message}`)
-        });
+    function performActionWithSelectedItems() {
+        props.actionHandler(wallet, solanaConnection, selectedItems)
     }
 
     React.useEffect(() => {
@@ -87,10 +151,12 @@ export default function NftsInWalletSelector() {
 
     const maxPerRow = config.max_nfts_per_row;
 
+    const items = props.items;
+
     // fill the row with placeholders
     // @todo use nft layout 
-    if (nftsInWallet && nftsInWallet.length < maxPerRow) {    
-        for (var i = 0; i < (maxPerRow - nftsInWallet.length); i++) {
+    if (items && items.length < maxPerRow) {
+        for (var i = 0; i < (maxPerRow - items.length); i++) {
             nftsPlaceholders.push(<GridItem
                 key={i}
                 cursor="pointer"
@@ -103,8 +169,8 @@ export default function NftsInWalletSelector() {
     }
 
     return <Box position="relative">
-        <Grid templateColumns={['repeat(2, 1fr)', 'repeat(3,1fr)', 'repeat(4, 1fr)']} gap={4}>
-            {nftsInWallet && nftsInWallet.map((it, idx) => {
+        <NftSelectorGrid>
+            {items && items.map((it, idx) => {
                 return <NftSelection
                     key={idx}
                     item={it}
@@ -116,10 +182,8 @@ export default function NftsInWalletSelector() {
             {nftsPlaceholders.map((it, idx) => {
                 return it;
             })}
-        </Grid>
-
+        </NftSelectorGrid>
         <Fadeable
-
             visible={selectedItemsPopupVisible}
             fadesize={7}
 
@@ -137,7 +201,7 @@ export default function NftsInWalletSelector() {
             p="4"
             borderRadius={appTheme.borderRadius}>
 
-            <Button typ="black" onClick={stakeSelectedItems}>Stake selected <Box
+            <Button typ="black" onClick={performActionWithSelectedItems}>{action_label}<Box
                 display="inline"
                 right="-15px"
                 top="-15px"

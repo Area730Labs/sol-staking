@@ -64,7 +64,7 @@ export function DevButtons() {
 
         const whitelist = getMerkleTree();
 
-        const ix = createStackingPlatform(mint, owner, new BN(1000000000), whitelist); // 1 coin per day per nft base
+        const ix = createStackingPlatform(mint, owner, new BN(100000000000), whitelist); // 1 coin per day per nft base
 
         const txhandler = new TxHandler(solanaConnection, wallet, []);
 

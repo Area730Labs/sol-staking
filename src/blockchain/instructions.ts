@@ -205,12 +205,12 @@ export function createStackingPlatform(
  * 
  * @param stackingReceipt item to collect rewards of  
  */
-function createClaimIx(stackingReceipt: StakingReceipt, stakeOwner: PublicKey): TransactionInstruction {
+function createClaimIx(mint: PublicKey, staker: PublicKey,stakeOwner: PublicKey): TransactionInstruction {
 
-    const [stakingReceiptAddr, bump] = calcAddressWithSeed("receipt", stackingReceipt.mint);
+    const [stakingReceiptAddr, bump] = calcAddressWithSeed("receipt", mint);
 
     const accounts = {
-        staker: stackingReceipt.staker,
+        staker: staker,
         stakingConfig: new PublicKey(config.stacking_config),
         stakeOwner: stakeOwner,
         stakingReceipt: stakingReceiptAddr
@@ -253,18 +253,19 @@ function createClaimStakeOwnerIx(staker: PublicKey, stakeOwner: PublicKey, mint:
     return claimStakeOwner(accounts);
 }
 
-function createUnstakeNftIx(receipt: StakingReceipt): TransactionInstruction {
+function createUnstakeNftIx(mint: PublicKey, staker: PublicKey): TransactionInstruction {
 
-    const stakerAccount = findAssociatedTokenAddress(receipt.staker, receipt.mint)
-    const [stakingDeposit, depositBump] = calcAddressWithSeed("deposit", receipt.mint);
-    const [stakingReceipt, receiptBump] = calcAddressWithSeed("receipt", receipt.mint);
+    const stakerAccount = findAssociatedTokenAddress(staker, mint)
+    const [stakingDeposit, depositBump] = calcAddressWithSeed("deposit", mint);
+    const [stakingReceipt, receiptBump] = calcAddressWithSeed("receipt", mint);
+
 
     const accounts = {
-        staker: receipt.staker,
+        staker: staker,
         stakingConfig: new PublicKey(config.stacking_config),
         escrow: new PublicKey(config.escrow),
         receipt: stakingReceipt,
-        mint: receipt.mint,
+        mint: mint,
         stakerNftAccount: stakerAccount,
         escrowNftAccount: stakingDeposit,
         tokenProgram: TOKEN_PROGRAM_ID,
