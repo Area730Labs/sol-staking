@@ -35,22 +35,16 @@ import { WalletReadyState } from "@solana/wallet-adapter-base"
 import { PublicKey, SystemProgram } from "@solana/web3.js"
 
 import config from "./config.json"
-import { getPlatformInfo } from "./state/platform"
 import { getStakedNftsCached, getStakeOwnerForWallet } from "./state/user"
-import { calcAddressWithTwoSeeds, createStakeOwnerIx, createClaimIx, createClaimStakeOwnerIx, findAssociatedTokenAddress, createUnstakeNftIx } from "./blockchain/instructions"
-import { TxHandler } from "./blockchain/handler"
-import { StakeOwner } from "./blockchain/idl/types/StakeOwner"
 import MainPageContainer from "./components/mainpagecontainer"
-import { claimStakeOwner } from "./blockchain/idl/instructions/claimStakeOwner"
 import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, TOKEN_PROGRAM_ID } from "@solana/spl-token"
-import { unstakeNft } from "./blockchain/idl/instructions/unstakeNft"
 import { getFakeNftImage } from "./components/nft"
 import SmallStakedNftsList, { StakedSmallNft } from "./smallstakednftslist"
 import SmallNftBlock from "./smallnftblock"
-import { NftSelection } from "./components/nftselection"
 import { fromStakeReceipt } from "./types/Nft"
-import EmptyRow from "./emptyrow"
 import { NftSelectorTabs } from "./components/nftstab"
+import { StakeOwner } from "./blockchain/idl/types/StakeOwner"
+import { createClaimIx, createClaimStakeOwnerIx, createStakeOwnerIx, findAssociatedTokenAddress } from "./blockchain/instructions"
 
 function HistoryActionNftLink(props: any) {
   return <Image cursor="pointer" src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="46px" />
@@ -113,8 +107,8 @@ function StakeButton() {
 
   const { setModalContent, setModalVisible, wallet, setWalletAdapter, solanaConnection, setNftsTab } = useAppContext();
 
-  const { setPendingRewards, pendingRewards } = useAppContext();
-  const { platform } = useAppContext();
+  const { setPendingRewards } = useAppContext();
+  const { platform, incomePerNftCalculator } = useAppContext();
 
   function stakeHandler() {
 
@@ -128,36 +122,6 @@ function StakeButton() {
       setModalVisible(true);
     }
   }
-
-  React.useEffect(() => {
-    /*setInterval(() => {
-      if (wallet != null) {
-        getStakedNftsCached(solanaConnection, wallet.publicKey).then(async (staked) => {
-
-          console.warn('got stacked nfts', staked)
-
-          const pinfo = await getPlatformInfo(false, solanaConnection, new PublicKey(config.stacking_config));
-
-          // calc income 
-          let income = 0;
-          const income_token_decimals = 1000000000;
-
-          let income_per_minute = pinfo.basicDailyIncome / (24 * 60);
-
-          const curTimestamp = (new Date()).getTime() / 1000;
-
-          for (var it of staked) {
-            const diff = (curTimestamp - it.lastClaim.toNumber()) / 60;
-            if (diff > 0) {
-              income += diff * income_per_minute;
-            }
-          }
-
-          setPendingRewards(income / income_token_decimals);
-        });
-      }
-    }, 15000)*/
-  })
 
   React.useEffect(() => {
 
@@ -190,37 +154,6 @@ function StakeButton() {
         toast.warn('wallet installed or loadable')
         phantomWallet.connect()
       }
-    } else {
-      getStakedNftsCached(solanaConnection, wallet.publicKey).then(async (staked) => {
-
-        console.warn('got stacked nfts', staked)
-        console.log('platform info', platform)
-
-        const stakeOwnerAddress = await getStakeOwnerForWallet(wallet.publicKey);
-
-        const stake_owner = await StakeOwner.fetch(solanaConnection, stakeOwnerAddress);
-
-        // calc income 
-        let income = 0;
-
-        let income_per_minute = platform.basicDailyIncome / (24 * 60);
-
-        const curTimestamp = (new Date()).getTime() / 1000;
-
-        for (var it of staked) {
-          const diff = (curTimestamp - it.lastClaim.toNumber()) / 60;
-          if (diff > 0) {
-            income += diff * income_per_minute;
-          }
-        }
-
-        let incomeNewValue = income / config.reward_token_decimals;
-        if (stake_owner != null) {
-          incomeNewValue += stake_owner.balance.toNumber() / config.reward_token_decimals;
-        }
-
-        setPendingRewards(incomeNewValue);
-      });
     }
   }, [wallet]);
 

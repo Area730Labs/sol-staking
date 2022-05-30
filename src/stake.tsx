@@ -2,8 +2,6 @@ import { Connection, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { toast } from "react-toastify";
 import { useAppContext } from "./state/app"
 import Nft from "./types/Nft";
-import { createClaimIx, createStakeNftIx, createStakeOwnerIx, createUnstakeNftIx } from "./blockchain/instructions"
-import { TxHandler } from "./blockchain/handler"
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { Box, GridItem } from "@chakra-ui/layout";
 import { NftSelection } from "./components/nftselection";
@@ -13,8 +11,6 @@ import appTheme from "./state/theme"
 import { Button } from "./components/button";
 
 import config from "./config.json"
-import { getStakeOwnerForWallet } from "./state/user";
-import { StakeOwner } from "./blockchain/idl/types/StakeOwner";
 import NftSelectorGrid from "./components/nftselectorgrid";
 import React from "react";
 

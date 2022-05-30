@@ -1,17 +1,19 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import * as web3 from '@solana/web3.js'
 import { WalletAdapter } from "@solana/wallet-adapter-base";
-import Nft from "../types/Nft";
+import Nft, { fromStakeReceipt } from "../types/Nft";
 import { toast } from 'react-toastify';
 
 import config from '../config.json'
-import { getNftsInWalletCached, getStakedNftsCached } from "./user";
+import { getNftsInWalletCached, getStakedNftsCached, getStakeOwnerForWallet } from "./user";
 import { StakingReceipt } from "../blockchain/idl/accounts/StakingReceipt";
 import Platform, { matchRule } from "../types/paltform";
 import { getPlatformInfo, getPlatformInfoFromCache } from "./platform";
 import { getOrConstruct } from "../types/cacheitem";
 import nfts from "../data/nfts";
 import { TxHandler } from "../blockchain/handler";
+import { MAX_BP } from "../data/uitls";
+import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 
 export type RankMultiplyerMap = { [key: string]: number }
 export type NftsSelectorTab = "stake" | "unstake"
@@ -51,7 +53,7 @@ export interface AppContextType {
     nftMultMap: RankMultiplyerMap | null
 
     sendTx: { (ixs: web3.TransactionInstruction[], signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
-
+    incomePerNftCalculator: { (item: Nft): number }
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
@@ -83,6 +85,70 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         setCounter(nftsTabClickCounter + 1);
     }
 
+    function calcBasicIncomePerNft(): number {
+        if (platform.emissionType == 3) { // fixed per nft, all time
+            return platform.basicDailyIncome;
+        } else {
+            toast.error(`Unable to calc income per nft for emission type of platform (${platform.emissionType})`)
+            return 0;
+        }
+    }
+
+    function incomePerNftCalculator(item: Nft): number {
+        const basicIncomePerNft = calcBasicIncomePerNft();
+        if (nftMultMap == null) {
+            return basicIncomePerNft;
+        } else {
+            const multBb = nftMultMap[item.address.toBase58()];
+            return basicIncomePerNft * multBb / MAX_BP;
+        }
+    }
+
+
+    useEffect(() => {
+
+        if (platform != null && connectedWallet != null) {
+
+            // calc inco me 
+            let income = 0;
+
+            const curTimestamp = (new Date()).getTime() / 1000;
+
+            for (var it of stackedNfts) {
+
+                let income_per_minute = incomePerNftCalculator(fromStakeReceipt(it)) / (24 * 60);
+
+                const diff = (curTimestamp - it.lastClaim.toNumber()) / 60;
+                if (diff > 0) {
+
+                    const incomePerStakedItem = diff * income_per_minute;
+
+                    console.log(' -- income per staked item', incomePerStakedItem, diff, income_per_minute)
+
+                    income += incomePerStakedItem;
+                }
+            }
+
+            let incomeNewValue = income / config.reward_token_decimals;
+            toast.info(`pending rewards: ${incomeNewValue}`)
+            setPendingRewards(incomeNewValue);
+
+            const savedIncomeValues = incomeNewValue;
+
+            getStakeOwnerForWallet(connectedWallet.publicKey).then(async (stakeOwnerAddress) => {
+
+                // connection expected to be always available 
+                return StakeOwner.fetch(web3Handler, stakeOwnerAddress);
+            }).then((stake_owner) => {
+                if (stake_owner != null) {
+                    const totalRewards = savedIncomeValues + (stake_owner.balance.toNumber() / config.reward_token_decimals);
+                    setPendingRewards(totalRewards);
+                }
+            });
+        }
+
+    }, [stackedNfts, platform, connectedWallet]);
+
     useEffect(() => {
 
         if (platform != null) {
@@ -108,7 +174,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                         result[it.address] = bp_value;
                     } else {
                         // 1
-                        result[it.address] = 10000;
+                        result[it.address] = MAX_BP;
                     }
                 }
 
@@ -148,12 +214,18 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     function sendTx(ixs: web3.TransactionInstruction[], signers?: []): Promise<web3.TransactionSignature> {
 
         const txhandler = new TxHandler(web3Handler, connectedWallet, []);
-        return txhandler.sendTransaction(ixs, signers).then((signature) => {
 
-            toast.info(`got tx: ${signature}`);
+        if (config.debug_simulate_tx) {
+            toast.warn("simulation of tx enabled. look into console for more info")
+            txhandler.simulate(ixs, signers);
+        } else {
+            return txhandler.sendTransaction(ixs, signers).then((signature) => {
 
-            return signature;
-        });
+                toast.info(`got tx: ${signature}`);
+
+                return signature;
+            });
+        }
     }
 
     const memoedValue = useMemo(() => {
@@ -190,7 +262,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             platform,
             nftMultMap,
 
-            sendTx
+            sendTx,
+            incomePerNftCalculator
         } as AppContextType;
 
         return curCtx

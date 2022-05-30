@@ -27,7 +27,7 @@ export async function getPlatformInfo(force: boolean, conn: Connection, platform
     return getOrConstruct<Platform>(force, cache_key_prefix, async () => {
         return StakingConfig.fetch(conn, platformKey).then(platformConfig => {
 
-            return {
+            const config = {
                 alias: platformConfig.alias.toBase58(),
 
                 emissionType: platformConfig.distributionType,
@@ -44,7 +44,9 @@ export async function getPlatformInfo(force: boolean, conn: Connection, platform
                 totalStaked: platformConfig.nftsStaked.toNumber(),
                 totalClaimed: platformConfig.totalRewardsClaimed.toNumber(),
 
-            } as Platform
+            } as Platform;
+
+            return config;
         });
     }, config.caching.platform, platformKey.toBase58())
 }

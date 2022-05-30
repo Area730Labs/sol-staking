@@ -6,7 +6,6 @@ import { CheckIcon } from "@chakra-ui/icons";
 import { Image } from "@chakra-ui/image";
 import { useAppContext } from "../state/app";
 import config from "../config.json";
-import { calcIncomePerNft } from "../data/uitls";
 
 export interface NftSelectionProps {
   item: Nft
@@ -27,10 +26,9 @@ export function NftSelection(props: NftSelectionProps | any) {
   useEffect(() => {
     if (ctx.nftMultMap != null) {
       setMult(ctx.nftMultMap[nftInfo.address.toBase58()] / 10000)
-      setDailyIncome(calcIncomePerNft(props.item, ctx))
+      setDailyIncome(ctx.incomePerNftCalculator(props.item)/config.reward_token_decimals)
     }
-
-  }, [ctx.nftMultMap])
+  }, [ctx.platform])
 
   function clickHandler() {
 
@@ -110,7 +108,7 @@ function MultiplicationWithSuggestion(props: { value: number, children: any }) {
 
   const [isHovering, setHovering] = useState(false);
 
-  if (props.value > 0) {
+  if (props.value > 1) {
     return <Box
       borderRadius="20px"
       background={!isHovering ? appTheme.stressColor : appTheme.stressColor2}

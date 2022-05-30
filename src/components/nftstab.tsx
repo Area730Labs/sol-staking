@@ -110,8 +110,7 @@ export function StakedNftsListTab() {
         return fromStakeReceipt(it);
     });
 
-
-    return <NftsTab emptyLabel="no NFT's to stake" heading={<>YOUR STAKED NFT'S. Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="black" backgroundColor={appTheme.stressColor2}>130  {config.reward_token_name}</Box> per day</>}>
+    return <NftsTab emptyLabel="no NFT's to unstake" heading={<>YOUR STAKED NFT'S. Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="black" backgroundColor={appTheme.stressColor2}>130  {config.reward_token_name}</Box> per day</>}>
         {items.length > 0 ? <NftsSelector items={items} actionHandler={unstakeSelectedItems} actionLabel="Unstake selected " /> : null}
     </NftsTab>
 }

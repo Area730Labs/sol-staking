@@ -158,7 +158,7 @@ export function createStackingPlatform(
 
     const [stakingConfig, sconfBump] = calcAddressWithSeed("staking", alias.publicKey);
 
-    console.log("config alias: ",alias.publicKey.toBase58())
+    console.log("config alias: ", alias.publicKey.toBase58())
 
 
     const [configAddress, configBump] = getProgramPDA("config");
@@ -168,10 +168,10 @@ export function createStackingPlatform(
         [Buffer.from("rewards", 'utf8'), alias.publicKey.toBuffer(), rewardsMint.toBuffer()], new PublicKey(config.program_id)
     );
 
-    console.log("rewards: ",rewardsAccount.toBase58())
+    console.log("rewards: ", rewardsAccount.toBase58())
     console.log("staking config", stakingConfig.toBase58());
     console.log("escrow", escrowAddress.toBase58());
-    console.log("platform config",configAddress.toBase58())
+    console.log("platform config", configAddress.toBase58())
 
     const now = new Date();
 
@@ -182,7 +182,7 @@ export function createStackingPlatform(
             escrow: escrowBump,
         } as InitializeStakingBumps,
         baseWeeklyEmissions: baseEmissions, // emission per nft per week
-        stackingType: 0,
+        stackingType: 3, // fixed per nft per day
         subscription: 1,
         start: new BN(now.getTime()),
         root: whitelist.getRootArray(),
@@ -191,43 +191,46 @@ export function createStackingPlatform(
             conds: [{
                 from: 0,
                 value: 60
-            },{
+            }, {
                 from: 2,
                 value: 50
-            },{
+            }, {
                 from: 3,
                 value: 40
-            },{
+            }, {
                 from: 4,
                 value: 30
-            },{
+            }, {
                 from: 5,
                 value: 20
-            },{
+            }, {
                 from: 6,
                 value: 10
-            },{
+            }, {
                 from: 7,
                 value: 0
             }] as Condition[]
         } as Rule,
         multiplierRule: {
-            steps: 5,
+            steps: 6,
             conds: [{
                 from: 1,
-                value: 500 
-            },{
+                value: 500
+            }, {
                 from: 4,
-                value: 230 
-            },{
+                value: 230
+            }, {
                 from: 31,
-                value: 210 
-            },{
+                value: 210
+            }, {
                 from: 101,
-                value: 180 
-            },{
+                value: 180
+            }, {
                 from: 501,
-                value: 150 
+                value: 150
+            }, {
+                from: 1000,
+                value: 100
             }] as Condition[]
         } as Rule
     } as AddStackingArgs
@@ -254,7 +257,7 @@ export function createStackingPlatform(
  * 
  * @param stackingReceipt item to collect rewards of  
  */
-function createClaimIx(mint: PublicKey, staker: PublicKey,stakeOwner: PublicKey): TransactionInstruction {
+function createClaimIx(mint: PublicKey, staker: PublicKey, stakeOwner: PublicKey): TransactionInstruction {
 
     const [stakingReceiptAddr, bump] = calcAddressWithSeed("receipt", mint);
 
