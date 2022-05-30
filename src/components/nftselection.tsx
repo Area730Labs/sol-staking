@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Nft from "../types/Nft";
 import appTheme from "../state/theme"
-import { getStakeMultiplyer } from "../data/uitls";
 import { Box, GridItem, Text } from "@chakra-ui/layout";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Image } from "@chakra-ui/image";
@@ -15,10 +14,18 @@ export interface NftSelectionProps {
 
 export function NftSelection(props: NftSelectionProps & any) {
 
-  const ctx = useAppContext();
-  const borderSize = props.borderSize ?? 4;
+  const { nftMultMap } = useAppContext();
   const [selected, setSelected] = useState<boolean>(false);
   const [mult, setMult] = useState(0);
+
+  const nftInfo = props.item;
+  const borderSize = props.borderSize ?? 4;
+
+  useEffect(() => {
+    if (nftMultMap != null) {
+      setMult(nftMultMap[nftInfo.address.toBase58()]/10000)
+    }
+  }, [nftMultMap])
 
   function clickHandler() {
 
@@ -43,14 +50,6 @@ export function NftSelection(props: NftSelectionProps & any) {
       return `${borderSize}px solid ${appTheme.selectedBorderColor}`
     }
   }, [selected]);
-
-  const nftInfo = props.item;
-
-  useEffect(() => {
-    getStakeMultiplyer(nftInfo,ctx).then((value) => {
-      setMult(value);
-    })
-  },[])
 
   return <GridItem
     cursor="pointer"

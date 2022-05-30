@@ -7,8 +7,12 @@ import { toast } from 'react-toastify';
 import config from '../config.json'
 import { getNftsInWalletCached, getStakedNftsCached } from "./user";
 import { StakingReceipt } from "../blockchain/idl/accounts/StakingReceipt";
+import Platform, { matchRule } from "../types/paltform";
+import { getPlatformInfo, getPlatformInfoFromCache } from "./platform";
+import { getOrConstruct } from "../types/cacheitem";
+import nfts from "../data/nfts";
 
-
+export type RankMultiplyerMap = { [key: string]: number }
 export type NftsSelectorTab = "stake" | "unstake"
 
 export interface AppContextType {
@@ -41,11 +45,17 @@ export interface AppContextType {
     setNftsTab: { (tabl: NftsSelectorTab): void }
 
     scrollRef: any
+
+    platform: Platform | null
+    nftMultMap: RankMultiplyerMap | null
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
 
 export function AppProvider({ children }: { children: ReactNode; }) {
+
+    const [platform, setPlatform] = useState<Platform | null>(getPlatformInfoFromCache(new web3.PublicKey(config.stacking_config)));
+    const [nftMultMap, setMultMap] = useState<RankMultiplyerMap | null>(null);
 
     const [userNfts, updateNfts] = useState<Nft[]>([]);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -69,11 +79,49 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         setCounter(nftsTabClickCounter + 1);
     }
 
+    useEffect(() => {
+
+        if (platform != null) {
+
+            // @todo add changes counter to staking config account
+            // and use it for caching 
+            getOrConstruct<RankMultiplyerMap>(config.disable_cache, "rank_multiplyer", async () => {
+
+                let result: RankMultiplyerMap = {};
+
+                const rule = platform.multiplyRule;
+
+                for (var it of nfts) {
+                    const matched = matchRule(rule, it.props.rank)
+                    if (matched != null) {
+
+                        let bp_value = matched.value;
+                        if (!matched.valueIsBp) {
+                            bp_value = matched.value * 100;
+                            // check max BP value cap
+                        }
+
+                        result[it.address] = bp_value;
+                    }
+                }
+
+                return result;
+            }, 86400 * 30).then((map) => {
+                setMultMap(map);
+            });
+
+        }
+    }, [platform]);
+
     // initialization
     useEffect(() => {
         if (connectedWallet != null && connectedWallet.connected) {
-
-            // console.log('wallet is connected', connectedWallet)
+            
+            getPlatformInfo(config.disable_cache, web3Handler, new web3.PublicKey(config.stacking_config)).then((platform) => {
+                setPlatform(platform);
+            }).catch((e) => {
+                toast.error('error while fetching staking config: '+e.message)
+            })
 
             // probably just use useMemo
             getStakedNftsCached(web3Handler, connectedWallet.publicKey).then((stakedNfts) => {
@@ -120,11 +168,19 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
             setNftsTab: changeNftsTab,
             nftsTabCounter: nftsTabClickCounter,
+
+            platform,
+            nftMultMap
         } as AppContextType;
 
         return curCtx
 
-    }, [pendingRewards, modalVisible, web3Handler, userNfts, modalContent, connectedWallet, stackedNfts, nftsTab, nftsTabClickCounter]);
+    }, [, modalVisible, modalContent,
+        pendingRewards, userNfts, stackedNfts,
+        nftsTab, nftsTabClickCounter,
+        web3Handler, connectedWallet,
+        nftMultMap
+    ]);
 
     return (
         <AppContext.Provider value={memoedValue}>

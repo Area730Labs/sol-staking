@@ -114,6 +114,7 @@ function StakeButton() {
   const { setModalContent, setModalVisible, wallet, setWalletAdapter, solanaConnection, setNftsTab } = useAppContext();
 
   const { setPendingRewards, pendingRewards } = useAppContext();
+  const {platform} = useAppContext();
 
   function stakeHandler() {
 
@@ -193,10 +194,7 @@ function StakeButton() {
       getStakedNftsCached(solanaConnection, wallet.publicKey).then(async (staked) => {
 
         console.warn('got stacked nfts', staked)
-
-        const pinfo = await getPlatformInfo(false, solanaConnection, new PublicKey(config.stacking_config));
-
-        console.log('platform info', pinfo)
+        console.log('platform info', platform)
 
         const stakeOwnerAddress = await getStakeOwnerForWallet(wallet.publicKey);
 
@@ -205,7 +203,7 @@ function StakeButton() {
         // calc income 
         let income = 0;
 
-        let income_per_minute = pinfo.basicDailyIncome / (24 * 60);
+        let income_per_minute = platform.basicDailyIncome / (24 * 60);
 
         const curTimestamp = (new Date()).getTime() / 1000;
 
