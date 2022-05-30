@@ -11,6 +11,7 @@ import Platform, { matchRule } from "../types/paltform";
 import { getPlatformInfo, getPlatformInfoFromCache } from "./platform";
 import { getOrConstruct } from "../types/cacheitem";
 import nfts from "../data/nfts";
+import { TxHandler } from "../blockchain/handler";
 
 export type RankMultiplyerMap = { [key: string]: number }
 export type NftsSelectorTab = "stake" | "unstake"
@@ -48,6 +49,9 @@ export interface AppContextType {
 
     platform: Platform | null
     nftMultMap: RankMultiplyerMap | null
+
+    sendTx: { (ixs: web3.TransactionInstruction[], signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
+
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
@@ -119,11 +123,11 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     // initialization
     useEffect(() => {
         if (connectedWallet != null && connectedWallet.connected) {
-            
+
             getPlatformInfo(config.disable_cache, web3Handler, new web3.PublicKey(config.stacking_config)).then((platform) => {
                 setPlatform(platform);
             }).catch((e) => {
-                toast.error('error while fetching staking config: '+e.message)
+                toast.error('error while fetching staking config: ' + e.message)
             })
 
             // probably just use useMemo
@@ -140,6 +144,17 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             updateNfts([]);
         }
     }, [connectedWallet]);
+
+    function sendTx(ixs: web3.TransactionInstruction[], signers?: []): Promise<web3.TransactionSignature> {
+
+        const txhandler = new TxHandler(web3Handler, connectedWallet, []);
+        return txhandler.sendTransaction(ixs, signers).then((signature) => {
+
+            toast.info(`got tx: ${signature}`);
+
+            return signature;
+        });
+    }
 
     const memoedValue = useMemo(() => {
 
@@ -173,7 +188,9 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             nftsTabCounter: nftsTabClickCounter,
 
             platform,
-            nftMultMap
+            nftMultMap,
+
+            sendTx
         } as AppContextType;
 
         return curCtx

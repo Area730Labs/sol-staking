@@ -36,7 +36,7 @@ export function NftsTab(props: NftsTabProps) {
 
 export function StakeNftsListTab() {
 
-    const { nftsInWallet } = useAppContext();
+    const { nftsInWallet, sendTx } = useAppContext();
 
     function stakeSelectedItems(
         wallet: WalletAdapter,
@@ -50,8 +50,7 @@ export function StakeNftsListTab() {
             instructions.push(createStakeNftIx(new PublicKey(it), wallet as WalletAdapter));
         }
 
-        const txhandler = new TxHandler(solanaConnection, wallet, []);
-        txhandler.sendTransaction(instructions).then((sig) => {
+        sendTx(instructions).then((sig) => {
 
             toast.warn("need to clear cache for staked items + nfts in wallet")
 
@@ -63,14 +62,14 @@ export function StakeNftsListTab() {
 
 
     return <NftsTab emptyLabel="no NFT's to stake" heading={<>NFT'S IN YOUR WALLET</>}>
-        {nftsInWallet.length > 0?<NftsSelector items={nftsInWallet} actionHandler={stakeSelectedItems} actionLabel="Stake selected " />:null}
+        {nftsInWallet.length > 0 ? <NftsSelector items={nftsInWallet} actionHandler={stakeSelectedItems} actionLabel="Stake selected " /> : null}
     </NftsTab>
 }
 
 
 export function StakedNftsListTab() {
 
-    const { stackedNfts } = useAppContext();
+    const { stackedNfts, sendTx } = useAppContext();
 
     async function unstakeSelectedItems(
         wallet: WalletAdapter,
@@ -96,8 +95,7 @@ export function StakedNftsListTab() {
                 instructions.push(createUnstakeNftIx(mint, wallet.publicKey));
             }
 
-            const txhandler = new TxHandler(solanaConnection, wallet, []);
-            txhandler.sendTransaction(instructions).then((sig) => {
+            sendTx(instructions).then((sig) => {
 
                 toast.warn("need to clear cache for staked items + nfts in wallet")
 
@@ -114,7 +112,7 @@ export function StakedNftsListTab() {
 
 
     return <NftsTab emptyLabel="no NFT's to stake" heading={<>YOUR STAKED NFT'S. Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="black" backgroundColor={appTheme.stressColor2}>130  {config.reward_token_name}</Box> per day</>}>
-        {items.length > 0?<NftsSelector items={items} actionHandler={unstakeSelectedItems} actionLabel="Unstake selected " />:null}
+        {items.length > 0 ? <NftsSelector items={items} actionHandler={unstakeSelectedItems} actionLabel="Unstake selected " /> : null}
     </NftsTab>
 }
 

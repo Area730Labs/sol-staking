@@ -27,9 +27,8 @@ export function NftSelection(props: NftSelectionProps | any) {
   useEffect(() => {
     if (ctx.nftMultMap != null) {
       setMult(ctx.nftMultMap[nftInfo.address.toBase58()] / 10000)
+      setDailyIncome(calcIncomePerNft(props.item, ctx))
     }
-
-    setDailyIncome(calcIncomePerNft(props.item,ctx))
 
   }, [ctx.nftMultMap])
 

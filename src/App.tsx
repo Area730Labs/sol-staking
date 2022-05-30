@@ -114,7 +114,7 @@ function StakeButton() {
   const { setModalContent, setModalVisible, wallet, setWalletAdapter, solanaConnection, setNftsTab } = useAppContext();
 
   const { setPendingRewards, pendingRewards } = useAppContext();
-  const {platform} = useAppContext();
+  const { platform } = useAppContext();
 
   function stakeHandler() {
 
@@ -229,7 +229,7 @@ function StakeButton() {
 
 function ClaimPendingRewardsButton() {
 
-  const { stackedNfts, wallet, solanaConnection } = useAppContext();
+  const { stackedNfts, wallet, solanaConnection, sendTx } = useAppContext();
 
   async function claimPendingRewardsHandler() {
 
@@ -270,13 +270,10 @@ function ClaimPendingRewardsButton() {
     }).then(() => {
       ixs.push(createClaimStakeOwnerIx(wallet.publicKey, stakeOwnerAddress, rewardsTokenMint));
 
-      const txhandler = new TxHandler(solanaConnection, wallet, []);
-
-      txhandler.sendTransaction(ixs).then((signature) => {
-        toast.info(`got transaction: ${signature}`)
-      }).catch((e) => {
+      sendTx(ixs).catch((e) => {
         toast.error(`unable to send unstake instruction: ${e.message}`)
       });
+
     });
   }
 

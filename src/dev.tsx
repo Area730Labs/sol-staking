@@ -11,10 +11,11 @@ import { createPlatformConfig, createStackingPlatform, getMerkleTree } from "./b
 import { Button } from "./components/button";
 import { useAppContext } from "./state/app";
 import config from "./config.json"
+import { web3 } from "@project-serum/anchor";
 
 export default function CreateMintButton() {
 
-    const { solanaConnection, wallet } = useAppContext();
+    const { solanaConnection, wallet, sendTx } = useAppContext();
 
     return <Button typ="black" onClick={async () => {
 
@@ -40,21 +41,19 @@ export default function CreateMintButton() {
 
         ixs.push(createMintIx);
 
-        const txhandler = new TxHandler(solanaConnection, wallet, []);
-
-        txhandler.sendTransaction(ixs, [{ publicKey: mint.publicKey, secretKey: mint.secretKey }]).then((signature) => {
-            console.log(`got transaction: ${signature}`)
-            toast.info(`created mint ${mint.publicKey}`)
-        }).catch((e) => {
-            toast.error(`unable to send create mint instruction: ${e.message}`)
-        });
+        sendTx(ixs, [
+            {
+                publicKey: mint.publicKey,
+                secretKey: mint.secretKey
+            }
+        ]);
 
     }}>Create token</Button>
 }
 
 export function DevButtons() {
 
-    const { wallet, solanaConnection } = useAppContext();
+    const { wallet, solanaConnection,sendTx } = useAppContext();
 
     function platformCreationButton() {
         toast.info("Platform creation button is pressed")
@@ -66,9 +65,7 @@ export function DevButtons() {
 
         const ix = createStackingPlatform(mint, owner, new BN(100000000000), whitelist); // 1 coin per day per nft base
 
-        const txhandler = new TxHandler(solanaConnection, wallet, []);
-
-        txhandler.sendTransaction([ix]).then((signature) => {
+        sendTx([ix]).then((signature) => {
             // console.log(`got transaction: ${signature}`)
             toast.info('platform created, look into logs for addresses !')
         }).catch((e) => {
@@ -97,9 +94,7 @@ export function DevButtons() {
 
         ixs.push(mintIx);
 
-        const txhandler = new TxHandler(solanaConnection, wallet, []);
-
-        txhandler.sendTransaction(ixs).then((signature) => {
+        sendTx(ixs).then((signature) => {
             // console.log(`got transaction: ${signature}`)
             toast.info('mint to treasury finished !')
         }).catch((e) => {
@@ -118,9 +113,7 @@ export function DevButtons() {
 
                 console.log('platform config ix ', ix)
 
-                const txhandler = new TxHandler(solanaConnection, wallet, []);
-
-                txhandler.sendTransaction([ix]).then((signature) => {
+                sendTx([ix]).then((signature) => {
                     // console.log(`got transaction: ${signature}`)
                     toast.info('platform config created !')
                 }).catch((e) => {

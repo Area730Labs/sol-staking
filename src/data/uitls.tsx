@@ -15,6 +15,11 @@ export function calcBasicIncomePerNft(ctx: AppContextType): number {
 
 export function calcIncomePerNft(item: Nft, ctx: AppContextType): number {
     const basicIncomePerNft = calcBasicIncomePerNft(ctx);
-    const multBb = ctx.nftMultMap[item.address.toBase58()];
-    return basicIncomePerNft * multBb / MAX_BP;
+    if (ctx.nftMultMap != null) {
+        return basicIncomePerNft;
+    } else {
+        const multBb = ctx.nftMultMap[item.address.toBase58()];
+        return basicIncomePerNft * multBb / MAX_BP;
+    }
+
 }
