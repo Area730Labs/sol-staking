@@ -34,67 +34,6 @@ export interface NftsSelectorProps {
     }
 }
 
-export function stakeSelectedItems(
-    wallet: WalletAdapter,
-    solanaConnection: Connection,
-    selectedItems: { [key: string]: boolean }
-) {
-
-    let instructions = [] as TransactionInstruction[];
-
-    for (var it in selectedItems) {
-        instructions.push(createStakeNftIx(new PublicKey(it), wallet as WalletAdapter));
-    }
-
-    const txhandler = new TxHandler(solanaConnection, wallet, []);
-    txhandler.sendTransaction(instructions).then((sig) => {
-
-        toast.warn("need to clear cache for staked items + nfts in wallet")
-
-        toast.info(`tx: ${sig}`)
-    }).catch((e) => {
-        toast.error(`Unable to stake: ${e.message}`)
-    });
-}
-
-export async function unstakeSelectedItems(
-    wallet: WalletAdapter,
-    solanaConnection: Connection,
-    selectedItems: { [key: string]: boolean }
-) {
-
-    let instructions = [] as TransactionInstruction[];
-
-    const stakeOwnerAddress = await getStakeOwnerForWallet(wallet.publicKey);
-
-    StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeOwnerInfo: StakeOwner) => {
-
-        if (stakeOwnerInfo == null) {
-            instructions.push(createStakeOwnerIx(wallet.publicKey, stakeOwnerAddress));
-        }
-
-
-        for (var it in selectedItems) {
-
-            const mint = new PublicKey(it);
-
-            instructions.push(createClaimIx(mint, wallet.publicKey, stakeOwnerAddress))
-            instructions.push(createUnstakeNftIx(mint, wallet.publicKey));
-        }
-
-        const txhandler = new TxHandler(solanaConnection, wallet, []);
-        txhandler.sendTransaction(instructions).then((sig) => {
-
-            toast.warn("need to clear cache for staked items + nfts in wallet")
-
-            toast.info(`tx: ${sig}`)
-        }).catch((e) => {
-            toast.error(`Unable to stake: ${e.message}`)
-        });
-    });
-
-}
-
 export default function NftsSelector(props: NftsSelectorProps) {
 
     const { wallet, solanaConnection } = useAppContext();

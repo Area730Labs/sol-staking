@@ -14,14 +14,14 @@ interface ModalStyles {
 }
 
 export interface ModalProps {
-    visible : boolean
+    show : boolean
     setVisible : any
 }
 
 
 export default function Modal(props: ModalStyles & any ) {
 
-    const visible = props.visible 
+    const visible = props.show 
     const setVisible = props.setVisible
 
     const [actualVisible, setAvisible] = useState(false);

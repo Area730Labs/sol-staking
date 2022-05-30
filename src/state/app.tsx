@@ -1,14 +1,15 @@
-import { SystemStyleObject, CSSObject } from "@chakra-ui/styled-system";
-import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import * as web3 from '@solana/web3.js'
-import { WalletAdapter, WalletReadyState } from "@solana/wallet-adapter-base";
+import { WalletAdapter } from "@solana/wallet-adapter-base";
 import Nft from "../types/Nft";
 import { toast } from 'react-toastify';
 
 import config from '../config.json'
 import { getNftsInWalletCached, getStakedNftsCached } from "./user";
 import { StakingReceipt } from "../blockchain/idl/accounts/StakingReceipt";
-import { TxHandler } from "../blockchain/handler";
+
+
+export type NftsSelectorTab = "stake" | "unstake"
 
 export interface AppContextType {
 
@@ -35,8 +36,11 @@ export interface AppContextType {
     stackedNfts: StakingReceipt[]
     updateStakedNfts: { (items: StakingReceipt[]): void }
 
-    nftsTab: "stake" | "unstake"
-    setNftsTab: { (tabl: string): void }
+    nftsTab: NftsSelectorTab
+    nftsTabCounter: number
+    setNftsTab: { (tabl: NftsSelectorTab): void }
+
+    scrollRef: any
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
@@ -53,11 +57,17 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     const [pendingRewards, setPendingRewards] = useState<number>(0);
     const [connectedWallet, setWallet] = useState<WalletAdapter | null>(null);
 
-    const [nftsTab, setNftsTab] = useState("stake");
+    const [nftsTabClickCounter, setCounter] = useState(0);
+    const [nftsTab, setNftsTab] = useState<NftsSelectorTab>("stake");
 
     const web3Handler = useMemo(() => {
         return new web3.Connection(solanaNode, 'confirmed');
     }, [solanaNode]);
+
+    function changeNftsTab(openedTab: NftsSelectorTab) {
+        setNftsTab(openedTab);
+        setCounter(nftsTabClickCounter + 1);
+    }
 
     // initialization
     useEffect(() => {
@@ -72,7 +82,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
             getNftsInWalletCached(connectedWallet.publicKey as web3.PublicKey, web3Handler).then(items => {
                 updateNfts(items);
-                toast.error(`Got ${items.length} nfts`)
             })
 
         } else {
@@ -108,12 +117,14 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             setWalletAdapter: setWallet,
 
             nftsTab,
-            setNftsTab,
+
+            setNftsTab: changeNftsTab,
+            nftsTabCounter: nftsTabClickCounter,
         } as AppContextType;
 
         return curCtx
 
-    }, [pendingRewards, modalVisible, web3Handler, userNfts, modalContent, connectedWallet, stackedNfts, nftsTab]);
+    }, [pendingRewards, modalVisible, web3Handler, userNfts, modalContent, connectedWallet, stackedNfts, nftsTab, nftsTabClickCounter]);
 
     return (
         <AppContext.Provider value={memoedValue}>
