@@ -7,6 +7,7 @@ import { PROGRAM_ID } from "../programId"
 export interface StakeNftArgs {
   bumps: StakeNftBumpsFields
   proof: Array<Array<number>>
+  rank: number
 }
 
 export interface StakeNftAccounts {
@@ -19,7 +20,6 @@ export interface StakeNftAccounts {
   stakerNftAccount: PublicKey
   escrowNftAccount: PublicKey
   tokenProgram: PublicKey
-  // clock: PublicKey
   rent: PublicKey
   systemProgram: PublicKey
 }
@@ -27,6 +27,7 @@ export interface StakeNftAccounts {
 export const layout = borsh.struct([
   StakeNftBumps.layout("bumps"),
   borsh.vec(borsh.array(borsh.u8(), 32), "proof"),
+  borsh.u16("rank"),
 ])
 
 export function stakeNft(args: StakeNftArgs, accounts: StakeNftAccounts) {
@@ -50,6 +51,7 @@ export function stakeNft(args: StakeNftArgs, accounts: StakeNftAccounts) {
     {
       bumps: StakeNftBumps.toEncodable(args.bumps),
       proof: args.proof,
+      rank: args.rank,
     },
     buffer
   )

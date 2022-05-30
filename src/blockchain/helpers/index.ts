@@ -1,5 +1,5 @@
-import assert from "assert";
-import { web3, Provider, BN } from "@project-serum/anchor";
+import { web3 } from "@project-serum/anchor";
+import BN from "bn.js"
 
 import {
   TOKEN_PROGRAM_ID,
@@ -22,21 +22,6 @@ export const findAssociatedAddress = async (
   );
 };
 
-export const assertFail = async (pendingTx: Promise<any>, error?: string) => {
-  const log = console.log;
-  console.log = () => {};
-  let success = true;
-  try {
-    await pendingTx;
-  } catch (err) {
-    success = false;
-    // log(err);
-  } finally {
-    console.log = log;
-  }
-  if (success) throw new Error("Should have failed");
-};
-
 export const buildLeaves = (
   data: Nft[]
 ) => {
@@ -46,6 +31,7 @@ export const buildLeaves = (
     leaves.push(
       Buffer.from([
         ...item.address.toBuffer(),
+        ...new BN(item.props.rank).toArray("le", 2),
       ])
     );
   }

@@ -7,17 +7,16 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { TxHandler } from "./blockchain/handler";
 import { PlatformConfig } from "./blockchain/idl/accounts/PlatformConfig";
-import { createPlatformConfig, createStackingPlatform, getMerkleTree } from "./blockchain/instructions";
+import { createPlatformConfig, createStackingPlatform, getMerkleTree, updateStakingPlatform } from "./blockchain/instructions";
 import { Button } from "./components/button";
 import { useAppContext } from "./state/app";
 import config from "./config.json"
-import { web3 } from "@project-serum/anchor";
 
 export default function CreateMintButton() {
 
     const { solanaConnection, wallet, sendTx } = useAppContext();
 
-    return <Button typ="black" onClick={async () => {
+    return <Button typ="black" size="sm" onClick={async () => {
 
 
         const mint = new Keypair();
@@ -53,7 +52,24 @@ export default function CreateMintButton() {
 
 export function DevButtons() {
 
-    const { wallet, solanaConnection,sendTx } = useAppContext();
+    const { wallet, solanaConnection, sendTx } = useAppContext();
+
+    function updatePlatformButtonHandler() {
+        toast.info("Platform update button is pressed")
+
+        const owner = wallet.publicKey;
+        const whitelist = getMerkleTree();
+        const configAddr = new PublicKey(config.stacking_config);
+        const dailyPerNft = parseInt(prompt("enter number of tokens per nft"));
+        
+        const ix = updateStakingPlatform(owner,configAddr, new BN(dailyPerNft*config.reward_token_decimals), whitelist);
+
+        sendTx([ix]).then((signature) => {
+            toast.info('platform updated')
+        }).catch((e) => {
+            toast.error(`unable to send update platform config instruction: ${e.message}`)
+        });
+    }
 
     function platformCreationButton() {
         toast.info("Platform creation button is pressed")
@@ -107,7 +123,7 @@ export function DevButtons() {
 
     if (wallet != null) {
         return <Box py="8">
-            <Button onClick={() => {
+            <Button size="sm" onClick={() => {
 
                 const ix = createPlatformConfig(wallet);
 
@@ -123,9 +139,11 @@ export function DevButtons() {
 
 
             }}>Global Init</Button>
-            <Button onClick={platformCreationButton}>Create platform</Button>
+            <Button size="sm" onClick={platformCreationButton}>Create platform</Button>
             <CreateMintButton />
-            <Button onClick={mintToTreasury}>Mint Tokens</Button>
+            <Button size="sm" onClick={mintToTreasury}>Mint Tokens</Button>
+            <Button typ="black" size="sm" onClick={updatePlatformButtonHandler}>Update</Button>
+
         </Box>
     } else {
         return null;

@@ -21,7 +21,7 @@
           "wallet_nfts": 60
      },
      "disable_cache": true,
-     "debug_simulate_tx" : false,
+     "debug_simulate_tx" :true,
      "max_items_per_stake": 4,
      "max_nfts_per_row": 4,
      "small_staked_nfts_list_size": 3

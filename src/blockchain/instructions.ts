@@ -18,14 +18,13 @@ import BN from "bn.js"
 import { toast } from "react-toastify";
 import { addPlatformConfig, AddPlatformConfigAccounts, AddPlatformConfigArgs } from "./idl/instructions/addPlatformConfig";
 import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { StakingReceipt } from "./idl/accounts/StakingReceipt";
 import { unstakeNft, UnstakeNftAccounts } from "./idl/instructions/unstakeNft";
-import { StakeOwner } from "./idl/types/StakeOwner";
 import { createStakeOwner, CreateStakeOwnerAccounts } from "./idl/instructions/createStakeOwner";
 import { claimLight, ClaimLightAccounts } from "./idl/instructions/claimLight";
 import { claimStakeOwner, ClaimStakeOwnerAccounts } from "./idl/instructions/claimStakeOwner";
 import { Rule } from "./idl/types/Rule";
 import { Condition } from "./idl/types/Condition";
+import { updateStaking, UpdateStakingAccounts, UpdateStakingArgs } from "./idl/instructions/updateStaking";
 
 
 export function getMerkleTree(): MerkleTree {
@@ -65,6 +64,8 @@ export function createStakeNftIx(mint: PublicKey, owner: WalletAdapter): Transac
         (e) => e.address === mint.toBase58()
     );
 
+    const nftToStake = nftsRaw[indexStaked];
+
     if (indexStaked == -1) {
         toast.warn(`This is not whitelisted nft : ${mint.toBase58()}`)
         throw new Error("not whitelisted nft");
@@ -83,6 +84,7 @@ export function createStakeNftIx(mint: PublicKey, owner: WalletAdapter): Transac
             deposit: depositBump,
         } as StakeNftBumps,
         proof: proof,
+        rank: nftToStake.props.rank,
     } as StakeNftArgs, {
         staker: owner.publicKey,
         platformConfig: new PublicKey(config.platform_config),
@@ -145,6 +147,81 @@ export function createPlatformConfig(wallet: WalletAdapter): TransactionInstruct
     } as AddPlatformConfigAccounts)
 
     return platformConfigIx;
+}
+
+export function updateStakingPlatform(
+    owner: PublicKey,
+    stakingConfig: PublicKey,
+    baseEmissions: BN,
+    whitelist: MerkleTree
+): TransactionInstruction {
+
+    const [configAddress, configBump] = getProgramPDA("config");
+
+    const now = new Date();
+
+    const args = {
+        baseWeeklyEmissions: baseEmissions, // emission per nft per week
+        // stackingType: 3, // fixed per nft per day
+        // subscription: 1,
+        start: new BN(now.getTime()),
+        root: whitelist.getRootArray(),
+        taxRule: {
+            steps: 7,
+            conds: [{
+                from: 0,
+                value: 60
+            }, {
+                from: 2,
+                value: 50
+            }, {
+                from: 3,
+                value: 40
+            }, {
+                from: 4,
+                value: 30
+            }, {
+                from: 5,
+                value: 20
+            }, {
+                from: 6,
+                value: 10
+            }, {
+                from: 7,
+                value: 0
+            }] as Condition[]
+        } as Rule,
+        multiplierRule: {
+            steps: 6,
+            conds: [{
+                from: 1,
+                value: 500
+            }, {
+                from: 4,
+                value: 230
+            }, {
+                from: 31,
+                value: 210
+            }, {
+                from: 101,
+                value: 180
+            }, {
+                from: 501,
+                value: 150
+            }, {
+                from: 1000,
+                value: 100
+            }] as Condition[]
+        } as Rule
+    } as UpdateStakingArgs
+
+    const accounts = {
+        owner: owner,
+        platformConfig: configAddress,
+        stakingConfig: stakingConfig,
+    } as UpdateStakingAccounts;
+
+    return updateStaking(args, accounts);
 }
 
 export function createStackingPlatform(
