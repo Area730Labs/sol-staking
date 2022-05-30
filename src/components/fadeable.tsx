@@ -8,7 +8,7 @@ export interface FadeableStyles {
 }
 
 export interface FadeableProps {
-    visible: boolean
+    show: boolean
     setVisible?: { (arg0: boolean): void }
     fadesize?: number
     animation?: number
@@ -16,7 +16,7 @@ export interface FadeableProps {
 
 export default function Fadeable(props: FadeableProps & any) {
 
-    const visible = props.visible
+    const visible = props.show
     const setVisible = props.setVisible
 
     const [actualVisible, setAvisible] = useState(false);

@@ -119,7 +119,7 @@ export default function NftsSelector(props: NftsSelectorProps) {
             })}
         </NftSelectorGrid>
         <Fadeable
-            visible={selectedItemsPopupVisible}
+            show={selectedItemsPopupVisible}
             fadesize={7}
 
             position="fixed" bottom="20px"

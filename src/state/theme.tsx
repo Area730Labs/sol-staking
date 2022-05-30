@@ -10,6 +10,8 @@ const styles = {
     },
     borderRadius: "6px",
     transition: "all 0.2s ease",
+    transitionXl: "all 0.5s ease",
+    transition2xl: "all 0.8s ease",
     selectedBorderColor : "black",
     stressColor: "rgb(237,41,57)",
     stressColor2: "#FFCC00"

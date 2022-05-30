@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Nft from "../types/Nft";
 import appTheme from "../state/theme"
 import { Box, GridItem, Text } from "@chakra-ui/layout";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Image } from "@chakra-ui/image";
 import { useAppContext } from "../state/app";
+import config from "../config.json";
+import { calcIncomePerNft } from "../data/uitls";
 
 export interface NftSelectionProps {
   item: Nft
@@ -12,20 +14,24 @@ export interface NftSelectionProps {
   onSelect?: { (pubkey: Nft, state: boolean): boolean }
 }
 
-export function NftSelection(props: NftSelectionProps & any) {
+export function NftSelection(props: NftSelectionProps | any) {
 
-  const { nftMultMap } = useAppContext();
+  const ctx = useAppContext();
   const [selected, setSelected] = useState<boolean>(false);
   const [mult, setMult] = useState(0);
+  const [dailyIncome, setDailyIncome] = useState(0);
 
   const nftInfo = props.item;
   const borderSize = props.borderSize ?? 4;
 
   useEffect(() => {
-    if (nftMultMap != null) {
-      setMult(nftMultMap[nftInfo.address.toBase58()]/10000)
+    if (ctx.nftMultMap != null) {
+      setMult(ctx.nftMultMap[nftInfo.address.toBase58()] / 10000)
     }
-  }, [nftMultMap])
+
+    setDailyIncome(calcIncomePerNft(props.item,ctx))
+
+  }, [ctx.nftMultMap])
 
   function clickHandler() {
 
@@ -94,19 +100,34 @@ export function NftSelection(props: NftSelectionProps & any) {
       </Box>
       <Text width="100%" marginTop="2" color="black" marginBottom="2">{nftInfo.name}</Text>
     </Box>
+    <MultiplicationWithSuggestion value={mult}>
+      ~{dailyIncome} {config.reward_token_name}
+    </MultiplicationWithSuggestion>
+    {props.children}
+  </GridItem>
+}
 
-    {mult > 1 ? <Box
+function MultiplicationWithSuggestion(props: { value: number, children: any }) {
+
+  const [isHovering, setHovering] = useState(false);
+
+  if (props.value > 0) {
+    return <Box
       borderRadius="20px"
-      background={appTheme.stressColor}
+      background={!isHovering ? appTheme.stressColor : appTheme.stressColor2}
       boxShadow="dark-lg"
-      color="white"
+      color={!isHovering ? "white" : "black"}
       fontWeight="bold"
       p="2"
       position="absolute"
       right="-10px"
       top="-15px"
-    >x{mult}</Box> : null}
-
-    {props.children}
-  </GridItem>
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+    >
+      {!isHovering ? "x" + props.value : props.children}
+    </Box>
+  } else {
+    return null;
+  }
 }

@@ -102,6 +102,9 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                         }
 
                         result[it.address] = bp_value;
+                    } else {
+                        // 1
+                        result[it.address] = 10000;
                     }
                 }
 
