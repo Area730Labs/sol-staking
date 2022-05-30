@@ -1,28 +1,50 @@
+import { getOrConstruct } from "../types/cacheitem";
 import Nft from "../types/Nft";
+import config from "../config.json"
+import nfts from "../data/nfts"
+import { getPlatformInfo } from "../state/platform";
+import { AppContextType } from "../state/app";
+import { PublicKey } from "@solana/web3.js";
+import { matchRule } from "../types/paltform";
+import { Condition } from "../blockchain/idl/types/Condition";
 
-export function getStakeMultiplyer(item : Nft) :number {
-   
-    const itemRank = item.props?.rank;
+// in basis points
+export type RankMultiplyerMap = { [key: string]: number }
 
-    if (itemRank <= 3) {
-        return 5
-    } 
+export async function getStakeMultiplyer(item: Nft, ctx: AppContextType): Promise<number> {
 
-    if (itemRank <= 30) {
-        return 2.3;
+    const force = config.disable_cache ?? false;
+
+    const platform = await getPlatformInfo(force, ctx.solanaConnection, new PublicKey(config.stacking_config))
+
+    if (platform.multiplyRule.steps == 0) {
+        return 1;
     }
 
-    if (itemRank <= 100) {
-        return 2.1;
-    }
+    const multiplyMap = await getOrConstruct<RankMultiplyerMap>(force, "rank_multiplyer", async () => {
 
-    if (itemRank <= 500) {
-        return 1.8;
-    }
+        let result: RankMultiplyerMap = {};
 
-    if (itemRank <= 1000) {
-        return 1.5;
-    }
+        const rule = platform.multiplyRule;
 
-    return 1;
+        for (var it of nfts) {
+            const matched = matchRule(rule, it.props.rank) as Condition;
+
+            if (matched != null) {
+
+                let bp_value = matched.value;
+                if (!matched.valueIsBp) {
+                    bp_value = matched.value * 100;
+                    // check max BP value cap
+                }
+
+                result[it.address] = matched.value;
+            }
+        }
+
+        return result;
+    }, 86400 * 30);
+
+
+    return multiplyMap[item.address.toBase58()];
 }

@@ -1,16 +1,21 @@
 import { PublicKey, Connection } from "@solana/web3.js"
 import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as types from "../types/StakeNftBumps" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
-import  * as types from "../types/StakeNftBumps"
 
 export interface StakingReceiptFields {
   staker: PublicKey
   mint: PublicKey
   stakingConfig: PublicKey
   lastClaim: BN
-  claimOffset: BN
+  stakedAt: BN
   bumps: types.StakeNftBumpsFields
+  rarityRank: number
+  prop2: number
+  prop3: BN
+  prop4: BN
+  prop5: PublicKey
 }
 
 export interface StakingReceiptJSON {
@@ -18,8 +23,13 @@ export interface StakingReceiptJSON {
   mint: string
   stakingConfig: string
   lastClaim: string
-  claimOffset: string
+  stakedAt: string
   bumps: types.StakeNftBumpsJSON
+  rarityRank: number
+  prop2: number
+  prop3: string
+  prop4: string
+  prop5: string
 }
 
 export class StakingReceipt {
@@ -27,8 +37,13 @@ export class StakingReceipt {
   readonly mint: PublicKey
   readonly stakingConfig: PublicKey
   readonly lastClaim: BN
-  readonly claimOffset: BN
+  readonly stakedAt: BN
   readonly bumps: types.StakeNftBumps
+  readonly rarityRank: number
+  readonly prop2: number
+  readonly prop3: BN
+  readonly prop4: BN
+  readonly prop5: PublicKey
 
   static readonly discriminator = Buffer.from([
     233, 186, 169, 11, 82, 70, 11, 68,
@@ -39,8 +54,13 @@ export class StakingReceipt {
     borsh.publicKey("mint"),
     borsh.publicKey("stakingConfig"),
     borsh.i64("lastClaim"),
-    borsh.u64("claimOffset"),
+    borsh.i64("stakedAt"),
     types.StakeNftBumps.layout("bumps"),
+    borsh.u16("rarityRank"),
+    borsh.u16("prop2"),
+    borsh.u64("prop3"),
+    borsh.u64("prop4"),
+    borsh.publicKey("prop5"),
   ])
 
   constructor(fields: StakingReceiptFields) {
@@ -48,8 +68,13 @@ export class StakingReceipt {
     this.mint = fields.mint
     this.stakingConfig = fields.stakingConfig
     this.lastClaim = fields.lastClaim
-    this.claimOffset = fields.claimOffset
+    this.stakedAt = fields.stakedAt
     this.bumps = new types.StakeNftBumps({ ...fields.bumps })
+    this.rarityRank = fields.rarityRank
+    this.prop2 = fields.prop2
+    this.prop3 = fields.prop3
+    this.prop4 = fields.prop4
+    this.prop5 = fields.prop5
   }
 
   static async fetch(
@@ -98,8 +123,13 @@ export class StakingReceipt {
       mint: dec.mint,
       stakingConfig: dec.stakingConfig,
       lastClaim: dec.lastClaim,
-      claimOffset: dec.claimOffset,
+      stakedAt: dec.stakedAt,
       bumps: types.StakeNftBumps.fromDecoded(dec.bumps),
+      rarityRank: dec.rarityRank,
+      prop2: dec.prop2,
+      prop3: dec.prop3,
+      prop4: dec.prop4,
+      prop5: dec.prop5,
     })
   }
 
@@ -109,8 +139,13 @@ export class StakingReceipt {
       mint: this.mint.toString(),
       stakingConfig: this.stakingConfig.toString(),
       lastClaim: this.lastClaim.toString(),
-      claimOffset: this.claimOffset.toString(),
+      stakedAt: this.stakedAt.toString(),
       bumps: this.bumps.toJSON(),
+      rarityRank: this.rarityRank,
+      prop2: this.prop2,
+      prop3: this.prop3.toString(),
+      prop4: this.prop4.toString(),
+      prop5: this.prop5.toString(),
     }
   }
 
@@ -120,8 +155,13 @@ export class StakingReceipt {
       mint: new PublicKey(obj.mint),
       stakingConfig: new PublicKey(obj.stakingConfig),
       lastClaim: new BN(obj.lastClaim),
-      claimOffset: new BN(obj.claimOffset),
+      stakedAt: new BN(obj.stakedAt),
       bumps: types.StakeNftBumps.fromJSON(obj.bumps),
+      rarityRank: obj.rarityRank,
+      prop2: obj.prop2,
+      prop3: new BN(obj.prop3),
+      prop4: new BN(obj.prop4),
+      prop5: new PublicKey(obj.prop5),
     })
   }
 }

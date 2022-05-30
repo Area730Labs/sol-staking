@@ -9,7 +9,7 @@ export async function getPlatformInfo(force: boolean, conn: Connection, platform
 
     return getOrConstruct<Platform>(force, "platform_config", async () => {
         return StakingConfig.fetch(conn, platformKey).then(platformConfig => {
-            
+
             return {
                 alias: platformConfig.alias.toBase58(),
 

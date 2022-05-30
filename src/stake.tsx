@@ -45,10 +45,6 @@ export default function NftsSelector(props: NftsSelectorProps) {
     const action_label = props.actionLabel ?? ""
     const max_selection = props.maxChunk ?? config.max_items_per_stake;
 
-    if (wallet != null) {
-        console.log('getting staked nfts ... ')
-    }
-
     function selectionHandler(item: Nft, state: boolean): boolean {
 
         if (state && selectedItemsCount == max_selection) {

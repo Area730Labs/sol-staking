@@ -1,5 +1,5 @@
-import { Condition } from "../blockchain/idl/types/Condition";
-import { Rule, RuleJSON } from "../blockchain/idl/types/Rule";
+import { ConditionJSON } from "../blockchain/idl/types/Condition";
+import { RuleJSON } from "../blockchain/idl/types/Rule";
 
 export default interface Platform {
 
@@ -19,7 +19,7 @@ export default interface Platform {
 }
 
 
-export function matchRule(rule: Rule, value: number): Condition | null {
+export function matchRule(rule: RuleJSON, value: number): ConditionJSON | null {
 
     let i = rule.steps;
 
