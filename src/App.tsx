@@ -196,6 +196,8 @@ function StakeButton() {
 
         const pinfo = await getPlatformInfo(false, solanaConnection, new PublicKey(config.stacking_config));
 
+        console.log('platform info', pinfo)
+
         const stakeOwnerAddress = await getStakeOwnerForWallet(wallet.publicKey);
 
         const stake_owner = await StakeOwner.fetch(solanaConnection, stakeOwnerAddress);

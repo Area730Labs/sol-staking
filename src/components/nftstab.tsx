@@ -10,8 +10,7 @@ import EmptyRow from "../emptyrow";
 import NftsSelector from "../stake";
 import { useAppContext } from "../state/app";
 import { getStakeOwnerForWallet } from "../state/user";
-import { fromStakeReceipt } from "../types/Nft";
-
+import { fromStakeReceipt } from "../types/Nft"
 import appTheme from "../state/theme"
 import config from "../config.json"
 import MainPageContainer from "./mainpagecontainer";

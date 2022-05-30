@@ -169,8 +169,6 @@ export function createStackingPlatform(
     );
 
     console.log("rewards: ",rewardsAccount.toBase58())
-
-
     console.log("staking config", stakingConfig.toBase58());
     console.log("escrow", escrowAddress.toBase58());
     console.log("platform config",configAddress.toBase58())

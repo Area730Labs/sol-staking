@@ -13,7 +13,7 @@
 
      "cluster_url": "https://api.devnet.solana.com",
      "reward_token_name": "SAMO",
-     "reward_token_decimals": 100000000000,
+     "reward_token_decimals": 1000000000,
      "caching": {
           "staked_nfts": 600,
           "platform": 3600,
