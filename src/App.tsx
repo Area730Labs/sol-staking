@@ -227,7 +227,7 @@ function UnstakeTaxModal() {
   return <Box>
     <VStack textAlign="left" >
       <Text fontSize="2xl" color={appTheme.stressColor}> <WarningIcon /> <Text display="inline-block" fontWeight="bold">{pretty(totalTax)}</Text> Unstake tax</Text>
-      <Text fontSize="sm">{taxedItems.length} items are subject to be paid taxes from.</Text>
+      <Text fontSize="sm">{taxedItems.length} items are subject to pay taxes from.</Text>
 
       {/* <Text fontSize="xs"  >wait at least 7 days before unstaking to keep all your gains</Text> */}
       <VStack maxH={["80%", "500px"]} overflowY="auto" spacing={4} p="4">
@@ -238,7 +238,7 @@ function UnstakeTaxModal() {
             // boxShadow="md"
             _hover={{ boxShadow: "xl" }}
             cursor="pointer"
-            backgroundColor={appTheme.themeColorAlpha(.05)}
+            backgroundColor={appTheme.themeColorAlpha(.07)}
             transition={appTheme.transition}
           >
             {/* <Text>#{idx}</Text> */}
@@ -246,7 +246,7 @@ function UnstakeTaxModal() {
             <VStack alignItems="left">
               {/* <Text fontSize="xs">{fromStakeReceipt(it.receipt).name}</Text> */}
               <Text >staked for {prettyTime(it.staked_for)}</Text>
-              <Text fontWeight="bold" color="white"> <Box display="inline-block" p="3px" borderRadius={appTheme.borderRadius} backgroundColor={appTheme.stressColor}>-{pretty(it.tax)}</Box></Text>
+              <Text fontWeight="bold" color="white"> <Box display="inline-block" p="3px" borderRadius={appTheme.borderRadius} backgroundColor={appTheme.stressColor}>-{pretty(it.tax)} ({(Math.ceil(100*pretty(it.tax)/pretty(it.income)))}%)</Box></Text>
             </VStack>
           </HStack>
         })}

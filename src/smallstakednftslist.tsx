@@ -41,6 +41,9 @@ export default function SmallStakedNftsList() {
         {stackedNfts.slice(0, config.small_staked_nfts_list_size).map((object, i) =>
             <StakedSmallNft key={i} item={fromStakeReceipt(object)} />
         )}
+        {stackedNfts.length < config.small_staked_nfts_list_size ? (
+            [...Array(config.max_nfts_per_row - stackedNfts.length - 1)].map((object, i) => <SmallNftBlock />)
+        ) : null}
         <SmallNftBlock>
             <Box paddingTop="10px" onClick={showStakedNfts}>
                 <Text>+{stackedNfts.length - config.small_staked_nfts_list_size}</Text>

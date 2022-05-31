@@ -162,12 +162,23 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         }
     }
 
+
+
     useEffect(() => {
+
         getPlatformInfo(config.disable_cache, web3Handler, new web3.PublicKey(config.stacking_config)).then((platform) => {
             setPlatform(platform);
         }).catch((e) => {
             toast.error('error while fetching staking config: ' + e.message)
         })
+
+        // const interval = setInterval(() => {
+        //     toast.info('getting platform info')
+        // }, 60000)
+
+        // return () => {
+        //     clearInterval(interval);
+        // }
     }, []);
 
 
