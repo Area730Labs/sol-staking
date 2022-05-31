@@ -1,5 +1,5 @@
 import { Box } from "@chakra-ui/layout";
-import { MintLayout, Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { createInitializeMintInstruction, createMintToInstruction, getMinimumBalanceForRentExemptAccount, MintLayout, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { Keypair, PublicKey, SystemInstruction, SystemProgram } from "@solana/web3.js";
 import BN from "bn.js";
 import { Signer } from "crypto";
@@ -23,7 +23,7 @@ export default function CreateMintButton() {
 
         let ixs = [];
 
-        const balanceNeeded = await Token.getMinBalanceRentForExemptMint(solanaConnection);
+        const balanceNeeded = await getMinimumBalanceForRentExemptAccount(solanaConnection);
 
         const createAccount = SystemProgram.createAccount({
             fromPubkey: owner,
@@ -35,7 +35,7 @@ export default function CreateMintButton() {
 
         ixs.push(createAccount);
 
-        const createMintIx = Token.createInitMintInstruction(TOKEN_PROGRAM_ID, mint.publicKey, 2, owner, null);
+        const createMintIx = createInitializeMintInstruction(mint.publicKey, 2, owner, null);
 
         ixs.push(createMintIx);
 
@@ -98,12 +98,10 @@ export function DevButtons() {
 
         const ixs = [];
 
-        const mintIx = Token.createMintToInstruction(
-            TOKEN_PROGRAM_ID,
+        const mintIx = createMintToInstruction(
             new PublicKey(config.rewards_mint),
             new PublicKey(config.rewards_token_account),
             wallet.publicKey,
-            [],
             tokenWithDecimals
         )
 

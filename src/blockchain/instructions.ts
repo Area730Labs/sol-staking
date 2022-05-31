@@ -1,6 +1,6 @@
 
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, Transaction, TransactionInstruction } from "@solana/web3.js"
-import { buildLeaves, findAssociatedAddress } from "./helpers";
+import { buildLeaves } from "./helpers";
 import { MerkleTree } from "./helpers/merkleTree";
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { stakeNft, StakeNftAccounts, StakeNftArgs } from "./idl/instructions/stakeNft";

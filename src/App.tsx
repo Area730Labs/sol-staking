@@ -37,7 +37,7 @@ import { PublicKey, SystemProgram } from "@solana/web3.js"
 import config from "./config.json"
 import { getStakedNftsCached, getStakeOwnerForWallet } from "./state/user"
 import MainPageContainer from "./components/mainpagecontainer"
-import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, TOKEN_PROGRAM_ID } from "@solana/spl-token"
+import { ASSOCIATED_TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, TOKEN_PROGRAM_ID } from "@solana/spl-token"
 import { getFakeNftImage } from "./components/nft"
 import SmallStakedNftsList, { StakedSmallNft } from "./smallstakednftslist"
 import SmallNftBlock from "./smallnftblock"
@@ -138,7 +138,7 @@ function StakeButton() {
 
       phantomWallet.on("connect", () => {
         setWalletAdapter(phantomWallet);
-        toast.info("wallet connected");
+        toast.info(<>Wallet connected</>);
       });
 
       phantomWallet.on("disconnect", () => {
@@ -151,7 +151,7 @@ function StakeButton() {
       console.log('current wallet state = ', currentWalletState);
 
       if (currentWalletState === WalletReadyState.Installed || currentWalletState === WalletReadyState.Loadable) {
-        toast.warn('wallet installed or loadable')
+        // toast.warn('wallet installed or loadable')
         phantomWallet.connect()
       }
     }
@@ -190,13 +190,11 @@ function ClaimPendingRewardsButton() {
     }).then((item) => {
       if (item == null) {
         // not exists
-        ixs.push(Token.createAssociatedTokenAccountInstruction(
-          ASSOCIATED_TOKEN_PROGRAM_ID,
-          TOKEN_PROGRAM_ID,
-          rewardsTokenMint,
+        ixs.push(createAssociatedTokenAccountInstruction(
+          wallet.publicKey,
           tokAcc,
           wallet.publicKey,
-          wallet.publicKey
+          rewardsTokenMint
         ));
 
       }
@@ -231,12 +229,6 @@ function PendingRewards(props: any) {
 
 
 export function App() {
-
-  const objects = [
-    {},
-    {},
-    {},
-  ];
 
   function newAction(operation: string) {
     return {
@@ -290,30 +282,20 @@ export function App() {
                   <VStack alignItems="flex-start">
                     <Text fontWeight="bold">Okay Bears</Text>
                     <Image src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="250px" boxShadow="dark" />
-                    <StakePlatformStats/>
+                    <StakePlatformStats />
                   </VStack>
                 </Box>
                 <Box>
                   <VStack textAlign="center" >
                     <Text fontSize="sm" fontWeight="bold">Rewards</Text>
                     <RewardImage img={config.reward_image} />
-                    <DailyRewardValue/>
+                    <DailyRewardValue />
                   </VStack>
                 </Box>
                 <Box>
                   <InfoColumn>
                     <Text fontSize="sm" fontWeight="bold">All staked</Text>
-                    <HStack>
-                      {objects.map((object, i) => <SmallNftBlock key={i}>
-                        <StakedSmallNft />
-                      </SmallNftBlock>)}
-                      <SmallNftBlock>
-                        <Box paddingTop="18px">
-                          <Text>+</Text>
-                          <Text>more</Text>
-                        </Box>
-                      </SmallNftBlock>
-                    </HStack>
+                    <AllStakedNfts />
                     <Text fontSize="sm" fontWeight="bold">Activity feed</Text>
                     {activityFeed.map((object, i) => <HistoryAction>
                       <Tooltip label={object.date.toUTCString()} fontSize='md'>
@@ -364,4 +346,27 @@ export function App() {
       </Box>
     </AppProvider>
   </ChakraProvider>
+}
+
+function AllStakedNfts() {
+
+  const { stackedNfts } = useAppContext();
+
+  if (stackedNfts.length == 0) {
+    return <HStack>
+      {[...Array(config.max_nfts_per_row)].map((object, i) =>   <SmallNftBlock/>)}
+    </HStack>
+  }
+
+  return <HStack>
+    {stackedNfts.map((object, i) =>
+      <StakedSmallNft key={i} item={fromStakeReceipt(object)} />)
+    }
+    <SmallNftBlock>
+      <Box paddingTop="10px">
+        <Text>+</Text>
+        <Text>more</Text>
+      </Box>
+    </SmallNftBlock>
+  </HStack>
 }
