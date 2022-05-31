@@ -30,6 +30,10 @@ export interface AppContextType {
     modalContent: JSX.Element | null
     setModalContent: any
 
+    // tax modal
+    taxModal: boolean
+    setTaxModal: any
+
     // solana 
     solanaConnection: web3.Connection
     setSolanaNode: any
@@ -78,6 +82,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
     const [nftsTabClickCounter, setCounter] = useState(0);
     const [nftsTab, setNftsTab] = useState<NftsSelectorTab>("stake");
+    const [taxModal, setTaxModal] = useState(false);
 
     const web3Handler = useMemo(() => {
         return new web3.Connection(solanaNode, 'confirmed');
@@ -258,6 +263,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             setModalVisible,
             modalContent,
             setModalContent,
+            taxModal,
+            setTaxModal,
 
             // user wallet nfts
             nftsInWallet: userNfts,
@@ -290,7 +297,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
         return curCtx
 
-    }, [, modalVisible, modalContent,
+    }, [, modalVisible, modalContent,taxModal,
         pendingRewards, userNfts, stackedNfts,
         nftsTab, nftsTabClickCounter,
         web3Handler, connectedWallet,

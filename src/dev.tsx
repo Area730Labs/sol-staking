@@ -118,7 +118,7 @@ export function DevButtons() {
 
     }
 
-    if (wallet != null) {
+    if (wallet != null && wallet.publicKey.toBase58() === config.treasury_wallet) {
         return <Box py="8">
             <Button size="sm" onClick={() => {
 

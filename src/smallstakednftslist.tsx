@@ -8,6 +8,7 @@ import { useAppContext } from "./state/app";
 
 import config from "./config.json"
 import Nft, { fromStakeReceipt } from "./types/Nft";
+import { Tooltip } from "@chakra-ui/tooltip";
 
 
 export interface StakedSmallNftProps {
@@ -16,7 +17,9 @@ export interface StakedSmallNftProps {
 
 export function StakedSmallNft(props: StakedSmallNftProps) {
     return <SmallNftBlock>
-        <Image cursor="pointer" src={props.item.image} borderRadius={appTheme.borderRadius} width="64px" />
+        <Tooltip label={props.item.name} fontSize='md'>
+            <Image cursor="pointer" src={props.item.image} borderRadius={appTheme.borderRadius} width="64px" />
+        </Tooltip>
     </SmallNftBlock>
 }
 

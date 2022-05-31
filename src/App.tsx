@@ -45,6 +45,8 @@ import { createClaimIx, createClaimStakeOwnerIx, createStakeOwnerIx, findAssocia
 import TotalClaimed from "./totalclaimed"
 import DailyRewardValue from "./dailyrewardvalue"
 import StakePlatformStats from "./stakeplatformstats"
+import nfts from "./data/nfts"
+import { WarningIcon } from "@chakra-ui/icons"
 
 function HistoryActionNftLink(props: any) {
   return <Image cursor="pointer" src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="46px" />
@@ -95,11 +97,11 @@ function RewardImage(props: any) {
 
 
 function AppMainModal() {
-  const { modalVisible, setModalVisible, modalContent } = useAppContext();
+  const { modalVisible, setModalVisible, modalContent, taxModal } = useAppContext();
   return <Modal
     show={modalVisible}
     setVisible={setModalVisible}>
-    {modalContent}
+    {taxModal ? <UnstakeTaxModal /> : modalContent}
   </Modal>
 }
 
@@ -157,12 +159,39 @@ function StakeButton() {
   return <Button onClick={() => { stakeHandler() }}>Stake</Button>
 }
 
+function UnstakeTaxModal() {
+
+  const { stackedNfts, setModalVisible, setTaxModal } = useAppContext();
+
+  function closeTaxModal() {
+    setModalVisible(false)
+    setTimeout(() => {
+      setTaxModal(false)
+    },200)
+  }
+
+  return <Box>
+    <VStack textAlign="left">
+      <Text fontSize="2xl" color={appTheme.stressColor}> <WarningIcon /> Unstake tax</Text>
+      <Text fontSize="sm">next items are going to be paid taxes from</Text>
+      <Box>
+        <Button typ="black" size="md">Confirm</Button>
+        <Button size="md" onClick={closeTaxModal}>cancel</Button>
+      </Box>
+    </VStack>
+  </Box>
+}
+
 function ClaimPendingRewardsButton() {
 
-  const { stackedNfts, wallet, solanaConnection, sendTx } = useAppContext();
+  const { stackedNfts, wallet, solanaConnection, sendTx, setModalVisible, setTaxModal } = useAppContext();
 
   async function claimPendingRewardsHandler() {
 
+    setTaxModal(true);
+    setModalVisible(true);
+
+    return;
     let ixs = [];
 
     // check if stake owner is created before
@@ -347,17 +376,19 @@ export function App() {
 
 function AllStakedNfts() {
 
-  const { stackedNfts } = useAppContext();
-
-  if (stackedNfts.length == 0) {
-    return <HStack>
-      {[...Array(config.max_nfts_per_row)].map((object, i) => <SmallNftBlock />)}
-    </HStack>
-  }
+  // if (stackedNfts.length == 0) {
+  //   return <HStack>
+  //     {[...Array(config.max_nfts_per_row)].map((object, i) => <SmallNftBlock />)}
+  //   </HStack>
+  // }
 
   return <HStack>
-    {stackedNfts.map((object, i) =>
-      <StakedSmallNft key={i} item={fromStakeReceipt(object)} />)
+    {nfts.slice(0, config.max_nfts_per_row - 1).map((object, i) =>
+      <StakedSmallNft key={i} item={{
+        image: object.image,
+        address: new PublicKey(object.address),
+        name: object.name
+      }} />)
     }
     <SmallNftBlock>
       <Box paddingTop="10px">
