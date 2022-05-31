@@ -102,7 +102,6 @@ export default function Modal(props: ModalStyles & any ) {
                     onClick={(e) => {
                         e.stopPropagation();
                     }}
-
                     top={0}
                     right={0}
                     left={0}

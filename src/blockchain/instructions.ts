@@ -166,6 +166,34 @@ export function createUpdateStakingPlatformIx(
         // subscription: 1,
         start: new BN(now.getTime()),
         root: whitelist.getRootArray(),
+        multiplierRule: {
+            steps: 6,
+            conds: [{
+                from: 1,
+                value: 500
+            }, {
+                from: 4,
+                value: 230
+            }, {
+                from: 31,
+                value: 210
+            }, {
+                from: 101,
+                value: 180
+            }, {
+                from: 501,
+                value: 150
+            }, {
+                from: 1000,
+                value: 100
+            },{
+                from: 0,
+                value: 0,
+            },{
+                from: 0,
+                value: 0,
+            }] as Condition[]
+        } as Rule,
         taxRule: {
             steps: 7,
             conds: [{
@@ -189,28 +217,9 @@ export function createUpdateStakingPlatformIx(
             }, {
                 from: 7,
                 value: 0
-            }] as Condition[]
-        } as Rule,
-        multiplierRule: {
-            steps: 6,
-            conds: [{
-                from: 1,
-                value: 500
-            }, {
-                from: 4,
-                value: 230
-            }, {
-                from: 31,
-                value: 210
-            }, {
-                from: 101,
-                value: 180
-            }, {
-                from: 501,
-                value: 150
-            }, {
-                from: 1000,
-                value: 100
+            },{
+                from: 0,
+                value: 0,
             }] as Condition[]
         } as Rule
     } as UpdateStakingArgs

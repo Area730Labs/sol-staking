@@ -230,7 +230,7 @@ function UnstakeTaxModal() {
       <Text fontSize="sm">{taxedItems.length} items are subject to pay taxes from.</Text>
 
       {/* <Text fontSize="xs"  >wait at least 7 days before unstaking to keep all your gains</Text> */}
-      <VStack maxH={["80%", "500px"]} overflowY="auto" spacing={4} p="4">
+      <VStack maxH={["80%", "400px"]} overflowY="auto" spacing={4} p="4">
         {taxedItems.map((it, idx) => {
           return <HStack p="2"
             width={["100%", "300px", "350px"]}
@@ -246,7 +246,7 @@ function UnstakeTaxModal() {
             <VStack alignItems="left">
               {/* <Text fontSize="xs">{fromStakeReceipt(it.receipt).name}</Text> */}
               <Text >staked for {prettyTime(it.staked_for)}</Text>
-              <Text fontWeight="bold" color="white"> <Box display="inline-block" p="3px" borderRadius={appTheme.borderRadius} backgroundColor={appTheme.stressColor}>-{pretty(it.tax)} ({(Math.ceil(100*pretty(it.tax)/pretty(it.income)))}%)</Box></Text>
+              <Text fontWeight="bold" color="white"> <Box display="inline-block" p="3px" borderRadius={appTheme.borderRadius} backgroundColor={appTheme.stressColor}>-{pretty(it.tax)} ({(Math.ceil(100 * pretty(it.tax) / pretty(it.income)))}%)</Box></Text>
             </VStack>
           </HStack>
         })}
@@ -315,7 +315,7 @@ function ClaimPendingRewardsButton() {
   async function claimPendingRewardsHandler() {
 
     if (ctx.wallet == null || ctx.wallet.publicKey == null) {
-        toast.info('No wallet connected. Use Stake button for now');
+      toast.info('No wallet connected. Use Stake button for now');
     } else {
       const [taxed, totalTax] = ctx.getTaxedItems();
 

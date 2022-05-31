@@ -31,6 +31,74 @@ const nfts  = [
             "rank": 1300
         }
     },
+    {
+        "address":"8RuFt5G7FAEHX46LJ8bRT386eCKGXJcmEXfc8B1Qpjw5",
+        "name": "DeGod #3081 (DGOD)",
+        "image": "https://metadata.degods.com/g/3080.png",  
+        "props": {
+            "rank": 850
+        }
+    },
+    {
+        "address":"4uizvFsqhtbTqouvMfid7oNYRPJe124yF8o4N6Httt79",
+        "name": "DeGod #3082 (DGOD)",
+        "image": "https://metadata.degods.com/g/3081.png",  
+        "props": {
+            "rank": 85
+        }
+    },
+    {
+        "address":"4HQ4WZQWBaYV5KMktAExbzrdkuVGtjbL7Ug587cVdH2P",
+        "name": "DeGod #3001 (DGOD)",
+        "image": "https://metadata.degods.com/g/3000.png",  
+        "props": {
+            "rank": 257
+        }
+    },
+    {
+        "address":"3B7SaWqbbBxeuVi3fLU6mYLoygh71WAVDDtCqVx6T8vR",
+        "name": "DeGod #3002 (DGOD)",
+        "image": "https://metadata.degods.com/g/3001.png",  
+        "props": {
+            "rank": 2570
+        }
+    },
+    {
+        "address":"BZQXVgdRHUaVKt9Wnewz3GBXmEy3duT5Q4uV65H3FqHR",
+        "name": "DeGod #3003 (DGOD)",
+        "image": "https://metadata.degods.com/g/3002.png",  
+        "props": {
+            "rank": 640
+        }
+    },
+    {
+        "address":"FLSdKVYUCDZWHn5qjfjUEMmKywdhYw7ediVTcM1tpyVj",
+        "name": "DeGod #3004 (DGOD)",
+        "image": "https://metadata.degods.com/g/3003.png",  
+        "props": {
+            "rank": 1980
+        }
+    },
+    {
+        "address":"D331JfhMRXPHLN7dDXkxa9RRRUwHVvoA46zfyPxZVvdn",
+        "name": "DeGod #3005 (DGOD)",
+        "image": "https://metadata.degods.com/g/3004.png",  
+        "props": {
+            "rank": 25
+        }
+    },
+    {
+        "address":"GK3GH7tBvqbXffmo8juY2QV8GxdjXZ4T3FYRNrKEHdBN",
+        "name": "DeGod #3006 (DGOD)",
+        "image": "https://metadata.degods.com/g/3005.png",  
+        "props": {
+            "rank": 987
+        }
+    }
+    
+    
+    
+
     // {
     //     "address": "FuEQzN7RAvLHdmUyd3YoFxiShVPPSjdpRGZYDoYbyXmV",
     //     "name": "ToastedBear #3739 (TBZ)",

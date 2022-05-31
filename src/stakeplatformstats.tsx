@@ -4,6 +4,7 @@ import HistoryAction from "./components/historyaction";
 import { Stat } from "./components/stat";
 import nfts from "./data/nfts";
 import { useAppContext } from "./state/app";
+import {prettyNumber} from "./data/uitls"
 
 export interface PlatformStats {
     totalStacked: number,
@@ -39,7 +40,7 @@ export default function StakePlatformStats() {
         <HStack justify="center">
             <Stat value={info.itemsAvailable}>Total</Stat>
             <Stat value={info.totalStacked}>Staked</Stat>
-            <Stat value={info.percentStaked} units="%">Percent</Stat>
+            <Stat value={prettyNumber(info.percentStaked)} units="%">Percent</Stat>
         </HStack>
     </HistoryAction>
 }

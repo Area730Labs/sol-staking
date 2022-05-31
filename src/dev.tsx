@@ -139,7 +139,7 @@ export function DevButtons() {
             <Button size="sm" onClick={platformCreationButton}>Create platform</Button>
             <CreateMintButton />
             <Button size="sm" onClick={mintToTreasury}>Mint Tokens</Button>
-            {/* <Button typ="black" size="sm" onClick={updatePlatformButtonHandler}>Update</Button> */}
+            <Button typ="black" size="sm" onClick={updatePlatformButtonHandler}>Update</Button>
 
         </Box>
     } else {

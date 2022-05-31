@@ -31,9 +31,9 @@ export function updateStaking(
   accounts: UpdateStakingAccounts
 ) {
   const keys = [
-    { pubkey: accounts.owner, isSigner: true, isWritable: false },
+    { pubkey: accounts.owner, isSigner: true, isWritable: true },
     { pubkey: accounts.platformConfig, isSigner: false, isWritable: false },
-    { pubkey: accounts.stakingConfig, isSigner: false, isWritable: false },
+    { pubkey: accounts.stakingConfig, isSigner: false, isWritable: true },
   ]
   const identifier = Buffer.from([145, 189, 111, 29, 136, 30, 127, 100])
   const buffer = Buffer.alloc(1000)
