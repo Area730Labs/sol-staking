@@ -47,6 +47,8 @@ import DailyRewardValue from "./dailyrewardvalue"
 import StakePlatformStats from "./stakeplatformstats"
 import nfts from "./data/nfts"
 import { WarningIcon } from "@chakra-ui/icons"
+import { matchRule } from "./types/paltform"
+import { MAX_BP } from "./data/uitls"
 
 function HistoryActionNftLink(props: any) {
   return <Image cursor="pointer" src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="46px" />
@@ -161,14 +163,22 @@ function StakeButton() {
 
 function UnstakeTaxModal() {
 
-  const { stackedNfts, setModalVisible, setTaxModal } = useAppContext();
+  toast.info('calc taxes ...')
+
+  const { platform, stackedNfts, setModalVisible, setTaxModal, calculateIncomeWithTaxes } = useAppContext();
 
   function closeTaxModal() {
     setModalVisible(false)
     setTimeout(() => {
       setTaxModal(false)
-    },200)
+    }, 200)
   }
+
+  const taxedItems = React.useMemo(() => {
+    for (var it of stackedNfts) {
+      const [taxes, income] = calculateIncomeWithTaxes(it);
+    }
+  }, [stackedNfts])
 
   return <Box>
     <VStack textAlign="left">

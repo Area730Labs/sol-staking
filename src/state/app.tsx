@@ -60,6 +60,7 @@ export interface AppContextType {
     sendTx: { (ixs: web3.TransactionInstruction[], signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
     incomePerNftCalculator: { (item: Nft): number }
     basicIncomePerNft: { (): number }
+    calculateIncomeWithTaxes: { (item: StakingReceipt): [number,number] }
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
@@ -98,13 +99,43 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             if (platform.emissionType == 3) { // fixed per nft, all time
                 return platform.basicDailyIncome;
             } else {
-                console.warn('platform',JSON.stringify(platform))
+                console.warn('platform', JSON.stringify(platform))
                 toast.error(`Unable to calc income per nft for emission type of platform (${platform.emissionType})`)
                 return 0;
             }
         } else {
             return 0;
         }
+    }
+
+    function calculateIncomeWithTaxes(item: StakingReceipt): [number,number] {
+
+        const rewards_amount = incomePerNftCalculator(fromStakeReceipt(item));
+
+        let day_seconds = 60 * 10;
+        let cur_ts = new Date().getTime() / 1000;
+
+        let staked_diff = cur_ts - item.stakedAt.toNumber();
+        let staking_days = staked_diff / day_seconds;
+
+        let matched_rule = matchRule(platform.taxRule, staking_days);
+
+        // calc tax percent
+        let tax_bp = matched_rule.value;
+        if (matched_rule.valueIsBp != 1) {
+            tax_bp = matched_rule.value * 100;
+        }
+
+        // check if its not bigger than 10000
+        if (tax_bp > MAX_BP) {
+            console.log("tax is more than 100%");
+            return [0,0];
+        }
+
+        let tax_value = rewards_amount * tax_bp / MAX_BP;
+
+        return [tax_value,rewards_amount];
+
     }
 
     function incomePerNftCalculator(item: Nft): number {
@@ -293,11 +324,12 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             sendTx,
             incomePerNftCalculator,
             basicIncomePerNft: calcBasicIncomePerNft,
+            calculateIncomeWithTaxes,
         } as AppContextType;
 
         return curCtx
 
-    }, [, modalVisible, modalContent,taxModal,
+    }, [, modalVisible, modalContent, taxModal,
         pendingRewards, userNfts, stackedNfts,
         nftsTab, nftsTabClickCounter,
         web3Handler, connectedWallet,
