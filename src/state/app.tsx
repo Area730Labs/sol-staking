@@ -14,6 +14,7 @@ import nfts from "../data/nfts";
 import { TxHandler } from "../blockchain/handler";
 import { MAX_BP } from "../data/uitls";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
+import { TaxedItem } from "../App";
 
 export type RankMultiplyerMap = { [key: string]: number }
 export type NftsSelectorTab = "stake" | "unstake"
@@ -60,7 +61,9 @@ export interface AppContextType {
     sendTx: { (ixs: web3.TransactionInstruction[], signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
     incomePerNftCalculator: { (item: Nft): number }
     basicIncomePerNft: { (): number }
-    calculateIncomeWithTaxes: { (item: StakingReceipt): [number,number] }
+    calculateIncomeWithTaxes: { (item: StakingReceipt): [number, number, number] }
+
+    getTaxedItems: { (): [TaxedItem[], number] }
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
@@ -108,10 +111,12 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         }
     }
 
-    function calculateIncomeWithTaxes(item: StakingReceipt): [number,number] {
+    function calculateIncomeWithTaxes(item: StakingReceipt): [number, number, number] {
 
-        const rewards_amount = incomePerNftCalculator(fromStakeReceipt(item));
+        const rewards_amount_daily = incomePerNftCalculator(fromStakeReceipt(item));
+        const rewards_per_minute = rewards_amount_daily / (60 * 24);
 
+        // @todo test only
         let day_seconds = 60 * 10;
         let cur_ts = new Date().getTime() / 1000;
 
@@ -122,20 +127,29 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
         // calc tax percent
         let tax_bp = matched_rule.value;
-        if (matched_rule.valueIsBp != 1) {
-            tax_bp = matched_rule.value * 100;
+        let tax_value = 0;
+
+        let rewards_diff = cur_ts - item.lastClaim.toNumber();
+        let staked_minutes = rewards_diff / 60;
+
+        let rewards_amount = staked_minutes * rewards_per_minute;
+
+        if (tax_bp != 0) {
+
+            if (matched_rule.valueIsBp != 1) {
+                tax_bp = matched_rule.value * 100;
+            }
+
+            // check if its not bigger than 10000
+            if (tax_bp > MAX_BP) {
+                console.log("tax is more than 100%");
+                return [0, 0, staked_diff];
+            }
+
+            tax_value = rewards_amount * tax_bp / MAX_BP;
         }
 
-        // check if its not bigger than 10000
-        if (tax_bp > MAX_BP) {
-            console.log("tax is more than 100%");
-            return [0,0];
-        }
-
-        let tax_value = rewards_amount * tax_bp / MAX_BP;
-
-        return [tax_value,rewards_amount];
-
+        return [tax_value, rewards_amount, staked_diff];
     }
 
     function incomePerNftCalculator(item: Nft): number {
@@ -285,6 +299,29 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         }
     }
 
+    function getTaxedItems(): [TaxedItem[], number] {
+        var result = [] as TaxedItem[];
+        var totalTax = 0;
+
+        for (var it of stackedNfts) {
+
+            const [taxes, income, stake_diff] = calculateIncomeWithTaxes(it);
+
+            if (taxes > 0) {
+                result.push({
+                    tax: taxes,
+                    income: income,
+                    receipt: it,
+                    staked_for: stake_diff,
+                });
+
+                totalTax += taxes;
+            }
+        }
+
+        return [result, totalTax];
+    }
+
     const memoedValue = useMemo(() => {
 
         const curCtx = {
@@ -325,6 +362,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             incomePerNftCalculator,
             basicIncomePerNft: calcBasicIncomePerNft,
             calculateIncomeWithTaxes,
+            getTaxedItems
         } as AppContextType;
 
         return curCtx

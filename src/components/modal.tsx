@@ -93,7 +93,7 @@ export default function Modal(props: ModalStyles & any ) {
                     // width="40vw"
                     borderRadius={appTheme.borderRadius}
                     p="8"
-                    height="400px"
+                    // height={["90%","400px","600px"]}
                     backgroundColor="white"
                     color="black"
                     zIndex="101"

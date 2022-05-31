@@ -19,6 +19,7 @@ export default function SmallNftBlock(props: any) {
         _hover={{
           boxShadow: "xl"
         }}
+        {...props}
       >
         {props.children}
       </Box>

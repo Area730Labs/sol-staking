@@ -15,8 +15,8 @@ export interface StakedSmallNftProps {
     item: Nft
 }
 
-export function StakedSmallNft(props: StakedSmallNftProps) {
-    return <SmallNftBlock>
+export function StakedSmallNft(props: StakedSmallNftProps | any) {
+    return <SmallNftBlock {...props}>
         <Tooltip label={props.item.name} fontSize='md'>
             <Image cursor="pointer" src={props.item.image} borderRadius={appTheme.borderRadius} width="64px" />
         </Tooltip>

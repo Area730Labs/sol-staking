@@ -10,13 +10,14 @@ import {
   Image,
   HStack,
   Tooltip,
+  Flex,
 } from "@chakra-ui/react"
 import { Button } from "./components/button"
 import HistoryAction from "./components/historyaction"
 import Address from "./components/address"
 import Countup from "./components/countup"
 
-import { AppProvider, useAppContext } from "./state/app"
+import { AppContextType, AppProvider, useAppContext } from "./state/app"
 import Modal from "./components/modal"
 import * as phantom from "@solana/wallet-adapter-phantom";
 
@@ -28,8 +29,8 @@ import appTheme from "./state/theme"
 import { DevButtons } from "./dev"
 
 import { WalletConnectButton } from "./components/walletconnect"
-import { WalletReadyState } from "@solana/wallet-adapter-base"
-import { PublicKey } from "@solana/web3.js"
+import { WalletAdapter, WalletReadyState } from "@solana/wallet-adapter-base"
+import { Connection, PublicKey } from "@solana/web3.js"
 
 import config from "./config.json"
 import { getStakeOwnerForWallet } from "./state/user"
@@ -47,8 +48,7 @@ import DailyRewardValue from "./dailyrewardvalue"
 import StakePlatformStats from "./stakeplatformstats"
 import nfts from "./data/nfts"
 import { WarningIcon } from "@chakra-ui/icons"
-import { matchRule } from "./types/paltform"
-import { MAX_BP } from "./data/uitls"
+import { StakingReceipt } from "./blockchain/idl/accounts/StakingReceipt"
 
 function HistoryActionNftLink(props: any) {
   return <Image cursor="pointer" src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="46px" />
@@ -161,10 +161,18 @@ function StakeButton() {
   return <Button onClick={() => { stakeHandler() }}>Stake</Button>
 }
 
+export interface TaxedItem {
+  tax: number,
+  income: number,
+  receipt: StakingReceipt
+  staked_for: number
+}
+
 function UnstakeTaxModal() {
 
-  toast.info('calc taxes ...')
+  // toast.info('calc taxes ...')
 
+  const ctx = useAppContext();
   const { platform, stackedNfts, setModalVisible, setTaxModal, calculateIncomeWithTaxes } = useAppContext();
 
   function closeTaxModal() {
@@ -174,74 +182,150 @@ function UnstakeTaxModal() {
     }, 200)
   }
 
-  const taxedItems = React.useMemo(() => {
+  const [taxedItems, totalTax] = React.useMemo<[TaxedItem[], number]>(() => {
+
+    var result = [] as TaxedItem[];
+    var totalTax = 0;
+
     for (var it of stackedNfts) {
-      const [taxes, income] = calculateIncomeWithTaxes(it);
+
+      const [taxes, income, stake_diff] = calculateIncomeWithTaxes(it);
+
+      if (taxes > 0) {
+        result.push({
+          tax: taxes,
+          income: income,
+          receipt: it,
+          staked_for: stake_diff,
+        });
+
+        totalTax += taxes;
+      }
     }
-  }, [stackedNfts])
+
+    return [result, totalTax];
+  }, [stackedNfts, platform])
+
+  function pretty(value: number): number {
+    return Math.round(((value / config.reward_token_decimals) + Number.EPSILON) * 100) / 100
+  }
+
+  function prettyTime(value: number): string {
+
+    if (value > 86400) {
+      const days = Math.floor(value / 86400);
+      return days + "days";
+    } else if (value > 3600) {
+      const hours = Math.floor(value / 3600);
+      return hours + " hours";
+    } else {
+      const minutes = Math.floor(value / 60);
+      return minutes + "minutes";
+    }
+  }
 
   return <Box>
-    <VStack textAlign="left">
-      <Text fontSize="2xl" color={appTheme.stressColor}> <WarningIcon /> Unstake tax</Text>
-      <Text fontSize="sm">next items are going to be paid taxes from</Text>
+    <VStack textAlign="left" >
+      <Text fontSize="2xl" color={appTheme.stressColor}> <WarningIcon /> <Text display="inline-block" fontWeight="bold">{pretty(totalTax)}</Text> Unstake tax</Text>
+      <Text fontSize="sm">{taxedItems.length} items are subject to be paid taxes from.</Text>
+
+      {/* <Text fontSize="xs"  >wait at least 7 days before unstaking to keep all your gains</Text> */}
+      <VStack maxH={["80%", "500px"]} overflowY="auto" spacing={4} p="4">
+        {taxedItems.map((it, idx) => {
+          return <HStack p="2"
+            width={["100%", "300px", "350px"]}
+            borderRadius={appTheme.borderRadius}
+            // boxShadow="md"
+            _hover={{ boxShadow: "xl" }}
+            cursor="pointer"
+            backgroundColor={appTheme.themeColorAlpha(.05)}
+            transition={appTheme.transition}
+          >
+            {/* <Text>#{idx}</Text> */}
+            <StakedSmallNft item={fromStakeReceipt(it.receipt)} />
+            <VStack alignItems="left">
+              {/* <Text fontSize="xs">{fromStakeReceipt(it.receipt).name}</Text> */}
+              <Text >staked for {prettyTime(it.staked_for)}</Text>
+              <Text fontWeight="bold" color="white"> <Box display="inline-block" p="3px" borderRadius={appTheme.borderRadius} backgroundColor={appTheme.stressColor}>-{pretty(it.tax)}</Box></Text>
+            </VStack>
+          </HStack>
+        })}
+      </VStack>
       <Box>
-        <Button typ="black" size="md">Confirm</Button>
+        <Button typ="black" size="md" onClick={() => {
+          closeTaxModal();
+          claimPendingrewardsHandlerImpl(ctx);
+        }}>Confirm</Button>
         <Button size="md" onClick={closeTaxModal}>cancel</Button>
       </Box>
     </VStack>
   </Box>
 }
 
+async function claimPendingrewardsHandlerImpl(ctx: AppContextType) {
+
+  const { wallet, solanaConnection, stackedNfts, sendTx } = ctx;
+
+  let ixs = [];
+
+  // check if stake owner is created before
+  const stakeOwnerAddress = await getStakeOwnerForWallet(wallet.publicKey);
+
+  const rewardsTokenMint = new PublicKey(config.rewards_mint);
+  const tokAcc = findAssociatedTokenAddress(wallet.publicKey, rewardsTokenMint);
+
+  StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeOwnerInfo: StakeOwner) => {
+
+    if (stakeOwnerInfo == null) {
+      ixs.push(createStakeOwnerIx(wallet.publicKey, stakeOwnerAddress));
+    }
+
+    for (var it of stackedNfts) {
+      // ixs.push(createUnstakeNftIx(it))
+      ixs.push(createClaimIx(it.mint, it.staker, stakeOwnerAddress))
+    }
+
+    // check if user has token account
+    return solanaConnection.getAccountInfo(tokAcc, "finalized");
+  }).then((item) => {
+    if (item == null) {
+      // not exists
+      ixs.push(createAssociatedTokenAccountInstruction(
+        wallet.publicKey,
+        tokAcc,
+        wallet.publicKey,
+        rewardsTokenMint
+      ));
+
+    }
+  }).then(() => {
+    ixs.push(createClaimStakeOwnerIx(wallet.publicKey, stakeOwnerAddress, rewardsTokenMint));
+
+    sendTx(ixs).catch((e) => {
+      toast.error(`unable to send unstake instruction: ${e.message}`)
+    });
+
+  });
+}
+
 function ClaimPendingRewardsButton() {
 
-  const { stackedNfts, wallet, solanaConnection, sendTx, setModalVisible, setTaxModal } = useAppContext();
+  const ctx = useAppContext();
 
   async function claimPendingRewardsHandler() {
 
-    setTaxModal(true);
-    setModalVisible(true);
+    if (ctx.wallet == null || ctx.wallet.publicKey == null) {
+        toast.info('No wallet connected. Use Stake button for now');
+    } else {
+      const [taxed, totalTax] = ctx.getTaxedItems();
 
-    return;
-    let ixs = [];
-
-    // check if stake owner is created before
-    const stakeOwnerAddress = await getStakeOwnerForWallet(wallet.publicKey);
-
-    const rewardsTokenMint = new PublicKey(config.rewards_mint);
-    const tokAcc = findAssociatedTokenAddress(wallet.publicKey, rewardsTokenMint);
-
-    StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeOwnerInfo: StakeOwner) => {
-
-      if (stakeOwnerInfo == null) {
-        ixs.push(createStakeOwnerIx(wallet.publicKey, stakeOwnerAddress));
+      if (totalTax > 0) {
+        ctx.setTaxModal(true);
+        ctx.setModalVisible(true);
+      } else {
+        claimPendingrewardsHandlerImpl(ctx);
       }
-
-      for (var it of stackedNfts) {
-        // ixs.push(createUnstakeNftIx(it))
-        ixs.push(createClaimIx(it.mint, it.staker, stakeOwnerAddress))
-      }
-
-      // check if user has token account
-      return solanaConnection.getAccountInfo(tokAcc, "finalized");
-    }).then((item) => {
-      if (item == null) {
-        // not exists
-        ixs.push(createAssociatedTokenAccountInstruction(
-          wallet.publicKey,
-          tokAcc,
-          wallet.publicKey,
-          rewardsTokenMint
-        ));
-
-      }
-    }).then(() => {
-      ixs.push(createClaimStakeOwnerIx(wallet.publicKey, stakeOwnerAddress, rewardsTokenMint));
-
-      sendTx(ixs).catch((e) => {
-        toast.error(`unable to send unstake instruction: ${e.message}`)
-      });
-
-    });
+    }
   }
 
   return (<Button typ="black" marginLeft="10px" onClick={claimPendingRewardsHandler}>Claim pending rewards</Button>)
