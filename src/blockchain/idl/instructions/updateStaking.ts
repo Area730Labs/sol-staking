@@ -1,8 +1,8 @@
 import { TransactionInstruction, PublicKey } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
-import { PROGRAM_ID } from "../programId"
 import * as types from "../types/Rule" // eslint-disable-line @typescript-eslint/no-unused-vars
+import { PROGRAM_ID } from "../programId"
 
 export interface UpdateStakingArgs {
   baseWeeklyEmissions: BN

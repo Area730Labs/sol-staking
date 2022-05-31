@@ -149,7 +149,7 @@ export function createPlatformConfig(wallet: WalletAdapter): TransactionInstruct
     return platformConfigIx;
 }
 
-export function updateStakingPlatform(
+export function createUpdateStakingPlatformIx(
     owner: PublicKey,
     stakingConfig: PublicKey,
     baseEmissions: BN,

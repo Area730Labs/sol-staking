@@ -28,7 +28,7 @@ export function NftSelection(props: NftSelectionProps | any) {
       setMult(ctx.nftMultMap[nftInfo.address.toBase58()] / 10000)
       setDailyIncome(ctx.incomePerNftCalculator(props.item)/config.reward_token_decimals)
     }
-  }, [ctx.platform])
+  }, [ctx.platform, ctx.nftMultMap])
 
   function clickHandler() {
 

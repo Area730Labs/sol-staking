@@ -78,7 +78,7 @@ export default function Countup(props: NumberWithIncreaseArgs | any) {
 
                 if (i == (stepsToUse - 1)) {
                     curStepValue = maxVal;
-                    console.log(`setting cur step value to be max val ${curStepValue}`)
+                    // console.log(`setting cur step value to be max val ${curStepValue}`)
                 }
 
                 setTimeout((v) => {

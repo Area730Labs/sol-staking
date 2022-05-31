@@ -51,10 +51,7 @@ export function StakeNftsListTab() {
         }
 
         sendTx(instructions).then((sig) => {
-
             toast.warn("need to clear cache for staked items + nfts in wallet")
-
-            toast.info(`tx: ${sig}`)
         }).catch((e) => {
             toast.error(`Unable to stake: ${e.message}`)
         });
@@ -69,7 +66,7 @@ export function StakeNftsListTab() {
 
 export function StakedNftsListTab() {
 
-    const { stackedNfts, sendTx } = useAppContext();
+    const { stackedNfts, sendTx, dailyRewards } = useAppContext();
 
     async function unstakeSelectedItems(
         wallet: WalletAdapter,
@@ -96,10 +93,7 @@ export function StakedNftsListTab() {
             }
 
             sendTx(instructions).then((sig) => {
-
                 toast.warn("need to clear cache for staked items + nfts in wallet")
-
-                toast.info(`tx: ${sig}`)
             }).catch((e) => {
                 toast.error(`Unable to stake: ${e.message}`)
             });
@@ -110,7 +104,7 @@ export function StakedNftsListTab() {
         return fromStakeReceipt(it);
     });
 
-    return <NftsTab emptyLabel="no NFT's to unstake" heading={<>YOUR STAKED NFT'S. Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="black" backgroundColor={appTheme.stressColor2}>130  {config.reward_token_name}</Box> per day</>}>
+    return <NftsTab emptyLabel="no NFT's to unstake" heading={<>YOUR STAKED NFT'S. Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="black" backgroundColor={appTheme.stressColor2}>{dailyRewards / config.reward_token_decimals}  {config.reward_token_name}</Box> per day</>}>
         {items.length > 0 ? <NftsSelector items={items} actionHandler={unstakeSelectedItems} actionLabel="Unstake selected " /> : null}
     </NftsTab>
 }

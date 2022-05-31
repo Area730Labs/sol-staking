@@ -45,6 +45,9 @@ import { fromStakeReceipt } from "./types/Nft"
 import { NftSelectorTabs } from "./components/nftstab"
 import { StakeOwner } from "./blockchain/idl/types/StakeOwner"
 import { createClaimIx, createClaimStakeOwnerIx, createStakeOwnerIx, findAssociatedTokenAddress } from "./blockchain/instructions"
+import TotalClaimed from "./totalclaimed"
+import DailyRewardValue from "./dailyrewardvalue"
+import StakePlatformStats from "./stakeplatformstats"
 
 function HistoryActionNftLink(props: any) {
   return <Image cursor="pointer" src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="46px" />
@@ -106,9 +109,6 @@ function AppMainModal() {
 function StakeButton() {
 
   const { setModalContent, setModalVisible, wallet, setWalletAdapter, solanaConnection, setNftsTab } = useAppContext();
-
-  const { setPendingRewards } = useAppContext();
-  const { platform, incomePerNftCalculator } = useAppContext();
 
   function stakeHandler() {
 
@@ -238,23 +238,6 @@ export function App() {
     {},
   ];
 
-  let info = {
-    totalStacked: 3450,
-    itemsAvailable: 10000,
-    percentStaked: 0,
-    rewardPerDayPerNft: 3.38
-  };
-
-  info.percentStaked = (info.totalStacked / info.itemsAvailable) * 100;
-
-
-  let userInfo = {
-    totalStacked: 7,
-    staked: [
-      {}, {}, {}
-    ]
-  }
-
   function newAction(operation: string) {
     return {
       performer: "skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY",
@@ -269,8 +252,6 @@ export function App() {
     newAction("withdrawn"),
     newAction("claimed")
   ];
-
-  const rewardImage = "https://www.orca.so/static/media/samo.e4c98a37.png" //https://img-cdn.magiceden.dev/rs:fill:400:400:0:0/plain/https://bafybeicifnldmpywwt43opvbwuanglybhnmalu3pi6pvajq2rj2ezqccym.ipfs.dweb.link/2741.png?ext=png";
 
   return <ChakraProvider theme={theme}>
     <ToastContainer
@@ -291,8 +272,7 @@ export function App() {
           <VStack spacing={8} >
             <Container maxW='container.lg' color='white'>
               <Box bottom="20px" textAlign="center" pt="10">
-                <Text fontSize="6xl" fontWeight="bold" color="white" textAlign="center" fontFamily="helvetica">
-                  <Countup number={123883393} /> {config.reward_token_name}</Text>
+                <TotalClaimed />
                 <Text fontSize="2xl" color="white">total claimed</Text>
               </Box>
             </Container>
@@ -310,21 +290,14 @@ export function App() {
                   <VStack alignItems="flex-start">
                     <Text fontWeight="bold">Okay Bears</Text>
                     <Image src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="250px" boxShadow="dark" />
-                    <HistoryAction backgroundColor="white" color="black">
-                      <HStack justify="center">
-                        <Stat value={info.itemsAvailable}>Total</Stat>
-                        <Stat value={info.totalStacked}>Staked</Stat>
-                        <Stat value={info.percentStaked} units="%">Percent</Stat>
-                      </HStack>
-                    </HistoryAction>
+                    <StakePlatformStats/>
                   </VStack>
                 </Box>
                 <Box>
                   <VStack textAlign="center" >
                     <Text fontSize="sm" fontWeight="bold">Rewards</Text>
-                    <RewardImage img={rewardImage} />
-                    <Text fontWeight="bold">{info.rewardPerDayPerNft}/day {config.reward_token_name}</Text>
-                    <Text>per NFT</Text>
+                    <RewardImage img={config.reward_image} />
+                    <DailyRewardValue/>
                   </VStack>
                 </Box>
                 <Box>
@@ -336,7 +309,7 @@ export function App() {
                       </SmallNftBlock>)}
                       <SmallNftBlock>
                         <Box paddingTop="18px">
-                          <Text>+{info.totalStacked}</Text>
+                          <Text>+</Text>
                           <Text>more</Text>
                         </Box>
                       </SmallNftBlock>

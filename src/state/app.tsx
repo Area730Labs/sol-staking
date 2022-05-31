@@ -22,6 +22,7 @@ export interface AppContextType {
 
     pendingRewards: number
     setPendingRewards: any
+    dailyRewards: number
 
     // modal state
     modalVisible: boolean,
@@ -54,6 +55,7 @@ export interface AppContextType {
 
     sendTx: { (ixs: web3.TransactionInstruction[], signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
     incomePerNftCalculator: { (item: Nft): number }
+    basicIncomePerNft: { (): number }
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
@@ -69,8 +71,9 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
     const [solanaNode, setSolanaNode] = useState<string>(config.cluster_url)
 
-    const [stackedNfts, updateStakedNfts] = useState<StakingReceipt[]>([]);
+    const [stackedNfts, updateStakedNfts] = useState<StakingReceipt[]>([] as StakingReceipt[]);
     const [pendingRewards, setPendingRewards] = useState<number>(0);
+    const [dailyRewards, setDailyrewards] = useState(0);
     const [connectedWallet, setWallet] = useState<WalletAdapter | null>(null);
 
     const [nftsTabClickCounter, setCounter] = useState(0);
@@ -104,33 +107,53 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         }
     }
 
+    useEffect(() => {
+        getPlatformInfo(config.disable_cache, web3Handler, new web3.PublicKey(config.stacking_config)).then((platform) => {
+            setPlatform(platform);
+        }).catch((e) => {
+            toast.error('error while fetching staking config: ' + e.message)
+        })
+    }, []);
+
 
     useEffect(() => {
 
-        if (platform != null && connectedWallet != null) {
+        if (platform != null && connectedWallet != null && nftMultMap != null && stackedNfts.length > 0) {
 
             // calc inco me 
             let income = 0;
 
             const curTimestamp = (new Date()).getTime() / 1000;
 
+            let dailyRewardsValue = 0;
+
             for (var it of stackedNfts) {
 
-                let income_per_minute = incomePerNftCalculator(fromStakeReceipt(it)) / (24 * 60);
+                const perDay = incomePerNftCalculator(fromStakeReceipt(it));
+
+                let income_per_minute = perDay / (24 * 60);
+
+                dailyRewardsValue += perDay;
 
                 const diff = (curTimestamp - it.lastClaim.toNumber()) / 60;
                 if (diff > 0) {
 
                     const incomePerStakedItem = diff * income_per_minute;
 
-                    console.log(' -- income per staked item', incomePerStakedItem, diff, income_per_minute)
+                    console.log(' -- income per staked item', incomePerStakedItem/config.reward_token_decimals, diff, income_per_minute)
 
                     income += incomePerStakedItem;
                 }
             }
 
+            setDailyrewards(dailyRewardsValue);
+
             let incomeNewValue = income / config.reward_token_decimals;
-            toast.info(`pending rewards: ${incomeNewValue}`)
+
+            if (incomeNewValue == 0) {
+                console.log(`pending rewards are set to ZERO. income = ${income}. length of stacked = ${stackedNfts.length}`)
+            }
+
             setPendingRewards(incomeNewValue);
 
             const savedIncomeValues = incomeNewValue;
@@ -146,8 +169,10 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                 }
             });
         }
+        // todo handle wallet disconnection
+        // need to set ZERO earnings
 
-    }, [stackedNfts, platform, connectedWallet]);
+    }, [stackedNfts, platform, connectedWallet, nftMultMap]);
 
     useEffect(() => {
 
@@ -189,13 +214,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     // initialization
     useEffect(() => {
         if (connectedWallet != null && connectedWallet.connected) {
-
-            getPlatformInfo(config.disable_cache, web3Handler, new web3.PublicKey(config.stacking_config)).then((platform) => {
-                setPlatform(platform);
-            }).catch((e) => {
-                toast.error('error while fetching staking config: ' + e.message)
-            })
-
             // probably just use useMemo
             getStakedNftsCached(web3Handler, connectedWallet.publicKey).then((stakedNfts) => {
                 updateStakedNfts(stakedNfts);
@@ -220,9 +238,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             txhandler.simulate(ixs, signers);
         } else {
             return txhandler.sendTransaction(ixs, signers).then((signature) => {
-
                 toast.info(`got tx: ${signature}`);
-
                 return signature;
             });
         }
@@ -238,7 +254,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             modalContent,
             setModalContent,
 
-
             // user wallet nfts
             nftsInWallet: userNfts,
             stackedNfts,
@@ -247,6 +262,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             // rewards  
             pendingRewards,
             setPendingRewards,
+            dailyRewards,
 
             // wallet
             solanaConnection: web3Handler,
@@ -263,7 +279,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             nftMultMap,
 
             sendTx,
-            incomePerNftCalculator
+            incomePerNftCalculator,
+            basicIncomePerNft: calcBasicIncomePerNft,
         } as AppContextType;
 
         return curCtx

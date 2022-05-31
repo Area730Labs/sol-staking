@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { TxHandler } from "./blockchain/handler";
 import { PlatformConfig } from "./blockchain/idl/accounts/PlatformConfig";
-import { createPlatformConfig, createStackingPlatform, getMerkleTree, updateStakingPlatform } from "./blockchain/instructions";
+import { createPlatformConfig, createStackingPlatform, createUpdateStakingPlatformIx, getMerkleTree } from "./blockchain/instructions";
 import { Button } from "./components/button";
 import { useAppContext } from "./state/app";
 import config from "./config.json"
@@ -17,7 +17,6 @@ export default function CreateMintButton() {
     const { solanaConnection, wallet, sendTx } = useAppContext();
 
     return <Button typ="black" size="sm" onClick={async () => {
-
 
         const mint = new Keypair();
         const owner = wallet.publicKey
@@ -62,7 +61,7 @@ export function DevButtons() {
         const configAddr = new PublicKey(config.stacking_config);
         const dailyPerNft = parseInt(prompt("enter number of tokens per nft"));
         
-        const ix = updateStakingPlatform(owner,configAddr, new BN(dailyPerNft*config.reward_token_decimals), whitelist);
+        const ix = createUpdateStakingPlatformIx(owner,configAddr, new BN(dailyPerNft*config.reward_token_decimals), whitelist);
 
         sendTx([ix]).then((signature) => {
             toast.info('platform updated')
@@ -142,7 +141,7 @@ export function DevButtons() {
             <Button size="sm" onClick={platformCreationButton}>Create platform</Button>
             <CreateMintButton />
             <Button size="sm" onClick={mintToTreasury}>Mint Tokens</Button>
-            <Button typ="black" size="sm" onClick={updatePlatformButtonHandler}>Update</Button>
+            {/* <Button typ="black" size="sm" onClick={updatePlatformButtonHandler}>Update</Button> */}
 
         </Box>
     } else {
