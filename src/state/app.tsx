@@ -89,10 +89,15 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     }
 
     function calcBasicIncomePerNft(): number {
-        if (platform.emissionType == 3) { // fixed per nft, all time
-            return platform.basicDailyIncome;
+        if (platform != null) {
+            if (platform.emissionType == 3) { // fixed per nft, all time
+                return platform.basicDailyIncome;
+            } else {
+                console.warn('platform',JSON.stringify(platform))
+                toast.error(`Unable to calc income per nft for emission type of platform (${platform.emissionType})`)
+                return 0;
+            }
         } else {
-            toast.error(`Unable to calc income per nft for emission type of platform (${platform.emissionType})`)
             return 0;
         }
     }
@@ -140,7 +145,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
                     const incomePerStakedItem = diff * income_per_minute;
 
-                    console.log(' -- income per staked item', incomePerStakedItem/config.reward_token_decimals, diff, income_per_minute)
+                    console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
 
                     income += incomePerStakedItem;
                 }

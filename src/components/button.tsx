@@ -14,6 +14,7 @@ interface ButtonStyle {
     fontSize: string
     boxShadow: string
     bRadius: number
+    fontWeight: string
 }
 
 export function Button(props: ButtonProps | SbuttonArgs | any) {
@@ -49,11 +50,12 @@ export function Button(props: ButtonProps | SbuttonArgs | any) {
     sizes.set("default", default_style);
 
     sizes.set("sm", {
-        px: 6,
+        px: 5,
         py: 1,
         fontSize: "sm",
         boxShadow: "xl",
-        bRadius: 50
+        bRadius: 50,
+        fontWeight: "bold"
     } as ButtonStyle);
     sizes.set("md", {
         px: 9,
@@ -75,6 +77,7 @@ export function Button(props: ButtonProps | SbuttonArgs | any) {
         px={sStyle.px}
         py={sStyle.py}
         cursor="pointer"
+        fontWeight={sStyle.fontWeight}
         borderRadius={sStyle.bRadius}
         color={textColor}
         fontSize={sStyle.fontSize}

@@ -1,4 +1,4 @@
-import { Flex, Text, Box } from "@chakra-ui/layout";
+import { Flex, Text, Box, HStack } from "@chakra-ui/layout";
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { Connection, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import React from "react";
@@ -14,6 +14,7 @@ import { fromStakeReceipt } from "../types/Nft"
 import appTheme from "../state/theme"
 import config from "../config.json"
 import MainPageContainer from "./mainpagecontainer";
+import { Button } from "./button";
 
 export interface NftsTabProps {
     heading: JSX.Element
@@ -36,7 +37,7 @@ export function NftsTab(props: NftsTabProps) {
 
 export function StakeNftsListTab() {
 
-    const { nftsInWallet, sendTx } = useAppContext();
+    const { nftsInWallet, sendTx,setNftsTab } = useAppContext();
 
     function stakeSelectedItems(
         wallet: WalletAdapter,
@@ -57,8 +58,7 @@ export function StakeNftsListTab() {
         });
     }
 
-
-    return <NftsTab emptyLabel="no NFT's to stake" heading={<>NFT'S IN YOUR WALLET</>}>
+    return <NftsTab emptyLabel="no NFT's to stake" heading={<>NFT'S IN YOUR WALLET. <Box alignSelf="flex-end" display="inline-block" paddingLeft="4">go to<Button marginLeft="2" typ="black" size="sm" onClick={() => setNftsTab("unstake")}>Staked</Button></Box></>}>
         {nftsInWallet.length > 0 ? <NftsSelector items={nftsInWallet} actionHandler={stakeSelectedItems} actionLabel="Stake selected " /> : null}
     </NftsTab>
 }

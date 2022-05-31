@@ -1,6 +1,6 @@
 import { Connection, PublicKey } from "@solana/web3.js";
 import { StakingConfig } from "../blockchain/idl/accounts/StakingConfig";
-import { constructCacheKey, getOrConstruct } from "../types/cacheitem";
+import CacheItem, { constructCacheKey, getOrConstruct } from "../types/cacheitem";
 import Platform from "../types/paltform";
 import config from "../config.json"
 
@@ -18,7 +18,8 @@ export function getPlatformInfoFromCache(platformKey: PublicKey): Platform | nul
     if (cachedItem == null) {
         return null;
     } else {
-        return JSON.parse(cachedItem);
+        const cached =  JSON.parse(cachedItem) as CacheItem;
+        return cached.data as Platform;
     }
 }
 
