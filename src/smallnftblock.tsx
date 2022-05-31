@@ -4,8 +4,8 @@ import appTheme from "./state/theme"
 export default function SmallNftBlock(props: any) {
   
     return (
-      <Box color="white"
-        backgroundColor="whiteAlpha.300"
+      <Box color="black"
+        backgroundColor="white"
         width="64px"
         height="64px"
         overflowY="hidden"

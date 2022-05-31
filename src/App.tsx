@@ -10,11 +10,8 @@ import {
   Image,
   HStack,
   Tooltip,
-  Flex,
-  GridItem,
 } from "@chakra-ui/react"
 import { Button } from "./components/button"
-import { Stat } from "./components/stat"
 import HistoryAction from "./components/historyaction"
 import Address from "./components/address"
 import Countup from "./components/countup"
@@ -32,10 +29,10 @@ import { DevButtons } from "./dev"
 
 import { WalletConnectButton } from "./components/walletconnect"
 import { WalletReadyState } from "@solana/wallet-adapter-base"
-import { PublicKey, SystemProgram } from "@solana/web3.js"
+import { PublicKey } from "@solana/web3.js"
 
 import config from "./config.json"
-import { getStakedNftsCached, getStakeOwnerForWallet } from "./state/user"
+import { getStakeOwnerForWallet } from "./state/user"
 import MainPageContainer from "./components/mainpagecontainer"
 import { ASSOCIATED_TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, TOKEN_PROGRAM_ID } from "@solana/spl-token"
 import { getFakeNftImage } from "./components/nft"
@@ -354,7 +351,7 @@ function AllStakedNfts() {
 
   if (stackedNfts.length == 0) {
     return <HStack>
-      {[...Array(config.max_nfts_per_row)].map((object, i) =>   <SmallNftBlock/>)}
+      {[...Array(config.max_nfts_per_row)].map((object, i) => <SmallNftBlock />)}
     </HStack>
   }
 

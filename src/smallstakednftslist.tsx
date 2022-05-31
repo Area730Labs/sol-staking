@@ -28,6 +28,12 @@ export default function SmallStakedNftsList() {
         setNftsTab("unstake");
     }
 
+    if (stackedNfts.length == 0) {
+        return <HStack>
+            {[...Array(config.max_nfts_per_row)].map((object, i) => <SmallNftBlock />)}
+        </HStack>
+    }
+
     return <HStack>
         {stackedNfts.slice(0, config.small_staked_nfts_list_size).map((object, i) =>
             <StakedSmallNft key={i} item={fromStakeReceipt(object)} />
