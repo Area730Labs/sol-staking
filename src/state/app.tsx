@@ -2,7 +2,7 @@ import { createContext, ReactNode, useContext, useEffect, useMemo, useState } fr
 import * as web3 from '@solana/web3.js'
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import Nft, { fromStakeReceipt } from "../types/Nft";
-import { toast } from 'react-toastify';
+import { toast, ToastOptions } from 'react-toastify';
 
 import config from '../config.json'
 import { getNftsInWalletCached, getStakedNftsCached, getStakeOwnerForWallet } from "./user";
@@ -16,24 +16,18 @@ import { MAX_BP } from "../data/uitls";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 import { TaxedItem } from "../App";
 
+import { CurrentTx, getCurrentTx, storeCurrentTx } from "./currenttx"
+
 export type RankMultiplyerMap = { [key: string]: number }
 export type NftsSelectorTab = "stake" | "unstake"
+export type TransactionType = "stake" | "unstake" | "platform" | "claim" | "other"
+export type SendTxFuncType = { (ixs: web3.TransactionInstruction[], signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
 
 export interface AppContextType {
 
     pendingRewards: number
     setPendingRewards: any
     dailyRewards: number
-
-    // modal state
-    modalVisible: boolean,
-    setModalVisible: any
-    modalContent: JSX.Element | null
-    setModalContent: any
-
-    // tax modal
-    taxModal: boolean
-    setTaxModal: any
 
     // solana 
     solanaConnection: web3.Connection
@@ -58,12 +52,14 @@ export interface AppContextType {
     platform: Platform | null
     nftMultMap: RankMultiplyerMap | null
 
-    sendTx: { (ixs: web3.TransactionInstruction[], signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
+    sendTx: SendTxFuncType
     incomePerNftCalculator: { (item: Nft): number }
     basicIncomePerNft: { (): number }
     calculateIncomeWithTaxes: { (item: StakingReceipt): [number, number, number] }
 
     getTaxedItems: { (): [TaxedItem[], number] }
+
+    setCurrentTx: { (item: CurrentTx): void }
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
@@ -74,8 +70,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     const [nftMultMap, setMultMap] = useState<RankMultiplyerMap | null>(null);
 
     const [userNfts, updateNfts] = useState<Nft[]>([]);
-    const [modalVisible, setModalVisible] = useState<boolean>(false);
-    const [modalContent, setModalContent] = useState<JSX.Element | null>(null);
 
     const [solanaNode, setSolanaNode] = useState<string>(config.cluster_url)
 
@@ -86,7 +80,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
     const [nftsTabClickCounter, setCounter] = useState(0);
     const [nftsTab, setNftsTab] = useState<NftsSelectorTab>("stake");
-    const [taxModal, setTaxModal] = useState(false);
+
+    const [curtx, setCurtx] = useState<CurrentTx | null>(null);
 
     const web3Handler = useMemo(() => {
         return new web3.Connection(solanaNode, 'confirmed');
@@ -162,8 +157,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         }
     }
 
-
-
     useEffect(() => {
 
         getPlatformInfo(config.disable_cache, web3Handler, new web3.PublicKey(config.stacking_config)).then((platform) => {
@@ -179,8 +172,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         // return () => {
         //     clearInterval(interval);
         // }
-    }, []);
 
+    }, []);
 
     useEffect(() => {
 
@@ -241,6 +234,60 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     }, [stackedNfts, platform, connectedWallet, nftMultMap]);
 
     useEffect(() => {
+        if (curtx != null) {
+
+            const sigConfirmPromise = new Promise((resolve, reject) => {
+
+                const interval = setInterval(() => {
+
+                    const curtime = new Date().getTime() / 1000;
+                    const diff = curtime - curtx.CreatedAt;
+
+                    if (diff > 40) {
+                        reject("unable to confirm tx in a time. check one more tim")
+                        setCurTxWrapper(null);
+                        clearInterval(interval);
+                        return
+                    }
+
+                    web3Handler.getSignatureStatus(curtx.Signature).then((resp) => {
+                        if (resp.value.confirmationStatus == 'finalized') {
+                            setCurTxWrapper(null);
+                            resolve("confirmed")
+                            clearInterval(interval);
+                        }
+                    });
+
+                    console.log(`checking tx ${curtx.Signature} status...`)
+                }, 3000)
+
+                return () => {
+                    console.warn('interval should be cleared now')
+                    clearInterval(interval);
+                }
+
+            }).then((item) => {
+
+                if (item != null) {
+                    console.info('then item is of type ' + typeof item, item)
+                }
+
+                console.info(' finished tx finalizing of type ' + curtx.Type)
+                setCurtx(null);
+            });
+
+            toast.promise(sigConfirmPromise, {
+                pending: 'Loading',
+                success: 'Confirmed',
+                error: 'Error when fetching',
+            }, {
+                theme: "dark",
+                hideProgressBar: false,
+            } as ToastOptions);
+        }
+    }, [curtx]);
+
+    useEffect(() => {
 
         if (platform != null) {
 
@@ -277,9 +324,17 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         }
     }, [platform]);
 
+    function setCurTxWrapper(tx: CurrentTx) {
+        storeCurrentTx(tx, connectedWallet);
+        setCurtx(tx);
+    }
+
     // initialization
     useEffect(() => {
         if (connectedWallet != null && connectedWallet.connected) {
+
+            setCurtx(getCurrentTx(connectedWallet));
+
             // probably just use useMemo
             getStakedNftsCached(web3Handler, connectedWallet.publicKey).then((stakedNfts) => {
                 updateStakedNfts(stakedNfts);
@@ -292,6 +347,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         } else {
             updateStakedNfts([]);
             updateNfts([]);
+            setCurtx(null);
         }
     }, [connectedWallet]);
 
@@ -306,6 +362,15 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             return txhandler.sendTransaction(ixs, signers).then((signature) => {
                 toast.info(`got tx: ${signature}`);
                 return signature;
+            }).then((txSig) => {
+
+                setCurTxWrapper({
+                    Signature: txSig,
+                    CreatedAt: new Date().getTime(),
+                    Type: "claim",
+                });
+
+                return txSig;
             });
         }
     }
@@ -337,14 +402,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
         const curCtx = {
 
-            // app modal
-            modalVisible,
-            setModalVisible,
-            modalContent,
-            setModalContent,
-            taxModal,
-            setTaxModal,
-
             // user wallet nfts
             nftsInWallet: userNfts,
             stackedNfts,
@@ -373,12 +430,16 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             incomePerNftCalculator,
             basicIncomePerNft: calcBasicIncomePerNft,
             calculateIncomeWithTaxes,
-            getTaxedItems
+            getTaxedItems,
+
+            // current tx 
+            setCurrentTx: setCurTxWrapper
+
         } as AppContextType;
 
         return curCtx
 
-    }, [, modalVisible, modalContent, taxModal,
+    }, [,
         pendingRewards, userNfts, stackedNfts,
         nftsTab, nftsTabClickCounter,
         web3Handler, connectedWallet,
@@ -391,7 +452,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         </AppContext.Provider>
     );
 }
-
 
 export function useAppContext() {
 
