@@ -50,6 +50,7 @@ import nfts from "./data/nfts"
 import { WarningIcon } from "@chakra-ui/icons"
 import { StakingReceipt } from "./blockchain/idl/accounts/StakingReceipt"
 import { ModalProvider, useModal } from "./state/modal"
+import { pretty } from "./data/uitls"
 
 function HistoryActionNftLink(props: any) {
   return <Image cursor="pointer" src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="46px" />
@@ -212,10 +213,6 @@ function UnstakeTaxModal() {
 
     return [result, totalTax];
   }, [stackedNfts, platform])
-
-  function pretty(value: number): number {
-    return Math.round(((value / config.reward_token_decimals) + Number.EPSILON) * 100) / 100
-  }
 
   function prettyTime(value: number): string {
 

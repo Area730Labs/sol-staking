@@ -12,7 +12,7 @@ import { getPlatformInfo, getPlatformInfoFromCache } from "./platform";
 import { getOrConstruct } from "../types/cacheitem";
 import nfts from "../data/nfts";
 import { TxHandler } from "../blockchain/handler";
-import { MAX_BP } from "../data/uitls";
+import { MAX_BP, pretty, prettyNumber } from "../data/uitls";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 import { TaxedItem } from "../App";
 
@@ -153,8 +153,20 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         if (nftMultMap == null) {
             return basicIncomePerNft;
         } else {
-            const multBb = nftMultMap[item.address.toBase58()];
-            return basicIncomePerNft * multBb / MAX_BP;
+
+            const itemAddr = item.address.toBase58();
+            const multBb = nftMultMap[itemAddr];
+            const finalResult = basicIncomePerNft * multBb / MAX_BP;
+            console.log(` --- ${itemAddr} `);
+            console.log(` --  mult ${multBb} `)
+            console.log(` --  final ${pretty(finalResult)} `)
+
+            const multFact = finalResult / basicIncomePerNft;
+
+            console.log(` --  base mult fact: ${prettyNumber(multFact)}`)
+            console.log(' ')
+
+            return finalResult;
         }
     }
 
@@ -189,6 +201,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
             for (var it of stackedNfts) {
 
+                console.log(' #### calc of staked item')
                 const perDay = incomePerNftCalculator(fromStakeReceipt(it));
 
                 let income_per_minute = perDay / (24 * 60);
@@ -211,7 +224,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             let incomeNewValue = income / config.reward_token_decimals;
 
             if (incomeNewValue == 0) {
-                console.log(`pending rewards are set to ZERO. income = ${income}. length of stacked = ${stackedNfts.length}`)
+                console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
             }
 
             setPendingRewards(incomeNewValue);
@@ -479,7 +492,7 @@ export function useAppContext() {
 
     if (!app) {
         toast.error(
-            "useAppContext: `app` is undefined. Seems you forgot to wrap your app in `<AppProvider />`",
+            "useAppContext: `app` is undefined. Seems you forgot to wrap your app in ` < AppProvider /> `",
         )
     }
 
