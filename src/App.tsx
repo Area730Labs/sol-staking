@@ -271,7 +271,7 @@ function UnstakeTaxModal() {
 
 async function claimPendingrewardsHandlerImpl(ctx: AppContextType) {
 
-  const { wallet, solanaConnection, stackedNfts, sendTx, setCurrentTx } = ctx;
+  const { wallet, solanaConnection, stackedNfts, sendTx } = ctx;
 
   let ixs = [];
 
@@ -308,8 +308,8 @@ async function claimPendingrewardsHandlerImpl(ctx: AppContextType) {
   }).then(() => {
     ixs.push(createClaimStakeOwnerIx(wallet.publicKey, stakeOwnerAddress, rewardsTokenMint));
 
-    sendTx(ixs).catch((e) => {
-      toast.error(`unable to send unstake instruction: ${e.message}`)
+    sendTx(ixs, 'claim').catch((e) => {
+      toast.error(`Unable to claim: ${e.message}`)
     })
 
   });

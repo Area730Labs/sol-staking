@@ -39,7 +39,7 @@ export default function CreateMintButton() {
 
         ixs.push(createMintIx);
 
-        sendTx(ixs, [
+        sendTx(ixs, 'platform', [
             {
                 publicKey: mint.publicKey,
                 secretKey: mint.secretKey
@@ -60,10 +60,10 @@ export function DevButtons() {
         const whitelist = getMerkleTree();
         const configAddr = new PublicKey(config.stacking_config);
         const dailyPerNft = parseInt(prompt("enter number of tokens per nft"));
-        
-        const ix = createUpdateStakingPlatformIx(owner,configAddr, new BN(dailyPerNft*config.reward_token_decimals), whitelist);
 
-        sendTx([ix]).then((signature) => {
+        const ix = createUpdateStakingPlatformIx(owner, configAddr, new BN(dailyPerNft * config.reward_token_decimals), whitelist);
+
+        sendTx([ix], 'platform').then((signature) => {
             toast.info('platform updated')
         }).catch((e) => {
             toast.error(`unable to send update platform config instruction: ${e.message}`)
@@ -80,7 +80,7 @@ export function DevButtons() {
 
         const ix = createStackingPlatform(mint, owner, new BN(100000000000), whitelist); // 1 coin per day per nft base
 
-        sendTx([ix]).then((signature) => {
+        sendTx([ix], 'platform').then((signature) => {
             // console.log(`got transaction: ${signature}`)
             toast.info('platform created, look into logs for addresses !')
         }).catch((e) => {
@@ -107,15 +107,13 @@ export function DevButtons() {
 
         ixs.push(mintIx);
 
-        sendTx(ixs).then((signature) => {
+        sendTx(ixs, 'platform').then((signature) => {
             // console.log(`got transaction: ${signature}`)
             toast.info('mint to treasury finished !')
         }).catch((e) => {
             console.log('mint info ', e)
             toast.error(`unable to send create mint instruction: ${e.message}`)
         });
-
-
     }
 
     if (wallet != null && wallet.publicKey.toBase58() === config.treasury_wallet) {
@@ -126,7 +124,7 @@ export function DevButtons() {
 
                 console.log('platform config ix ', ix)
 
-                sendTx([ix]).then((signature) => {
+                sendTx([ix],'platform').then((signature) => {
                     // console.log(`got transaction: ${signature}`)
                     toast.info('platform config created !')
                 }).catch((e) => {

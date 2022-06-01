@@ -2,7 +2,7 @@ import { createContext, ReactNode, useContext, useEffect, useMemo, useState } fr
 import * as web3 from '@solana/web3.js'
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import Nft, { fromStakeReceipt } from "../types/Nft";
-import { toast, ToastOptions } from 'react-toastify';
+import { toast, ToastOptions,Icons } from 'react-toastify';
 
 import config from '../config.json'
 import { getNftsInWalletCached, getStakedNftsCached, getStakeOwnerForWallet } from "./user";
@@ -21,7 +21,7 @@ import { CurrentTx, getCurrentTx, storeCurrentTx } from "./currenttx"
 export type RankMultiplyerMap = { [key: string]: number }
 export type NftsSelectorTab = "stake" | "unstake"
 export type TransactionType = "stake" | "unstake" | "platform" | "claim" | "other"
-export type SendTxFuncType = { (ixs: web3.TransactionInstruction[], signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
+export type SendTxFuncType = { (ixs: web3.TransactionInstruction[], typ: TransactionType, signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
 
 export interface AppContextType {
 
@@ -59,11 +59,15 @@ export interface AppContextType {
 
     getTaxedItems: { (): [TaxedItem[], number] }
 
-    setCurrentTx: { (item: CurrentTx): void }
+    // setCurrentTx: { (item: CurrentTx): void }
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
 
+interface GetSet<T> {
+    get: T
+    set: { (value: T): void }
+}
 export function AppProvider({ children }: { children: ReactNode; }) {
 
     const [platform, setPlatform] = useState<Platform | null>(getPlatformInfoFromCache(new web3.PublicKey(config.stacking_config)));
@@ -234,6 +238,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     }, [stackedNfts, platform, connectedWallet, nftMultMap]);
 
     useEffect(() => {
+
         if (curtx != null) {
 
             const sigConfirmPromise = new Promise((resolve, reject) => {
@@ -244,7 +249,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                     const diff = curtime - curtx.CreatedAt;
 
                     if (diff > 40) {
-                        reject("unable to confirm tx in a time. check one more tim")
+                        reject("unable to confirm tx in a time. try again later")
                         setCurTxWrapper(null);
                         clearInterval(interval);
                         return
@@ -273,13 +278,18 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                 }
 
                 console.info(' finished tx finalizing of type ' + curtx.Type)
-                setCurtx(null);
+                setCurTxWrapper(null);
             });
 
             toast.promise(sigConfirmPromise, {
-                pending: 'Loading',
-                success: 'Confirmed',
-                error: 'Error when fetching',
+                pending: 'Waiting ' + curtx.Type + ' operation',
+                success: {
+                    icon: Icons.success,
+                    render() {
+                        return "Confirmed"
+                    }
+                },
+                error: 'Unable to confirm tx, try again later',
             }, {
                 theme: "dark",
                 hideProgressBar: false,
@@ -325,8 +335,10 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     }, [platform]);
 
     function setCurTxWrapper(tx: CurrentTx) {
-        storeCurrentTx(tx, connectedWallet);
-        setCurtx(tx);
+        if (connectedWallet != null) {
+            storeCurrentTx(tx, connectedWallet);
+            setCurtx(tx);
+        }
     }
 
     // initialization
@@ -347,11 +359,16 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         } else {
             updateStakedNfts([]);
             updateNfts([]);
-            setCurtx(null);
+            setCurTxWrapper(null);
         }
     }, [connectedWallet]);
 
-    function sendTx(ixs: web3.TransactionInstruction[], signers?: []): Promise<web3.TransactionSignature> {
+    function sendTx(ixs: web3.TransactionInstruction[], typ: TransactionType = 'other', signers?: []): Promise<web3.TransactionSignature> {
+
+
+        if (curtx != null) {
+            return Promise.reject(new Error("wait till current transaction is confirmed"));
+        }
 
         const txhandler = new TxHandler(web3Handler, connectedWallet, []);
 
@@ -360,17 +377,18 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             txhandler.simulate(ixs, signers);
         } else {
             return txhandler.sendTransaction(ixs, signers).then((signature) => {
-                toast.info(`got tx: ${signature}`);
+
+                if (typ != 'other' && typ != 'platform') {
+
+                    toast.success('setting current tx [' + typ + ']... ')
+                    setCurTxWrapper({
+                        Signature: signature,
+                        CreatedAt: new Date().getTime(),
+                        Type: typ,
+                    });
+                }
+
                 return signature;
-            }).then((txSig) => {
-
-                setCurTxWrapper({
-                    Signature: txSig,
-                    CreatedAt: new Date().getTime(),
-                    Type: "claim",
-                });
-
-                return txSig;
             });
         }
     }
@@ -399,7 +417,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     }
 
     const memoedValue = useMemo(() => {
-
         const curCtx = {
 
             // user wallet nfts
@@ -432,9 +449,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             calculateIncomeWithTaxes,
             getTaxedItems,
 
-            // current tx 
-            setCurrentTx: setCurTxWrapper
-
         } as AppContextType;
 
         return curCtx
@@ -443,7 +457,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         pendingRewards, userNfts, stackedNfts,
         nftsTab, nftsTabClickCounter,
         web3Handler, connectedWallet,
-        nftMultMap
+        nftMultMap,
+        curtx
     ]);
 
     return (

@@ -1,4 +1,5 @@
 import { WalletAdapter } from "@solana/wallet-adapter-base";
+import { TransactionType } from "./app";
 
 const current_tx_cache_prefix = "current_tx";
 
@@ -9,11 +10,15 @@ function getCurrentTxCacheKey(wallet: WalletAdapter): string {
 interface CurrentTx {
     CreatedAt: number
     Signature: string
-    Type: string
+    Type: TransactionType
 }
 
 function storeCurrentTx(item: CurrentTx, wallet: WalletAdapter) {
-    localStorage.setItem(getCurrentTxCacheKey(wallet), JSON.stringify(item))
+    if (item == null) {
+        cleanupCurrentTx(wallet);
+    } else {
+        localStorage.setItem(getCurrentTxCacheKey(wallet), JSON.stringify(item))
+    }
 }
 
 function cleanupCurrentTx(wallet: WalletAdapter) {
@@ -30,5 +35,5 @@ function getCurrentTx(wallet: WalletAdapter): CurrentTx | null {
 }
 
 export {
-    getCurrentTx, cleanupCurrentTx, storeCurrentTx, CurrentTx
+    getCurrentTx, storeCurrentTx, CurrentTx
 }

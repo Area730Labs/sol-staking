@@ -51,7 +51,7 @@ export function StakeNftsListTab() {
             instructions.push(createStakeNftIx(new PublicKey(it), wallet as WalletAdapter));
         }
 
-        sendTx(instructions).then((sig) => {
+        sendTx(instructions,'stake').then((sig) => {
             toast.warn("need to clear cache for staked items + nfts in wallet")
         }).catch((e) => {
             toast.error(`Unable to stake: ${e.message}`)
@@ -92,10 +92,10 @@ export function StakedNftsListTab() {
                 instructions.push(createUnstakeNftIx(mint, wallet.publicKey));
             }
 
-            sendTx(instructions).then((sig) => {
+            sendTx(instructions,'unstake').then((sig) => {
                 toast.warn("need to clear cache for staked items + nfts in wallet")
             }).catch((e) => {
-                toast.error(`Unable to stake: ${e.message}`)
+                toast.error(`Unable to unstake: ${e.message}`)
             });
         });
     }
