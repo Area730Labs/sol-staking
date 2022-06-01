@@ -105,7 +105,7 @@ function AppMainModal() {
   // todo fix tax modal  :)
 
   return <Modal
-    show={modalVisible}
+    isVisible={modalVisible}
     setVisible={setModalVisible}>
     {taxModal ? <UnstakeTaxModal /> : modalContent}
   </Modal>
@@ -426,7 +426,7 @@ export function App() {
                       <Text fontSize="sm" fontWeight="bold">All staked</Text>
                       <AllStakedNfts />
                       <Text fontSize="sm" fontWeight="bold">Activity feed</Text>
-                      {activityFeed.map((object, i) => <HistoryAction>
+                      {activityFeed.map((object, i) => <HistoryAction key={i}>
                         <Tooltip label={object.date.toUTCString()} fontSize='md'>
                           <HStack justifyContent="flex-end" key={i}>
                             <Box justifySelf="flex-start" textAlign="left">

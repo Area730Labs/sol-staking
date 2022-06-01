@@ -12,7 +12,7 @@ import { Button } from "./components/button";
 
 import config from "./config.json"
 import NftSelectorGrid from "./components/nftselectorgrid";
-import React from "react";
+import React, { ReactNode } from "react";
 
 export interface NftsSelectorProps {
     items: Nft[]
@@ -20,13 +20,13 @@ export interface NftsSelectorProps {
     maxChunk: number
     maxSelectedMsg?: string
 
-    actionLabel: string
+    actionLabel: ReactNode
     actionHandler: {
         (
             wallet: WalletAdapter,
             solanaConnection: Connection,
             selectedItems: { [key: string]: boolean }
-        ): void
+        ): Promise<any>
     },
 
 }
@@ -68,7 +68,11 @@ export default function NftsSelector(props: NftsSelectorProps) {
     }
 
     function performActionWithSelectedItems() {
-        props.actionHandler(wallet, solanaConnection, selectedItems)
+        props.actionHandler(wallet, solanaConnection, selectedItems).then((signature) => {
+            // cleanup selection
+            setSelectedItemsCount(0);
+            setSelectedItems({});
+        })
     }
 
     React.useEffect(() => {
@@ -116,7 +120,7 @@ export default function NftsSelector(props: NftsSelectorProps) {
             })}
         </NftSelectorGrid>
         <Fadeable
-            show={selectedItemsPopupVisible}
+            isVisible={selectedItemsPopupVisible}
             fadesize={7}
 
             position="fixed" bottom="20px"
@@ -133,7 +137,7 @@ export default function NftsSelector(props: NftsSelectorProps) {
             p="4"
             borderRadius={appTheme.borderRadius}>
 
-            <Button typ="black" onClick={performActionWithSelectedItems}>{action_label}<Box
+            <Button typ="black" onClick={performActionWithSelectedItems}>{action_label} <Box
                 display="inline"
                 right="-15px"
                 top="-15px"

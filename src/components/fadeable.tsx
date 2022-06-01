@@ -8,7 +8,7 @@ export interface FadeableStyles {
 }
 
 export interface FadeableProps {
-    show: boolean
+    isVisible: boolean
     setVisible?: { (arg0: boolean): void }
     fadesize?: number
     animation?: number
@@ -16,8 +16,7 @@ export interface FadeableProps {
 
 export default function Fadeable(props: FadeableProps & any) {
 
-    const visible = props.show
-    const setVisible = props.setVisible
+    const { isVisible, setVisible, ...rest } = props;
 
     const [actualVisible, setAvisible] = useState(false);
     const [firstInit, setFirstInit] = useState<boolean>(true);
@@ -31,7 +30,7 @@ export default function Fadeable(props: FadeableProps & any) {
     const fadeSize = props.fadesize ?? 20;
 
     useEffect(() => {
-        if (visible) {
+        if (isVisible) {
             setAvisible(true);
             setTimeout(function () {
                 setStyles({
@@ -55,7 +54,7 @@ export default function Fadeable(props: FadeableProps & any) {
                 setFirstInit(false);
             }
         }
-    }, [visible]);
+    }, [isVisible]);
 
 
     const result = useMemo(() => {
@@ -64,7 +63,7 @@ export default function Fadeable(props: FadeableProps & any) {
             opacity={styles.opacity}
             transform={styles.transform}
             transition={appTheme.transition}
-            {...props}
+            {...rest}
         >{props.children}</Box>
     }, [actualVisible, styles, props.children])
 

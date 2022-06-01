@@ -1,6 +1,6 @@
 import { Flex, Text, Box, HStack } from "@chakra-ui/layout";
 import { WalletAdapter } from "@solana/wallet-adapter-base";
-import { Connection, PublicKey, TransactionInstruction } from "@solana/web3.js";
+import { Connection, PublicKey, TransactionInstruction, TransactionSignature } from "@solana/web3.js";
 import React from "react";
 import { toast } from "react-toastify";
 import { TxHandler } from "../blockchain/handler";
@@ -15,6 +15,7 @@ import appTheme from "../state/theme"
 import config from "../config.json"
 import MainPageContainer from "./mainpagecontainer";
 import { Button } from "./button";
+import { Label } from "./label";
 
 export interface NftsTabProps {
     heading: JSX.Element
@@ -46,7 +47,7 @@ export function StakeNftsListTab(props: NftTabContentProps) {
         wallet: WalletAdapter,
         solanaConnection: Connection,
         selectedItems: { [key: string]: boolean }
-    ) {
+    ): Promise<any> {
 
         let instructions = [] as TransactionInstruction[];
 
@@ -54,13 +55,13 @@ export function StakeNftsListTab(props: NftTabContentProps) {
             instructions.push(createStakeNftIx(new PublicKey(it), wallet as WalletAdapter));
         }
 
-        sendTx(instructions, 'stake').catch((e) => {
+        return sendTx(instructions, 'stake').catch((e) => {
             toast.error(`Unable to stake: ${e.message}`)
         });
     }
 
     return <NftsTab emptyLabel="no NFT's to stake" heading={<>NFT'S IN YOUR WALLET. <Box alignSelf="flex-end" display="inline-block" paddingLeft="4">go to<Button marginLeft="2" typ="black" size="sm" onClick={() => setNftsTab("unstake")}>Staked</Button></Box></>}>
-        {nftsInWallet.length > 0 ? <NftsSelector maxChunk={props.maxSelection} items={nftsInWallet} actionHandler={stakeSelectedItems} actionLabel="Stake selected " /> : null}
+        {nftsInWallet.length > 0 ? <NftsSelector maxChunk={props.maxSelection} items={nftsInWallet} actionHandler={stakeSelectedItems} actionLabel={<Label>Stake selected</Label>} /> : null}
     </NftsTab>
 }
 
@@ -73,13 +74,13 @@ export function StakedNftsListTab(props: NftTabContentProps) {
         wallet: WalletAdapter,
         solanaConnection: Connection,
         selectedItems: { [key: string]: boolean }
-    ) {
+    ): Promise<any> {
 
         let instructions = [] as TransactionInstruction[];
 
         const stakeOwnerAddress = await getStakeOwnerForWallet(wallet.publicKey);
 
-        StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeOwnerInfo: StakeOwner) => {
+        return StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeOwnerInfo: StakeOwner) => {
 
             if (stakeOwnerInfo == null) {
                 instructions.push(createStakeOwnerIx(wallet.publicKey, stakeOwnerAddress));
@@ -93,7 +94,7 @@ export function StakedNftsListTab(props: NftTabContentProps) {
                 instructions.push(createUnstakeNftIx(mint, wallet.publicKey));
             }
 
-            sendTx(instructions, 'unstake').catch((e) => {
+            return sendTx(instructions, 'unstake').catch((e) => {
                 toast.error(`Unable to unstake: ${e.message}`)
             });
         });
@@ -103,8 +104,8 @@ export function StakedNftsListTab(props: NftTabContentProps) {
         return fromStakeReceipt(it);
     });
 
-    return <NftsTab emptyLabel="no NFT's to unstake" heading={<>YOUR STAKED NFT'S. Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="black" backgroundColor={appTheme.stressColor2}>{dailyRewards / config.reward_token_decimals}  {config.reward_token_name}</Box> per day</>}>
-        {items.length > 0 ? <NftsSelector maxChunk={props.maxSelection} items={items} actionHandler={unstakeSelectedItems} actionLabel="Unstake selected " /> : null}
+    return <NftsTab emptyLabel="no NFT's to unstake" heading={<><Label>YOUR STAKED NFT'S</Label>. Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="black" backgroundColor={appTheme.stressColor2}>{dailyRewards / config.reward_token_decimals}  {config.reward_token_name}</Box> per day</>}>
+        {items.length > 0 ? <NftsSelector maxChunk={props.maxSelection} items={items} actionHandler={unstakeSelectedItems} actionLabel={<Label>Unstake selected</Label>} /> : null}
     </NftsTab>
 }
 
