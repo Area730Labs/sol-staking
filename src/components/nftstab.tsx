@@ -34,10 +34,13 @@ export function NftsTab(props: NftsTabProps) {
     </>
 }
 
+interface NftTabContentProps {
+    maxSelection: number
+}
 
-export function StakeNftsListTab() {
+export function StakeNftsListTab(props: NftTabContentProps) {
 
-    const { nftsInWallet, sendTx,setNftsTab } = useAppContext();
+    const { nftsInWallet, sendTx, setNftsTab } = useAppContext();
 
     function stakeSelectedItems(
         wallet: WalletAdapter,
@@ -51,20 +54,18 @@ export function StakeNftsListTab() {
             instructions.push(createStakeNftIx(new PublicKey(it), wallet as WalletAdapter));
         }
 
-        sendTx(instructions,'stake').then((sig) => {
-            toast.warn("need to clear cache for staked items + nfts in wallet")
-        }).catch((e) => {
+        sendTx(instructions, 'stake').catch((e) => {
             toast.error(`Unable to stake: ${e.message}`)
         });
     }
 
     return <NftsTab emptyLabel="no NFT's to stake" heading={<>NFT'S IN YOUR WALLET. <Box alignSelf="flex-end" display="inline-block" paddingLeft="4">go to<Button marginLeft="2" typ="black" size="sm" onClick={() => setNftsTab("unstake")}>Staked</Button></Box></>}>
-        {nftsInWallet.length > 0 ? <NftsSelector items={nftsInWallet} actionHandler={stakeSelectedItems} actionLabel="Stake selected " /> : null}
+        {nftsInWallet.length > 0 ? <NftsSelector maxChunk={props.maxSelection} items={nftsInWallet} actionHandler={stakeSelectedItems} actionLabel="Stake selected " /> : null}
     </NftsTab>
 }
 
 
-export function StakedNftsListTab() {
+export function StakedNftsListTab(props: NftTabContentProps) {
 
     const { stackedNfts, sendTx, dailyRewards } = useAppContext();
 
@@ -92,9 +93,7 @@ export function StakedNftsListTab() {
                 instructions.push(createUnstakeNftIx(mint, wallet.publicKey));
             }
 
-            sendTx(instructions,'unstake').then((sig) => {
-                toast.warn("need to clear cache for staked items + nfts in wallet")
-            }).catch((e) => {
+            sendTx(instructions, 'unstake').catch((e) => {
                 toast.error(`Unable to unstake: ${e.message}`)
             });
         });
@@ -105,7 +104,7 @@ export function StakedNftsListTab() {
     });
 
     return <NftsTab emptyLabel="no NFT's to unstake" heading={<>YOUR STAKED NFT'S. Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="black" backgroundColor={appTheme.stressColor2}>{dailyRewards / config.reward_token_decimals}  {config.reward_token_name}</Box> per day</>}>
-        {items.length > 0 ? <NftsSelector items={items} actionHandler={unstakeSelectedItems} actionLabel="Unstake selected " /> : null}
+        {items.length > 0 ? <NftsSelector maxChunk={props.maxSelection} items={items} actionHandler={unstakeSelectedItems} actionLabel="Unstake selected " /> : null}
     </NftsTab>
 }
 
@@ -131,6 +130,9 @@ export function NftSelectorTabs() {
 
     return <MainPageContainer paddingY="10" paddingBottom="40">
         <Box ref={scrollRef}></Box>
-        {nftsTab === "stake" ? <StakeNftsListTab /> : <StakedNftsListTab />}
+        {nftsTab === "stake" ?
+            <StakeNftsListTab maxSelection={config.max_items_per_stake} /> :
+            <StakedNftsListTab maxSelection={config.max_items_per_unstake} />
+        }
     </MainPageContainer>
 }

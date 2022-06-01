@@ -17,7 +17,7 @@ import React from "react";
 export interface NftsSelectorProps {
     items: Nft[]
 
-    maxChunk?: number
+    maxChunk: number
     maxSelectedMsg?: string
 
     actionLabel: string
@@ -27,7 +27,8 @@ export interface NftsSelectorProps {
             solanaConnection: Connection,
             selectedItems: { [key: string]: boolean }
         ): void
-    }
+    },
+
 }
 
 export default function NftsSelector(props: NftsSelectorProps) {
@@ -39,7 +40,7 @@ export default function NftsSelector(props: NftsSelectorProps) {
     const [selectedItemsPopupVisible, setSelectedPopupVisible] = React.useState(false);
 
     const action_label = props.actionLabel ?? ""
-    const max_selection = props.maxChunk ?? config.max_items_per_stake;
+    const max_selection = props.maxChunk;
 
     function selectionHandler(item: Nft, state: boolean): boolean {
 

@@ -2,7 +2,7 @@ import { createContext, ReactNode, useContext, useEffect, useMemo, useState } fr
 import * as web3 from '@solana/web3.js'
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import Nft, { fromStakeReceipt } from "../types/Nft";
-import { toast, ToastOptions,Icons } from 'react-toastify';
+import { toast, ToastOptions, Icons } from 'react-toastify';
 
 import config from '../config.json'
 import { getNftsInWalletCached, getStakedNftsCached, getStakeOwnerForWallet } from "./user";
@@ -64,10 +64,6 @@ export interface AppContextType {
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
 
-interface GetSet<T> {
-    get: T
-    set: { (value: T): void }
-}
 export function AppProvider({ children }: { children: ReactNode; }) {
 
     const [platform, setPlatform] = useState<Platform | null>(getPlatformInfoFromCache(new web3.PublicKey(config.stacking_config)));
@@ -86,6 +82,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     const [nftsTab, setNftsTab] = useState<NftsSelectorTab>("stake");
 
     const [curtx, setCurtx] = useState<CurrentTx | null>(null);
+    const [userUpdatesCounter, setUserUpdatesCounter] = useState(0);
 
     const web3Handler = useMemo(() => {
         return new web3.Connection(solanaNode, 'confirmed');
@@ -266,18 +263,27 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                     console.log(`checking tx ${curtx.Signature} status...`)
                 }, 3000)
 
-                return () => {
-                    console.warn('interval should be cleared now')
-                    clearInterval(interval);
+            }).then((item: TransactionType) => {
+
+                const tx_type = curtx.Type;
+
+                switch (tx_type) {
+                    case 'claim': {
+                        const timeTook = new Date().getTime() - curtx.CreatedAt;
+                        console.log('calc income for time when tx were confirming', timeTook)
+                        setPendingRewards(0);
+                        break;
+                    }
+                    case 'stake':
+                    case 'unstake': {
+                        setUserUpdatesCounter(userUpdatesCounter + 1);
+                        break;
+                    }
+                    default: {
+                        toast.warn('unknown tx type got: ' + tx_type)
+                    }
                 }
 
-            }).then((item) => {
-
-                if (item != null) {
-                    console.info('then item is of type ' + typeof item, item)
-                }
-
-                console.info(' finished tx finalizing of type ' + curtx.Type)
                 setCurTxWrapper(null);
             });
 
@@ -361,7 +367,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             updateNfts([]);
             setCurTxWrapper(null);
         }
-    }, [connectedWallet]);
+    }, [connectedWallet, userUpdatesCounter]);
 
     function sendTx(ixs: web3.TransactionInstruction[], typ: TransactionType = 'other', signers?: []): Promise<web3.TransactionSignature> {
 
@@ -380,7 +386,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
                 if (typ != 'other' && typ != 'platform') {
 
-                    toast.success('setting current tx [' + typ + ']... ')
                     setCurTxWrapper({
                         Signature: signature,
                         CreatedAt: new Date().getTime(),
@@ -458,7 +463,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         nftsTab, nftsTabClickCounter,
         web3Handler, connectedWallet,
         nftMultMap,
-        curtx
+        curtx, userUpdatesCounter
     ]);
 
     return (
