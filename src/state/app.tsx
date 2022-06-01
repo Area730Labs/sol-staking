@@ -178,15 +178,55 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             toast.error('error while fetching staking config: ' + e.message)
         })
 
-        // const interval = setInterval(() => {
-        //     toast.info('getting platform info')
-        // }, 60000)
-
-        // return () => {
-        //     clearInterval(interval);
-        // }
-
     }, []);
+
+    useEffect(() => {
+        if (stackedNfts.length > 0) {
+
+            const interval = setInterval(() => {
+
+                // calc inco me 
+                let income = 0;
+
+                const curTimestamp = (new Date()).getTime() / 1000;
+
+                let dailyRewardsValue = 0;
+
+                for (var it of stackedNfts) {
+
+                    const perDay = incomePerNftCalculator(fromStakeReceipt(it));
+
+                    let income_per_minute = perDay / (24 * 60);
+
+                    dailyRewardsValue += perDay;
+
+                    const diff = Math.floor((curTimestamp - it.lastClaim.toNumber()) / 60);
+
+                    if (diff > 0) {
+
+                        const incomePerStakedItem = diff * income_per_minute;
+
+                        // console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
+
+                        income += incomePerStakedItem;
+                    }
+                }
+
+                let incomeNewValue = income / config.reward_token_decimals;
+
+                if (incomeNewValue == 0) {
+                    console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
+                }
+    
+                setPendingRewards(incomeNewValue);
+
+            }, 21000)
+
+            return () => {
+                clearInterval(interval);
+            }
+        }
+    }, [stackedNfts])
 
     useEffect(() => {
 
@@ -201,7 +241,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
             for (var it of stackedNfts) {
 
-                console.log(' #### calc of staked item')
                 const perDay = incomePerNftCalculator(fromStakeReceipt(it));
 
                 let income_per_minute = perDay / (24 * 60);
