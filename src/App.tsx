@@ -403,7 +403,7 @@ export function App() {
         <AppMainModal />
         <Box fontSize="xl" backgroundColor={appTheme.themeColor}>
           <Grid minH="10vh" p={3}>
-            <Box justifySelf="flex-end">
+            <Box justifySelf="flex-end" fontSize="sm">
               <LangSelector />
             </Box>
             <VStack spacing={8} >
