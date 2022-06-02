@@ -381,7 +381,7 @@ export function App() {
 
   let activityFeed = [
     newAction("staked"),
-    newAction("staked"),
+    // newAction("staked"),
     newAction("withdrawn"),
     newAction("claimed")
   ];
@@ -473,9 +473,9 @@ export function App() {
                       <HistoryAction>
                         <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> withdrawed
                   </HistoryAction>
-                      <HistoryAction>
+                      {/* <HistoryAction>
                         <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> claimed
-                  </HistoryAction>
+                  </HistoryAction> */}
                     </InfoColumn>
                   </Box>
                 </HStack>
