@@ -84,6 +84,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     const [curtx, setCurtx] = useState<CurrentTx | null>(null);
     const [userUpdatesCounter, setUserUpdatesCounter] = useState(0);
 
+    const [curInterval, setCurInterval] = useState(null);
+
     const web3Handler = useMemo(() => {
         return new web3.Connection(solanaNode, 'confirmed');
     }, [solanaNode]);
@@ -157,14 +159,14 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             const itemAddr = item.address.toBase58();
             const multBb = nftMultMap[itemAddr];
             const finalResult = basicIncomePerNft * multBb / MAX_BP;
-            console.log(` --- ${itemAddr} `);
-            console.log(` --  mult ${multBb} `)
-            console.log(` --  final ${pretty(finalResult)} `)
+            // console.log(` --- ${itemAddr} `);
+            // console.log(` --  mult ${multBb} `)
+            // console.log(` --  final ${pretty(finalResult)} `)
 
             const multFact = finalResult / basicIncomePerNft;
 
-            console.log(` --  base mult fact: ${prettyNumber(multFact)}`)
-            console.log(' ')
+            // console.log(` --  base mult fact: ${prettyNumber(multFact)}`)
+            // console.log(' ')
 
             return finalResult;
         }
@@ -181,24 +183,24 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     }, []);
 
     useEffect(() => {
-        if (stackedNfts.length > 0) {
 
-            const interval = setInterval(() => {
+        if (curInterval != null) {
+            clearInterval(curInterval);
+        }
+
+        if (stackedNfts.length > 0) {
+            setCurInterval(setInterval(() => {
 
                 // calc inco me 
                 let income = 0;
 
                 const curTimestamp = (new Date()).getTime() / 1000;
 
-                let dailyRewardsValue = 0;
-
                 for (var it of stackedNfts) {
 
                     const perDay = incomePerNftCalculator(fromStakeReceipt(it));
 
                     let income_per_minute = perDay / (24 * 60);
-
-                    dailyRewardsValue += perDay;
 
                     const diff = Math.floor((curTimestamp - it.lastClaim.toNumber()) / 60);
 
@@ -209,7 +211,10 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                         // console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
 
                         income += incomePerStakedItem;
-                    }
+                    } 
+                    // else {
+                        // console.log(' -- staked item diff is 0?. item\'s last claim. now ',it.lastClaim.toNumber(),new Date().getTime()/1000)
+                    // }
                 }
 
                 let incomeNewValue = income / config.reward_token_decimals;
@@ -217,14 +222,10 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                 if (incomeNewValue == 0) {
                     console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
                 }
-    
+
                 setPendingRewards(incomeNewValue);
 
-            }, 21000)
-
-            return () => {
-                clearInterval(interval);
-            }
+            }, 21000));
         }
     }, [stackedNfts])
 
@@ -324,6 +325,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                         const timeTook = new Date().getTime() - curtx.CreatedAt;
                         console.log('calc income for time when tx were confirming', timeTook)
                         setPendingRewards(0);
+                        setUserUpdatesCounter(userUpdatesCounter + 1);
                         break;
                     }
                     case 'stake':
