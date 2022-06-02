@@ -1,8 +1,9 @@
 import { SettingsIcon } from "@chakra-ui/icons";
 import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/menu";
+import { Button } from "@chakra-ui/react"
 import { ReactNode } from "react";
 import { useAppContext } from "../state/app";
-import { Button } from "./button";
+
 
 export type Lang = "en" | "zh";
 
@@ -34,6 +35,7 @@ function Language(props: { children: ReactNode }) {
 export default function LangSelector() {
     return <Menu>
         <MenuButton as={Button} rightIcon={<SettingsIcon />}>
+            Settings
         </MenuButton>
         <MenuList>
             <Language>zh</Language>

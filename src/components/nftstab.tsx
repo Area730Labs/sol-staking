@@ -1,9 +1,8 @@
 import { Flex, Text, Box, HStack } from "@chakra-ui/layout";
 import { WalletAdapter } from "@solana/wallet-adapter-base";
-import { Connection, PublicKey, TransactionInstruction, TransactionSignature } from "@solana/web3.js";
+import { Connection, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import React from "react";
 import { toast } from "react-toastify";
-import { TxHandler } from "../blockchain/handler";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 import { createClaimIx, createStakeNftIx, createStakeOwnerIx, createUnstakeNftIx } from "../blockchain/instructions";
 import EmptyRow from "../emptyrow";

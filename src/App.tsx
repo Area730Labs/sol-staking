@@ -401,10 +401,11 @@ export function App() {
     <AppProvider>
       <ModalProvider>
         <AppMainModal />
-        <LangSelector />
-
         <Box fontSize="xl" backgroundColor={appTheme.themeColor}>
           <Grid minH="10vh" p={3}>
+            <Box justifySelf="flex-end">
+              <LangSelector />
+            </Box>
             <VStack spacing={8} >
               <Container maxW='container.lg' color='white'>
                 <Box bottom="20px" textAlign="center" pt="10">
