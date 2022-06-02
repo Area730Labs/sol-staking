@@ -25,6 +25,7 @@ import { claimStakeOwner, ClaimStakeOwnerAccounts } from "./idl/instructions/cla
 import { Rule } from "./idl/types/Rule";
 import { Condition } from "./idl/types/Condition";
 import { updateStaking, UpdateStakingAccounts, UpdateStakingArgs } from "./idl/instructions/updateStaking";
+import { resizeObject, ResizeObjectAccounts } from "./idl/instructions/resizeObject";
 
 
 export function getMerkleTree(): MerkleTree {
@@ -54,6 +55,21 @@ export function findAssociatedTokenAddress(
         ],
         ASSOCIATED_TOKEN_PROGRAM_ID
     )[0];
+}
+
+export function createResizeObjectIx(typ: number, address: PublicKey, signer: WalletAdapter): TransactionInstruction {
+
+    const args = {
+        typ: typ
+    };
+
+    const accounts = {
+        admin: signer.publicKey,
+        objectAccount: address,
+        systemProgram: SystemProgram.programId
+    } as ResizeObjectAccounts;
+
+    return resizeObject(args, accounts);
 }
 
 export function createStakeNftIx(mint: PublicKey, owner: WalletAdapter): TransactionInstruction {
@@ -153,7 +169,9 @@ export function createUpdateStakingPlatformIx(
     owner: PublicKey,
     stakingConfig: PublicKey,
     baseEmissions: BN,
-    whitelist: MerkleTree
+    whitelist: MerkleTree,
+    emissionType: number,
+    spanDuration: BN
 ): TransactionInstruction {
 
     const [configAddress, configBump] = getProgramPDA("config");
@@ -162,7 +180,7 @@ export function createUpdateStakingPlatformIx(
 
     const args = {
         baseWeeklyEmissions: baseEmissions, // emission per nft per week
-        // stackingType: 3, // fixed per nft per day
+        distributionType: emissionType, // fixed per nft per day
         // subscription: 1,
         start: new BN(now.getTime()),
         root: whitelist.getRootArray(),
@@ -186,10 +204,10 @@ export function createUpdateStakingPlatformIx(
             }, {
                 from: 1000,
                 value: 100
-            },{
+            }, {
                 from: 0,
                 value: 0,
-            },{
+            }, {
                 from: 0,
                 value: 0,
             }] as Condition[]
@@ -217,11 +235,12 @@ export function createUpdateStakingPlatformIx(
             }, {
                 from: 7,
                 value: 0
-            },{
+            }, {
                 from: 0,
                 value: 0,
             }] as Condition[]
-        } as Rule
+        } as Rule,
+        spanDuration: spanDuration
     } as UpdateStakingArgs
 
     const accounts = {
@@ -237,7 +256,9 @@ export function createStackingPlatform(
     rewardsMint: PublicKey,
     platformOwner: PublicKey,
     baseEmissions: BN,
-    whitelist: MerkleTree
+    whitelist: MerkleTree,
+    emissionSpanDuration: BN,
+    emissionType: number
 ): TransactionInstruction {
 
     const alias = new Keypair();
@@ -267,8 +288,8 @@ export function createStackingPlatform(
             staking: sconfBump,
             escrow: escrowBump,
         } as InitializeStakingBumps,
-        baseWeeklyEmissions: baseEmissions, // emission per nft per week
-        stackingType: 3, // fixed per nft per day
+        emissions: baseEmissions, // emission per span, according to stackingType
+        stackingType: emissionType, // fixed per nft per day
         subscription: 1,
         start: new BN(now.getTime()),
         root: whitelist.getRootArray(),
@@ -318,7 +339,8 @@ export function createStackingPlatform(
                 from: 1000,
                 value: 100
             }] as Condition[]
-        } as Rule
+        } as Rule,
+        spanDuration: emissionSpanDuration,
     } as AddStackingArgs
 
     const accounts = {

@@ -1,6 +1,6 @@
 import config from "../config.json"
 
-export const MAX_BP = 10000;
+export const BASIS_POINTS_100P = 10000;
 
 export function prettyNumber(value: number): number {
     return Math.round((value + Number.EPSILON) * 100) / 100

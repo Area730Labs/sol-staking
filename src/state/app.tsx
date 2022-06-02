@@ -12,7 +12,7 @@ import { getPlatformInfo, getPlatformInfoFromCache } from "./platform";
 import { getOrConstruct } from "../types/cacheitem";
 import nfts from "../data/nfts";
 import { TxHandler } from "../blockchain/handler";
-import { MAX_BP, pretty, prettyNumber } from "../data/uitls";
+import { BASIS_POINTS_100P, pretty, prettyNumber } from "../data/uitls";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 import { TaxedItem } from "../App";
 
@@ -98,11 +98,20 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     function calcBasicIncomePerNft(): number {
         if (platform != null) {
             if (platform.emissionType == 3) { // fixed per nft, all time
-                return platform.basicDailyIncome;
+                return platform.baseEmissions;
             } else {
-                console.warn('platform', JSON.stringify(platform))
-                toast.error(`Unable to calc income per nft for emission type of platform (${platform.emissionType})`)
-                return 0;
+                if (platform.emissionType == 2) {
+                    
+                    // this reward you can get if you stake 1 your nft
+                    // const stakedUnitsValue = (platform.stakedUnits > 0 ? ((platform.stakedUnits + BASIS_POINTS_100P) / BASIS_POINTS_100P) : 1);
+                    const stakedUnitsValue = (platform.stakedUnits > 0 ? ((platform.stakedUnits) / BASIS_POINTS_100P) : 1);
+                    
+                    return platform.baseEmissions / stakedUnitsValue;
+                } else {
+                    console.warn('platform', JSON.stringify(platform))
+                    toast.error(`Unable to calc income per nft for emission type of platform (${platform.emissionType})`)
+                    return 0;
+                }
             }
         } else {
             return 0;
@@ -139,12 +148,12 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             }
 
             // check if its not bigger than 10000
-            if (tax_bp > MAX_BP) {
+            if (tax_bp > BASIS_POINTS_100P) {
                 console.log("tax is more than 100%");
                 return [0, 0, staked_diff];
             }
 
-            tax_value = rewards_amount * tax_bp / MAX_BP;
+            tax_value = rewards_amount * tax_bp / BASIS_POINTS_100P;
         }
 
         return [tax_value, rewards_amount, staked_diff];
@@ -158,15 +167,15 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
             const itemAddr = item.address.toBase58();
             const multBb = nftMultMap[itemAddr];
-            const finalResult = basicIncomePerNft * multBb / MAX_BP;
-            // console.log(` --- ${itemAddr} `);
-            // console.log(` --  mult ${multBb} `)
-            // console.log(` --  final ${pretty(finalResult)} `)
+            const finalResult = basicIncomePerNft * multBb / BASIS_POINTS_100P;
+            console.log(` --- ${itemAddr} `);
+            console.log(` --  mult ${multBb} `)
+            console.log(` --  final ${pretty(finalResult)} `)
 
             const multFact = finalResult / basicIncomePerNft;
 
-            // console.log(` --  base mult fact: ${prettyNumber(multFact)}`)
-            // console.log(' ')
+            console.log(` --  base mult fact: ${prettyNumber(multFact)}`)
+            console.log(' ')
 
             return finalResult;
         }
@@ -200,20 +209,22 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
                     const perDay = incomePerNftCalculator(fromStakeReceipt(it));
 
-                    let income_per_minute = perDay / (24 * 60);
+                    const tick_size = 1;
 
-                    const diff = Math.floor((curTimestamp - it.lastClaim.toNumber()) / 60);
+                    let income_per_tick = perDay / (86400 / tick_size);
+
+                    const diff = Math.floor((curTimestamp - it.lastClaim.toNumber()) / tick_size);
 
                     if (diff > 0) {
 
-                        const incomePerStakedItem = diff * income_per_minute;
+                        const incomePerStakedItem = diff * income_per_tick;
 
                         // console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
 
                         income += incomePerStakedItem;
-                    } 
+                    }
                     // else {
-                        // console.log(' -- staked item diff is 0?. item\'s last claim. now ',it.lastClaim.toNumber(),new Date().getTime()/1000)
+                    // console.log(' -- staked item diff is 0?. item\'s last claim. now ',it.lastClaim.toNumber(),new Date().getTime()/1000)
                     // }
                 }
 
@@ -225,7 +236,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
                 setPendingRewards(incomeNewValue);
 
-            }, 21000));
+            }, 15000));
         }
     }, [stackedNfts])
 
@@ -306,7 +317,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                     }
 
                     web3Handler.getSignatureStatus(curtx.Signature).then((resp) => {
-                        if (resp.value.confirmationStatus == 'finalized') {
+                        if (resp.value.confirmationStatus == 'confirmed') {
                             setCurTxWrapper(null);
                             resolve("confirmed")
                             clearInterval(interval);
@@ -382,7 +393,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                         result[it.address] = bp_value;
                     } else {
                         // 1
-                        result[it.address] = MAX_BP;
+                        result[it.address] = BASIS_POINTS_100P;
                     }
                 }
 
@@ -424,7 +435,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     }, [connectedWallet, userUpdatesCounter]);
 
     function sendTx(ixs: web3.TransactionInstruction[], typ: TransactionType = 'other', signers?: []): Promise<web3.TransactionSignature> {
-
 
         if (curtx != null) {
             return Promise.reject(new Error("wait till current transaction is confirmed"));

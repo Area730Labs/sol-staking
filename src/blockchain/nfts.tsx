@@ -33,7 +33,7 @@ export async function getAllNfts(connection: solana.Connection, owner: solana.Pu
 
     const accounts = await connection.getParsedTokenAccountsByOwner(owner, {
         programId: spl.TOKEN_PROGRAM_ID
-    }, 'finalized')
+    }, 'confirmed')
 
     let result = [];
 

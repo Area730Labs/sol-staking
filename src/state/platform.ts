@@ -33,9 +33,12 @@ export async function getPlatformInfo(force: boolean, conn: Connection, platform
 
                 emissionType: platformConfig.distributionType,
 
-                basicWeeklyEmissions: platformConfig.baseWeeklyEmissions.toNumber(),
-                basicDailyIncome: platformConfig.dailyEmissionPerNft.toNumber(),
+                baseEmissions: platformConfig.baseSpanEmissions.toNumber(),
+                spanDuration: platformConfig.spanDurationSeconds.toNumber(),
 
+                claimOffset : platformConfig.distributionRewardsOffset.toNumber(),
+                claimOffsetTimestamp: platformConfig.rewardsOffsetLastChange.toNumber(),
+                stakedUnits: platformConfig.totalStakedMult.toNumber(),
 
                 // rules
                 multiplyRule: platformConfig.rewardMultiplierRule.toJSON(),

@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { TxHandler } from "./blockchain/handler";
 import { PlatformConfig } from "./blockchain/idl/accounts/PlatformConfig";
-import { createPlatformConfig, createStackingPlatform, createUpdateStakingPlatformIx, getMerkleTree } from "./blockchain/instructions";
+import { createPlatformConfig, createResizeObjectIx, createStackingPlatform, createUpdateStakingPlatformIx, getMerkleTree } from "./blockchain/instructions";
 import { Button } from "./components/button";
 import { useAppContext } from "./state/app";
 import config from "./config.json"
@@ -54,16 +54,30 @@ export function DevButtons() {
     const { wallet, solanaConnection, sendTx } = useAppContext();
 
     function updatePlatformButtonHandler() {
-        toast.info("Platform update button is pressed")
 
         const owner = wallet.publicKey;
         const whitelist = getMerkleTree();
         const configAddr = new PublicKey(config.stacking_config);
         const dailyPerNft = parseInt(prompt("enter number of tokens per nft"));
 
-        const ix = createUpdateStakingPlatformIx(owner, configAddr, new BN(dailyPerNft * config.reward_token_decimals), whitelist);
+        let ixs = [];
 
-        sendTx([ix], 'platform').then((signature) => {
+        if (prompt("are there changes in smart contract") != "") {
+            ixs.push(createResizeObjectIx(1, configAddr, wallet))
+        }
+
+        const emissionType = prompt("emission type : 2 - fixed per span, 3 - fixed per nft");
+        const spanDurationDays = parseInt(prompt("span duration days: ")) * 86400;
+
+        ixs.push(createUpdateStakingPlatformIx(
+            owner,
+            configAddr,
+            new BN(dailyPerNft * config.reward_token_decimals),
+            whitelist,
+            parseInt(emissionType),
+            new BN(spanDurationDays)));
+
+        sendTx(ixs, 'platform').then((signature) => {
             toast.info('platform updated')
         }).catch((e) => {
             toast.error(`unable to send update platform config instruction: ${e.message}`)
@@ -78,7 +92,20 @@ export function DevButtons() {
 
         const whitelist = getMerkleTree();
 
-        const ix = createStackingPlatform(mint, owner, new BN(100000000000), whitelist); // 1 coin per day per nft base
+
+        const dailyPerNft = parseInt(prompt("enter number of tokens per nft"));
+
+        const emissionType = parseInt(prompt("emission type : 2 - fixed per span, 3 - fixed per nft"));
+        const spanDurationDays = parseInt(prompt("span duration days: ")) * 86400;
+
+        const ix = createStackingPlatform(
+            mint,
+            owner,
+            new BN(dailyPerNft),
+            whitelist,
+            new BN(spanDurationDays),
+            emissionType
+        ); // 1 coin per day per nft base
 
         sendTx([ix], 'platform').then((signature) => {
             // console.log(`got transaction: ${signature}`)
@@ -124,7 +151,7 @@ export function DevButtons() {
 
                 console.log('platform config ix ', ix)
 
-                sendTx([ix],'platform').then((signature) => {
+                sendTx([ix], 'platform').then((signature) => {
                     // console.log(`got transaction: ${signature}`)
                     toast.info('platform config created !')
                 }).catch((e) => {

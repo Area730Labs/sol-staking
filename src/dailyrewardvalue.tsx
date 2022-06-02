@@ -2,8 +2,8 @@ import { Box, Text } from "@chakra-ui/layout";
 import { useEffect, useState } from "react"
 import { useAppContext } from "./state/app";
 
-import appTheme from "./state/theme"
 import config from "./config.json"
+import { pretty } from "./data/uitls";
 
 export default function DailyRewardValue() {
 
@@ -12,7 +12,7 @@ export default function DailyRewardValue() {
 
     useEffect(() => {
         if (platform != null) {
-            setReward(basicIncomePerNft() / config.reward_token_decimals);
+            setReward(pretty(basicIncomePerNft()));
         }
     }, [platform]);
 

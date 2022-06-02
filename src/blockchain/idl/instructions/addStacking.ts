@@ -1,20 +1,20 @@
 import { TransactionInstruction, PublicKey } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
-import {InitializeStakingBumpsFields,InitializeStakingBumps} from "../types/InitializeStakingBumps" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as types from "../types/Rule" // eslint-disable-line @typescript-eslint/no-unused-vars
-
 import { PROGRAM_ID } from "../programId"
+import {InitializeStakingBumpsFields,InitializeStakingBumps} from "../types/InitializeStakingBumps"
 
 export interface AddStackingArgs {
   bumps: InitializeStakingBumpsFields
-  baseWeeklyEmissions: BN
+  emissions: BN
   stackingType: number
   subscription: number
   start: BN
   multiplierRule: types.RuleFields
   taxRule: types.RuleFields
   root: Array<number>
+  spanDuration: BN
 }
 
 export interface AddStackingAccounts {
@@ -33,13 +33,14 @@ export interface AddStackingAccounts {
 
 export const layout = borsh.struct([
   InitializeStakingBumps.layout("bumps"),
-  borsh.u64("baseWeeklyEmissions"),
+  borsh.u64("emissions"),
   borsh.u8("stackingType"),
   borsh.u8("subscription"),
   borsh.i64("start"),
   types.Rule.layout("multiplierRule"),
   types.Rule.layout("taxRule"),
   borsh.array(borsh.u8(), 32, "root"),
+  borsh.u64("spanDuration"),
 ])
 
 export function addStacking(
@@ -64,13 +65,14 @@ export function addStacking(
   const len = layout.encode(
     {
       bumps: InitializeStakingBumps.toEncodable(args.bumps),
-      baseWeeklyEmissions: args.baseWeeklyEmissions,
+      emissions: args.emissions,
       stackingType: args.stackingType,
       subscription: args.subscription,
       start: args.start,
       multiplierRule: types.Rule.toEncodable(args.multiplierRule),
       taxRule: types.Rule.toEncodable(args.taxRule),
       root: args.root,
+      spanDuration: args.spanDuration,
     },
     buffer
   )

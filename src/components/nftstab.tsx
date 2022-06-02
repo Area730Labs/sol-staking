@@ -16,6 +16,7 @@ import config from "../config.json"
 import MainPageContainer from "./mainpagecontainer";
 import { Button } from "./button";
 import { Label } from "./label";
+import { pretty } from "../data/uitls";
 
 export interface NftsTabProps {
     heading: JSX.Element
@@ -104,7 +105,7 @@ export function StakedNftsListTab(props: NftTabContentProps) {
         return fromStakeReceipt(it);
     });
 
-    return <NftsTab emptyLabel="no NFT's to unstake" heading={<><Label>YOUR STAKED NFT'S</Label>. Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="black" backgroundColor={appTheme.stressColor2}>{dailyRewards / config.reward_token_decimals}  {config.reward_token_name}</Box> per day</>}>
+    return <NftsTab emptyLabel="no NFT's to unstake" heading={<><Label>YOUR STAKED NFT'S</Label>. Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="black" backgroundColor={appTheme.stressColor2}>{pretty(dailyRewards)}  {config.reward_token_name}</Box> per day</>}>
         {items.length > 0 ? <NftsSelector maxChunk={props.maxSelection} items={items} actionHandler={unstakeSelectedItems} actionLabel={<Label>Unstake selected</Label>} /> : null}
     </NftsTab>
 }

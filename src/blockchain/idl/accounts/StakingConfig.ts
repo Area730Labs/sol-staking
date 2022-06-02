@@ -1,9 +1,10 @@
 import { PublicKey, Connection } from "@solana/web3.js"
 import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as types from "../types/InitializeStakingBumps" // eslint-disable-line @typescript-eslint/no-unused-vars
-import { RuleFields, RuleJSON, Rule } from "../types/Rule"
+import {InitializeStakingBumpsFields,InitializeStakingBumpsJSON,InitializeStakingBumps} from "../types/InitializeStakingBumps" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
+import {RuleFields,RuleJSON,Rule} from "../types/Rule"
+
 
 export interface StakingConfigFields {
   alias: PublicKey
@@ -11,19 +12,24 @@ export interface StakingConfigFields {
   owner: PublicKey
   withdrawFee: BN
   distributionType: number
-  bumps: types.InitializeStakingBumpsFields
+  bumps: InitializeStakingBumpsFields
   escrow: PublicKey
   mint: PublicKey
   rewardsAccount: PublicKey
   nftsStaked: BN
   active: boolean
-  dailyEmissionPerNft: BN
-  baseWeeklyEmissions: BN
+  spanEmissionPerNft: BN
+  baseSpanEmissions: BN
   start: BN
   root: Array<number>
-  rewardMultiplierRule: RuleFields
+  rewardMultiplierRule:RuleFields
   taxRule: RuleFields
   totalRewardsClaimed: BN
+  totalStakedMult: BN
+  distributionRewardsOffset: BN
+  rewardsOffsetLastChange: BN
+  spanDurationSeconds: BN
+  spanStartDate: BN
 }
 
 export interface StakingConfigJSON {
@@ -32,19 +38,24 @@ export interface StakingConfigJSON {
   owner: string
   withdrawFee: string
   distributionType: number
-  bumps: types.InitializeStakingBumpsJSON
+  bumps: InitializeStakingBumpsJSON
   escrow: string
   mint: string
   rewardsAccount: string
   nftsStaked: string
   active: boolean
-  dailyEmissionPerNft: string
-  baseWeeklyEmissions: string
+  spanEmissionPerNft: string
+  baseSpanEmissions: string
   start: string
   root: Array<number>
   rewardMultiplierRule: RuleJSON
   taxRule: RuleJSON
   totalRewardsClaimed: string
+  totalStakedMult: string
+  distributionRewardsOffset: string
+  rewardsOffsetLastChange: string
+  spanDurationSeconds: string
+  spanStartDate: string
 }
 
 export class StakingConfig {
@@ -53,19 +64,24 @@ export class StakingConfig {
   readonly owner: PublicKey
   readonly withdrawFee: BN
   readonly distributionType: number
-  readonly bumps: types.InitializeStakingBumps
+  readonly bumps: InitializeStakingBumps
   readonly escrow: PublicKey
   readonly mint: PublicKey
   readonly rewardsAccount: PublicKey
   readonly nftsStaked: BN
   readonly active: boolean
-  readonly dailyEmissionPerNft: BN
-  readonly baseWeeklyEmissions: BN
+  readonly spanEmissionPerNft: BN
+  readonly baseSpanEmissions: BN
   readonly start: BN
   readonly root: Array<number>
   readonly rewardMultiplierRule: Rule
   readonly taxRule: Rule
   readonly totalRewardsClaimed: BN
+  readonly totalStakedMult: BN
+  readonly distributionRewardsOffset: BN
+  readonly rewardsOffsetLastChange: BN
+  readonly spanDurationSeconds: BN
+  readonly spanStartDate: BN
 
   static readonly discriminator = Buffer.from([
     45, 134, 252, 82, 37, 57, 84, 25,
@@ -77,19 +93,24 @@ export class StakingConfig {
     borsh.publicKey("owner"),
     borsh.u64("withdrawFee"),
     borsh.u8("distributionType"),
-    types.InitializeStakingBumps.layout("bumps"),
+    InitializeStakingBumps.layout("bumps"),
     borsh.publicKey("escrow"),
     borsh.publicKey("mint"),
     borsh.publicKey("rewardsAccount"),
     borsh.u64("nftsStaked"),
     borsh.bool("active"),
-    borsh.u64("dailyEmissionPerNft"),
-    borsh.u64("baseWeeklyEmissions"),
+    borsh.u64("spanEmissionPerNft"),
+    borsh.u64("baseSpanEmissions"),
     borsh.i64("start"),
     borsh.array(borsh.u8(), 32, "root"),
     Rule.layout("rewardMultiplierRule"),
     Rule.layout("taxRule"),
     borsh.u64("totalRewardsClaimed"),
+    borsh.u64("totalStakedMult"),
+    borsh.u64("distributionRewardsOffset"),
+    borsh.i64("rewardsOffsetLastChange"),
+    borsh.u64("spanDurationSeconds"),
+    borsh.i64("spanStartDate"),
   ])
 
   constructor(fields: StakingConfigFields) {
@@ -98,14 +119,14 @@ export class StakingConfig {
     this.owner = fields.owner
     this.withdrawFee = fields.withdrawFee
     this.distributionType = fields.distributionType
-    this.bumps = new types.InitializeStakingBumps({ ...fields.bumps })
+    this.bumps = new InitializeStakingBumps({ ...fields.bumps })
     this.escrow = fields.escrow
     this.mint = fields.mint
     this.rewardsAccount = fields.rewardsAccount
     this.nftsStaked = fields.nftsStaked
     this.active = fields.active
-    this.dailyEmissionPerNft = fields.dailyEmissionPerNft
-    this.baseWeeklyEmissions = fields.baseWeeklyEmissions
+    this.spanEmissionPerNft = fields.spanEmissionPerNft
+    this.baseSpanEmissions = fields.baseSpanEmissions
     this.start = fields.start
     this.root = fields.root
     this.rewardMultiplierRule = new Rule({
@@ -113,6 +134,11 @@ export class StakingConfig {
     })
     this.taxRule = new Rule({ ...fields.taxRule })
     this.totalRewardsClaimed = fields.totalRewardsClaimed
+    this.totalStakedMult = fields.totalStakedMult
+    this.distributionRewardsOffset = fields.distributionRewardsOffset
+    this.rewardsOffsetLastChange = fields.rewardsOffsetLastChange
+    this.spanDurationSeconds = fields.spanDurationSeconds
+    this.spanStartDate = fields.spanStartDate
   }
 
   static async fetch(
@@ -162,19 +188,24 @@ export class StakingConfig {
       owner: dec.owner,
       withdrawFee: dec.withdrawFee,
       distributionType: dec.distributionType,
-      bumps: types.InitializeStakingBumps.fromDecoded(dec.bumps),
+      bumps: InitializeStakingBumps.fromDecoded(dec.bumps),
       escrow: dec.escrow,
       mint: dec.mint,
       rewardsAccount: dec.rewardsAccount,
       nftsStaked: dec.nftsStaked,
       active: dec.active,
-      dailyEmissionPerNft: dec.dailyEmissionPerNft,
-      baseWeeklyEmissions: dec.baseWeeklyEmissions,
+      spanEmissionPerNft: dec.spanEmissionPerNft,
+      baseSpanEmissions: dec.baseSpanEmissions,
       start: dec.start,
       root: dec.root,
       rewardMultiplierRule: Rule.fromDecoded(dec.rewardMultiplierRule),
       taxRule: Rule.fromDecoded(dec.taxRule),
       totalRewardsClaimed: dec.totalRewardsClaimed,
+      totalStakedMult: dec.totalStakedMult,
+      distributionRewardsOffset: dec.distributionRewardsOffset,
+      rewardsOffsetLastChange: dec.rewardsOffsetLastChange,
+      spanDurationSeconds: dec.spanDurationSeconds,
+      spanStartDate: dec.spanStartDate,
     })
   }
 
@@ -191,13 +222,18 @@ export class StakingConfig {
       rewardsAccount: this.rewardsAccount.toString(),
       nftsStaked: this.nftsStaked.toString(),
       active: this.active,
-      dailyEmissionPerNft: this.dailyEmissionPerNft.toString(),
-      baseWeeklyEmissions: this.baseWeeklyEmissions.toString(),
+      spanEmissionPerNft: this.spanEmissionPerNft.toString(),
+      baseSpanEmissions: this.baseSpanEmissions.toString(),
       start: this.start.toString(),
       root: this.root,
       rewardMultiplierRule: this.rewardMultiplierRule.toJSON(),
       taxRule: this.taxRule.toJSON(),
       totalRewardsClaimed: this.totalRewardsClaimed.toString(),
+      totalStakedMult: this.totalStakedMult.toString(),
+      distributionRewardsOffset: this.distributionRewardsOffset.toString(),
+      rewardsOffsetLastChange: this.rewardsOffsetLastChange.toString(),
+      spanDurationSeconds: this.spanDurationSeconds.toString(),
+      spanStartDate: this.spanStartDate.toString(),
     }
   }
 
@@ -208,19 +244,24 @@ export class StakingConfig {
       owner: new PublicKey(obj.owner),
       withdrawFee: new BN(obj.withdrawFee),
       distributionType: obj.distributionType,
-      bumps: types.InitializeStakingBumps.fromJSON(obj.bumps),
+      bumps: InitializeStakingBumps.fromJSON(obj.bumps),
       escrow: new PublicKey(obj.escrow),
       mint: new PublicKey(obj.mint),
       rewardsAccount: new PublicKey(obj.rewardsAccount),
       nftsStaked: new BN(obj.nftsStaked),
       active: obj.active,
-      dailyEmissionPerNft: new BN(obj.dailyEmissionPerNft),
-      baseWeeklyEmissions: new BN(obj.baseWeeklyEmissions),
+      spanEmissionPerNft: new BN(obj.spanEmissionPerNft),
+      baseSpanEmissions: new BN(obj.baseSpanEmissions),
       start: new BN(obj.start),
       root: obj.root,
       rewardMultiplierRule: Rule.fromJSON(obj.rewardMultiplierRule),
       taxRule: Rule.fromJSON(obj.taxRule),
       totalRewardsClaimed: new BN(obj.totalRewardsClaimed),
+      totalStakedMult: new BN(obj.totalStakedMult),
+      distributionRewardsOffset: new BN(obj.distributionRewardsOffset),
+      rewardsOffsetLastChange: new BN(obj.rewardsOffsetLastChange),
+      spanDurationSeconds: new BN(obj.spanDurationSeconds),
+      spanStartDate: new BN(obj.spanStartDate),
     })
   }
 }

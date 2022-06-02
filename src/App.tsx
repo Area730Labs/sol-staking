@@ -290,7 +290,7 @@ async function claimPendingrewardsHandlerImpl(ctx: AppContextType) {
     }
 
     // check if user has token account
-    return solanaConnection.getAccountInfo(tokAcc, "finalized");
+    return solanaConnection.getAccountInfo(tokAcc, "confirmed");
   }).then((item) => {
     if (item == null) {
       // not exists

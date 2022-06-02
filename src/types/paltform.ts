@@ -7,8 +7,13 @@ export default interface Platform {
 
     emissionType: number
 
-    basicDailyIncome: number
-    basicWeeklyEmissions: number
+    baseEmissions: number
+    spanDuration: number
+    stakedUnits : number
+
+    // 
+    claimOffset : number
+    claimOffsetTimestamp : number,
 
     // rules
     taxRule: RuleJSON
