@@ -1,6 +1,7 @@
-import { ReactNode } from "react";
-import i18n from "../data/lang/en.json"
-
+import { ReactNode, useMemo } from "react";
+import { toast } from "react-toastify";
+import langZh from "../data/lang/zh.json";
+import { useAppContext } from "../state/app";
 
 function format(that: string, ...args: string[]) {
     return that.replace(/\[(\d+)\]/g, function (match, number) {
@@ -18,15 +19,27 @@ export interface LabelProps {
 
 export function Label(props: LabelProps) {
 
+    const { lang } = useAppContext();
+
     const label = props.children as string;
-    const value = label ; //i18n[label] ?? label;
 
-    let calculated = value;
+    const calculated = useMemo(() => {
 
-    if (props.args != null) {
-        // console.log('calculating ... ')
-        calculated = format(label, ...props.args);
-    }
+        let langMap = {};
+        if (lang == "zh") {
+            langMap = langZh;
+        }
+
+        const value = langMap[label] ?? label;
+
+        let result = value;
+
+        if (props.args != null) {
+            result = format(label, ...props.args);
+        }
+
+        return result;
+    }, [lang, props.args]);
 
     return <>{calculated}</>
 }

@@ -20,7 +20,7 @@ import { pretty } from "../data/uitls";
 
 export interface NftsTabProps {
     heading: JSX.Element
-    emptyLabel: string
+    emptyLabel: JSX.Element
     children?: JSX.Element
 }
 
@@ -61,7 +61,7 @@ export function StakeNftsListTab(props: NftTabContentProps) {
         });
     }
 
-    return <NftsTab emptyLabel="no NFT's to stake" heading={<>NFT'S IN YOUR WALLET. <Box alignSelf="flex-end" display="inline-block" paddingLeft="4">go to<Button marginLeft="2" typ="black" size="sm" onClick={() => setNftsTab("unstake")}>Staked</Button></Box></>}>
+    return <NftsTab emptyLabel={<Label>no NFT's to stake</Label>} heading={<><Label>NFT'S IN YOUR WALLET</Label>. <Box alignSelf="flex-end" display="inline-block" paddingLeft="4">go to<Button marginLeft="2" typ="black" size="sm" onClick={() => setNftsTab("unstake")}><Label>Staked</Label></Button></Box></>}>
         {nftsInWallet.length > 0 ? <NftsSelector maxChunk={props.maxSelection} items={nftsInWallet} actionHandler={stakeSelectedItems} actionLabel={<Label>Stake selected</Label>} /> : null}
     </NftsTab>
 }
@@ -105,7 +105,7 @@ export function StakedNftsListTab(props: NftTabContentProps) {
         return fromStakeReceipt(it);
     });
 
-    return <NftsTab emptyLabel="no NFT's to unstake" heading={<><Label>YOUR STAKED NFT'S</Label>. Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="black" backgroundColor={appTheme.stressColor2}>{pretty(dailyRewards)}  {config.reward_token_name}</Box> per day</>}>
+    return <NftsTab emptyLabel={<Label>no NFT's to unstake</Label>} heading={<><Label>YOUR STAKED NFT'S</Label>. Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="black" backgroundColor={appTheme.stressColor2}>{pretty(dailyRewards)}  {config.reward_token_name}</Box> per day</>}>
         {items.length > 0 ? <NftsSelector maxChunk={props.maxSelection} items={items} actionHandler={unstakeSelectedItems} actionLabel={<Label>Unstake selected</Label>} /> : null}
     </NftsTab>
 }

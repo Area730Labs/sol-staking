@@ -17,6 +17,7 @@ import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 import { TaxedItem } from "../App";
 
 import { CurrentTx, getCurrentTx, storeCurrentTx } from "./currenttx"
+import { getLanguageFromCache, Lang } from "../components/langselector";
 
 export type RankMultiplyerMap = { [key: string]: number }
 export type NftsSelectorTab = "stake" | "unstake"
@@ -59,12 +60,17 @@ export interface AppContextType {
 
     getTaxedItems: { (): [TaxedItem[], number] }
 
+    lang: Lang,
+    setLang : {(value: Lang)}
+
     // setCurrentTx: { (item: CurrentTx): void }
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
 
 export function AppProvider({ children }: { children: ReactNode; }) {
+
+    const [lang, setLang] = useState<Lang>(getLanguageFromCache());
 
     const [platform, setPlatform] = useState<Platform | null>(getPlatformInfoFromCache(new web3.PublicKey(config.stacking_config)));
     const [nftMultMap, setMultMap] = useState<RankMultiplyerMap | null>(null);
@@ -228,7 +234,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                     // }
                 }
 
-                let incomeNewValue = income / config.reward_token_decimals;
+                let incomeNewValue = income;
 
                 if (incomeNewValue == 0) {
                     console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
@@ -272,7 +278,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
             setDailyrewards(dailyRewardsValue);
 
-            let incomeNewValue = income / config.reward_token_decimals;
+            let incomeNewValue = income;
 
             if (incomeNewValue == 0) {
                 console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
@@ -288,7 +294,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                 return StakeOwner.fetch(web3Handler, stakeOwnerAddress);
             }).then((stake_owner) => {
                 if (stake_owner != null) {
-                    const totalRewards = savedIncomeValues + (stake_owner.balance.toNumber() / config.reward_token_decimals);
+                    const totalRewards = savedIncomeValues + stake_owner.balance.toNumber();
                     setPendingRewards(totalRewards);
                 }
             });
@@ -518,6 +524,10 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             calculateIncomeWithTaxes,
             getTaxedItems,
 
+            // lang 
+            lang,
+            setLang
+
         } as AppContextType;
 
         return curCtx
@@ -527,7 +537,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         nftsTab, nftsTabClickCounter,
         web3Handler, connectedWallet,
         nftMultMap,
-        curtx, userUpdatesCounter
+        curtx, userUpdatesCounter,
+        lang
     ]);
 
     return (

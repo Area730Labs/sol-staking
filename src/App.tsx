@@ -51,6 +51,8 @@ import { WarningIcon } from "@chakra-ui/icons"
 import { StakingReceipt } from "./blockchain/idl/accounts/StakingReceipt"
 import { ModalProvider, useModal } from "./state/modal"
 import { pretty } from "./data/uitls"
+import { Label } from "./components/label"
+import LangSelector from "./components/langselector"
 
 function HistoryActionNftLink(props: any) {
   return <Image cursor="pointer" src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="46px" />
@@ -104,6 +106,8 @@ function AppMainModal() {
 
   const { modalVisible, setModalVisible, modalContent, taxModal } = useModal();
   // todo fix tax modal  :)
+
+
 
   return <Modal
     isVisible={modalVisible}
@@ -165,7 +169,7 @@ function StakeButton() {
     }
   }, [wallet]);
 
-  return <Button onClick={() => { stakeHandler() }}>Stake</Button>
+  return <Button onClick={() => { stakeHandler() }}><Label>Stake</Label></Button>
 }
 
 export interface TaxedItem {
@@ -180,7 +184,7 @@ function UnstakeTaxModal() {
   // toast.info('calc taxes ...')
 
   const ctx = useAppContext();
-  const { platform, stackedNfts, calculateIncomeWithTaxes } = useAppContext();
+
   const { setModalVisible, setTaxModal } = useModal();
 
   function closeTaxModal() {
@@ -195,9 +199,9 @@ function UnstakeTaxModal() {
     var result = [] as TaxedItem[];
     var totalTax = 0;
 
-    for (var it of stackedNfts) {
+    for (var it of ctx.stackedNfts) {
 
-      const [taxes, income, stake_diff] = calculateIncomeWithTaxes(it);
+      const [taxes, income, stake_diff] = ctx.calculateIncomeWithTaxes(it);
 
       if (taxes > 0) {
         result.push({
@@ -212,7 +216,7 @@ function UnstakeTaxModal() {
     }
 
     return [result, totalTax];
-  }, [stackedNfts, platform])
+  }, [ctx.stackedNfts, ctx.platform])
 
   function prettyTime(value: number): string {
 
@@ -228,10 +232,14 @@ function UnstakeTaxModal() {
     }
   }
 
+  const earningsMinusTax = React.useMemo(() => {
+    return ctx.pendingRewards - totalTax;
+  }, [ctx.pendingRewards, totalTax]);
+
   return <Box>
     <VStack textAlign="left" >
-      <Text fontSize="2xl" color={appTheme.stressColor}> <WarningIcon /> <Text display="inline-block" fontWeight="bold">{pretty(totalTax)}</Text> Unstake tax</Text>
-      <Text fontSize="sm">{taxedItems.length} items are subject to pay taxes from.</Text>
+      <Text fontSize="2xl" color={appTheme.stressColor}> <WarningIcon /> <Text display="inline-block" fontWeight="bold">{pretty(totalTax)}</Text> <Label>Unstake tax</Label></Text>
+      <Text fontSize="sm">{taxedItems.length} <Label>items are subject to pay taxes from</Label>.</Text>
 
       {/* <Text fontSize="xs"  >wait at least 7 days before unstaking to keep all your gains</Text> */}
       <VStack maxH={["80%", "400px"]} overflowY="auto" spacing={4} p="4">
@@ -259,8 +267,16 @@ function UnstakeTaxModal() {
         <Button typ="black" size="md" onClick={() => {
           closeTaxModal();
           claimPendingrewardsHandlerImpl(ctx);
-        }}>Confirm</Button>
-        <Button size="md" onClick={closeTaxModal}>cancel</Button>
+        }}><Label>Claim</Label> <Text
+          display="inline-block"
+          color="black"
+          p="1px"
+          px="10px"
+          borderRadius={"15px"}
+          backgroundColor={appTheme.stressColor2}
+        >{pretty(earningsMinusTax)}</Text>
+        </Button>
+        <Button size="md" onClick={closeTaxModal}><Label>Cancel</Label></Button>
       </Box>
     </VStack>
   </Box>
@@ -333,7 +349,7 @@ function ClaimPendingRewardsButton() {
     }
   }
 
-  return (<Button typ="black" marginLeft="10px" onClick={claimPendingRewardsHandler}>Claim pending rewards</Button>)
+  return (<Button typ="black" marginLeft="10px" onClick={claimPendingRewardsHandler}><Label>Claim pending rewards</Label></Button>)
 }
 
 function PendingRewards(props: any) {
@@ -347,7 +363,7 @@ function PendingRewards(props: any) {
         backgroundColor="rgb(237,41,57)"
         p="2"
         px="4"
-      >+<Countup float="true" number={pendingRewards} timems="300" /> {config.reward_token_name}</Box>
+      >+<Countup float="true" number={pretty(pendingRewards)} timems="300" /> {config.reward_token_name}</Box>
       : null}
   </Box>
 }
@@ -385,13 +401,15 @@ export function App() {
     <AppProvider>
       <ModalProvider>
         <AppMainModal />
+        <LangSelector />
+
         <Box fontSize="xl" backgroundColor={appTheme.themeColor}>
           <Grid minH="10vh" p={3}>
             <VStack spacing={8} >
               <Container maxW='container.lg' color='white'>
                 <Box bottom="20px" textAlign="center" pt="10">
                   <TotalClaimed />
-                  <Text fontSize="2xl" color="white">total claimed</Text>
+                  <Text fontSize="2xl" color="white"><Label>total claimed rewards</Label></Text>
                 </Box>
               </Container>
               <Container maxW='container.lg' color='white' zIndex="15" textAlign="center">
@@ -413,16 +431,16 @@ export function App() {
                   </Box>
                   <Box>
                     <VStack textAlign="center" >
-                      <Text fontSize="sm" fontWeight="bold">Rewards</Text>
+                      <Text fontSize="sm" fontWeight="bold"><Label>Rewards</Label></Text>
                       <RewardImage img={config.reward_image} />
                       <DailyRewardValue />
                     </VStack>
                   </Box>
                   <Box>
                     <InfoColumn>
-                      <Text fontSize="sm" fontWeight="bold">All staked</Text>
+                      <Text fontSize="sm" fontWeight="bold"><Label>All staked</Label></Text>
                       <AllStakedNfts />
-                      <Text fontSize="sm" fontWeight="bold">Activity feed</Text>
+                      <Text fontSize="sm" fontWeight="bold"><Label>Activity feed</Label></Text>
                       {activityFeed.map((object, i) => <HistoryAction key={i}>
                         <Tooltip label={object.date.toUTCString()} fontSize='md'>
                           <HStack justifyContent="flex-end" key={i}>
@@ -441,9 +459,9 @@ export function App() {
                   </Box>
                   <Box>
                     <InfoColumn>
-                      <Text fontSize="sm" fontWeight="bold">Your position</Text>
+                      <Text fontSize="sm" fontWeight="bold"><Label>Your position</Label></Text>
                       <SmallStakedNftsList />
-                      <Text fontSize="sm" fontWeight="bold">Activity feed</Text>
+                      <Text fontSize="sm" fontWeight="bold"><Label>Activity feed</Label></Text>
 
                       <HistoryAction>
                         <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> staked
