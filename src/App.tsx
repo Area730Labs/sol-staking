@@ -425,8 +425,8 @@ export function App() {
                 <HStack spacing={4} alignItems="flex-start">
                   <Box>
                     <VStack alignItems="flex-start">
-                      <Text fontWeight="bold">Okay Bears</Text>
-                      <Image src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="250px" boxShadow="dark" />
+                      <Text fontWeight="bold">{global_config.label}</Text>
+                    <MainImage/>
                       <StakePlatformStats />
                     </VStack>
                   </Box>
@@ -519,4 +519,11 @@ function AllStakedNfts() {
       </Box>
     </SmallNftBlock>
   </HStack>
+}
+
+function MainImage() {
+
+  const {config} = useAppContext();
+
+  return   <Image src={config.main_image} borderRadius={appTheme.borderRadius} width="250px" boxShadow="dark" />
 }

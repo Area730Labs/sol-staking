@@ -83,13 +83,14 @@ export function DevButtons() {
     function platformCreationButton() {
         toast.info("Platform creation button is pressed")
 
-        const mint = new PublicKey("5tgyTiconR365e9beKg8PiMiVje1e8bL6CU3tdYmz3my");
+        const token = prompt("enter token address");
+
+        const mint = new PublicKey(token);
         const owner = wallet.publicKey;
 
         const whitelist = getMerkleTree();
 
-
-        const dailyPerNft = parseInt(prompt("enter number of tokens per nft"));
+        const dailyPerNft = parseInt(prompt("enter number of tokens per nft"))*config.reward_token_decimals;
 
         const emissionType = parseInt(prompt("emission type : 2 - fixed per span, 3 - fixed per nft"));
         const spanDurationDays = parseInt(prompt("span duration days: ")) * 86400;
@@ -140,7 +141,7 @@ export function DevButtons() {
         });
     }
 
-    if (wallet != null && wallet.publicKey === config.treasury_wallet) {
+    if (wallet != null && wallet.publicKey.toBase58() === config.treasury_wallet.toBase58()) {
         return <Box py="8">
             <Button size="sm" onClick={() => {
 
@@ -153,7 +154,7 @@ export function DevButtons() {
                     toast.info('platform config created !')
                 }).catch((e) => {
                     console.log('mint info ', e)
-                    toast.error(`unable to send create mint instruction: ${e.message}`)
+                    toast.error(`unable to send create global platform instruction: ${e.message}`)
                 });
 
 

@@ -18,6 +18,8 @@ export interface Config {
     reward_token_name: string
     reward_token_decimals: number
     rewards_mint: PublicKey,
+
+    main_image: string
 }
 
 export function fromJson(object: any): Config {
@@ -37,6 +39,8 @@ export function fromJson(object: any): Config {
         reward_token_name: object.reward_token_name,
         reward_token_decimals: object.reward_token_decimals,
         rewards_mint: new PublicKey(object.rewards_mint),
+
+        main_image: object.main_image
     }
 }
 

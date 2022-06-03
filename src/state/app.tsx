@@ -76,7 +76,6 @@ const AppContext = createContext<AppContextType>({} as AppContextType);
 
 export function AppProvider({ children }: { children: ReactNode; }) {
 
-
     const [lang, setLang] = useState<Lang>(getLanguageFromCache());
     const [config, setConfig] = useState<Config>(environmentConfig());
 
