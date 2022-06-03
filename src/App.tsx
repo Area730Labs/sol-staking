@@ -46,7 +46,7 @@ import { createClaimIx, createClaimStakeOwnerIx, createStakeOwnerIx, findAssocia
 import TotalClaimed from "./totalclaimed"
 import DailyRewardValue from "./dailyrewardvalue"
 import StakePlatformStats from "./stakeplatformstats"
-import nfts from "./data/nfts"
+import nfts from "./data/nfts.json"
 import { WarningIcon } from "@chakra-ui/icons"
 import { StakingReceipt } from "./blockchain/idl/accounts/StakingReceipt"
 import { ModalProvider, useModal } from "./state/modal"
@@ -463,10 +463,12 @@ export function App() {
                       <Text fontSize="sm" fontWeight="bold"><Label>Your position</Label></Text>
                       <SmallStakedNftsList />
                       <Text fontSize="sm" fontWeight="bold"><Label>Activity feed</Label></Text>
-
-                      <HistoryAction>
-                        <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> staked
-                  </HistoryAction>
+                      <HistoryAction textAlign="left">
+                        <Text >
+                          <Label>Total Claimed</Label>
+                        </Text>
+                        <Text fontSize="xl">{pretty(238923392323323)}</Text>
+                      </HistoryAction>
                       <HistoryAction>
                         <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> staked
                   </HistoryAction>

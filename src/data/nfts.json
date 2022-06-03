@@ -1,4 +1,4 @@
-const nfts  = [
+[
     {
         "address": "5D9RpxPzd6WoMDEjtPhQS7ArWMg2srEiKSzJm8wpTp7P",
         "name": "810 Rodeo Drive",
@@ -95,18 +95,4 @@ const nfts  = [
             "rank": 987
         }
     }
-    
-    
-    
-
-    // {
-    //     "address": "FuEQzN7RAvLHdmUyd3YoFxiShVPPSjdpRGZYDoYbyXmV",
-    //     "name": "ToastedBear #3739 (TBZ)",
-    //     "image": "https://dn5b7isw2zvmtyw3anzxpjox55fujfzhy4cwq3og2bnz4ipo.arweave.net/G3ofolbWasni2wNzd6XX70-tElyfHB-WhtxtBbniHuY?ext=png",
-    //     "props": {
-    //         "rank": 2
-    //     }
-    // }
-];
-
-export default nfts;
+]

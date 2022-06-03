@@ -10,7 +10,7 @@ import { StakingReceipt } from "../blockchain/idl/accounts/StakingReceipt";
 import Platform, { matchRule } from "../types/paltform";
 import { getPlatformInfo, getPlatformInfoFromCache } from "./platform";
 import { getOrConstruct } from "../types/cacheitem";
-import nfts from "../data/nfts";
+import nfts from "../data/nfts.json";
 import { TxHandler } from "../blockchain/handler";
 import { BASIS_POINTS_100P, pretty, prettyNumber } from "../data/uitls";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";

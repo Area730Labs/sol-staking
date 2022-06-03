@@ -5,7 +5,7 @@ import { getAllNfts, getStakedNfts } from "../blockchain/nfts";
 import { constructCacheKey, getOrConstruct } from "../types/cacheitem";
 import config from "../config.json"
 import Nft from "../types/Nft";
-import nftsAvailable from '../data/nfts'
+import nftsAvailable from '../data/nfts.json'
 import { calcAddressWithTwoSeeds } from "../blockchain/instructions";
 
 export async function getStakedNftsCached(solanaConnection: Connection, wallet: PublicKey, force: boolean = false,): Promise<StakingReceipt[]> {

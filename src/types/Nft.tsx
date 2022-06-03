@@ -1,5 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
-import nfts from "../data/nfts"
+import nfts from "../data/nfts.json"
 import { StakingReceipt } from "../blockchain/idl/accounts/StakingReceipt";
 
 export default interface Nft {

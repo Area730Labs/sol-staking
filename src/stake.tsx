@@ -91,11 +91,12 @@ export default function NftsSelector(props: NftsSelectorProps) {
 
     // fill the row with placeholders
     // @todo use nft layout 
-    if (items && items.length < maxPerRow) {
-        for (var i = 0; i < (maxPerRow - items.length); i++) {
+    const diffToDraw =  maxPerRow - Math.floor(items.length % maxPerRow);
+
+    if (items && diffToDraw != 0) {
+        for (var i = 0; i < diffToDraw; i++) {
             nftsPlaceholders.push(<GridItem
                 key={i}
-                cursor="pointer"
                 w="100%"
                 maxH='280px'
                 borderRadius={appTheme.borderRadius}

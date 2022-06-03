@@ -11,7 +11,7 @@ import { PlatformBumps } from "./idl/types/PlatformBumps";
 import { StakeNftBumps } from "./idl/types/StakeNftBumps"
 import { Nft } from "./types";
 
-import nftsRaw from "../data/nfts"
+import nftsRaw from "../data/nfts.json"
 import config from "../config.json"
 import BN from "bn.js"
 

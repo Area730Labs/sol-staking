@@ -2,7 +2,7 @@ import { HStack } from "@chakra-ui/layout";
 import { useEffect, useState } from "react";
 import HistoryAction from "./components/historyaction";
 import { Stat } from "./components/stat";
-import nfts from "./data/nfts";
+import nfts from "./data/nfts.json";
 import { useAppContext } from "./state/app";
 import {prettyNumber} from "./data/uitls"
 
