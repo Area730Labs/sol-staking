@@ -15,7 +15,6 @@ import config from "../config.json"
 import MainPageContainer from "./mainpagecontainer";
 import { Button } from "./button";
 import { Label } from "./label";
-import { pretty } from "../data/uitls";
 
 export interface NftsTabProps {
     heading: JSX.Element
@@ -41,7 +40,7 @@ interface NftTabContentProps {
 
 export function StakeNftsListTab(props: NftTabContentProps) {
 
-    const { nftsInWallet, sendTx, setNftsTab } = useAppContext();
+    const { nftsInWallet, sendTx, setNftsTab, config } = useAppContext();
 
     function stakeSelectedItems(
         wallet: WalletAdapter,
@@ -52,7 +51,7 @@ export function StakeNftsListTab(props: NftTabContentProps) {
         let instructions = [] as TransactionInstruction[];
 
         for (var it in selectedItems) {
-            instructions.push(createStakeNftIx(new PublicKey(it), wallet as WalletAdapter));
+            instructions.push(createStakeNftIx(config, new PublicKey(it), wallet as WalletAdapter));
         }
 
         return sendTx(instructions, 'stake').catch((e) => {
@@ -68,7 +67,7 @@ export function StakeNftsListTab(props: NftTabContentProps) {
 
 export function StakedNftsListTab(props: NftTabContentProps) {
 
-    const { stackedNfts, sendTx, dailyRewards } = useAppContext();
+    const { stackedNfts, sendTx, dailyRewards, config, pretty } = useAppContext();
 
     async function unstakeSelectedItems(
         wallet: WalletAdapter,
@@ -78,20 +77,20 @@ export function StakedNftsListTab(props: NftTabContentProps) {
 
         let instructions = [] as TransactionInstruction[];
 
-        const stakeOwnerAddress = await getStakeOwnerForWallet(wallet.publicKey);
+        const stakeOwnerAddress = await getStakeOwnerForWallet(config, wallet.publicKey);
 
         return StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeOwnerInfo: StakeOwner) => {
 
             if (stakeOwnerInfo == null) {
-                instructions.push(createStakeOwnerIx(wallet.publicKey, stakeOwnerAddress));
+                instructions.push(createStakeOwnerIx(config, wallet.publicKey, stakeOwnerAddress));
             }
 
             for (var it in selectedItems) {
 
                 const mint = new PublicKey(it);
 
-                instructions.push(createClaimIx(mint, wallet.publicKey, stakeOwnerAddress))
-                instructions.push(createUnstakeNftIx(mint, wallet.publicKey));
+                instructions.push(createClaimIx(config, mint, wallet.publicKey, stakeOwnerAddress))
+                instructions.push(createUnstakeNftIx(config, mint, wallet.publicKey));
             }
 
             return sendTx(instructions, 'unstake').catch((e) => {

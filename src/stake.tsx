@@ -10,9 +10,9 @@ import Fadeable from "./components/fadeable";
 import appTheme from "./state/theme"
 import { Button } from "./components/button";
 
-import config from "./config.json"
 import NftSelectorGrid from "./components/nftselectorgrid";
 import React, { ReactNode } from "react";
+import global_config from "./config.json"
 
 export interface NftsSelectorProps {
     items: Nft[]
@@ -33,7 +33,7 @@ export interface NftsSelectorProps {
 
 export default function NftsSelector(props: NftsSelectorProps) {
 
-    const { wallet, solanaConnection } = useAppContext();
+    const { wallet, solanaConnection, config } = useAppContext();
 
     const [selectedItems, setSelectedItems] = React.useState<{ [key: string]: boolean }>({});
     const [selectedItemsCount, setSelectedItemsCount] = React.useState(0);
@@ -85,13 +85,13 @@ export default function NftsSelector(props: NftsSelectorProps) {
 
     const nftsPlaceholders = [];
 
-    const maxPerRow = config.max_nfts_per_row;
+    const maxPerRow = global_config.max_nfts_per_row;
 
     const items = props.items;
 
     // fill the row with placeholders
     // @todo use nft layout 
-    const diffToDraw =  maxPerRow - Math.floor(items.length % maxPerRow);
+    const diffToDraw = maxPerRow - Math.floor(items.length % maxPerRow);
 
     if (items && diffToDraw != 0) {
         for (var i = 0; i < diffToDraw; i++) {

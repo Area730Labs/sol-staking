@@ -1,11 +1,12 @@
 import * as solana from '@solana/web3.js'
 import * as spl from '@solana/spl-token'
 import { StakingReceipt } from './idl/accounts/StakingReceipt';
-import config from "../config.json"
+import global_config from "../config.json"
+import { Config } from "../types/config"
 
-export async function getStakedNfts(connection: solana.Connection, owner: solana.PublicKey): Promise<StakingReceipt[]> {
+export async function getStakedNfts(config: Config, connection: solana.Connection, owner: solana.PublicKey): Promise<StakingReceipt[]> {
 
-    const receiptAccounts = await connection.getProgramAccounts(new solana.PublicKey(config.program_id), {
+    const receiptAccounts = await connection.getProgramAccounts(config.program_id, {
         filters: [
             {
                 dataSize: StakingReceipt.layout.span + 8
@@ -20,7 +21,7 @@ export async function getStakedNfts(connection: solana.Connection, owner: solana
     })
 
 
-    let  result = [];
+    let result = [];
 
     for (var it of receiptAccounts) {
         result.push(StakingReceipt.decode(it.account.data))

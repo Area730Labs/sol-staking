@@ -4,7 +4,7 @@ import { WalletAdapter } from "@solana/wallet-adapter-base";
 import Nft, { fromStakeReceipt } from "../types/Nft";
 import { toast, ToastOptions, Icons } from 'react-toastify';
 
-import config from '../config.json'
+import global_config from '../config.json'
 import { getNftsInWalletCached, getStakedNftsCached, getStakeOwnerForWallet } from "./user";
 import { StakingReceipt } from "../blockchain/idl/accounts/StakingReceipt";
 import Platform, { matchRule } from "../types/paltform";
@@ -12,12 +12,13 @@ import { getPlatformInfo, getPlatformInfoFromCache } from "./platform";
 import { getOrConstruct } from "../types/cacheitem";
 import nfts from "../data/nfts.json";
 import { TxHandler } from "../blockchain/handler";
-import { BASIS_POINTS_100P, pretty, prettyNumber } from "../data/uitls";
+import { BASIS_POINTS_100P, prettyNumber } from "../data/uitls";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 import { TaxedItem } from "../App";
 
 import { CurrentTx, getCurrentTx, storeCurrentTx } from "./currenttx"
 import { getLanguageFromCache, Lang } from "../components/langselector";
+import { Config, environmentConfig } from "../types/config"
 
 export type RankMultiplyerMap = { [key: string]: number }
 export type NftsSelectorTab = "stake" | "unstake"
@@ -61,7 +62,12 @@ export interface AppContextType {
     getTaxedItems: { (): [TaxedItem[], number] }
 
     lang: Lang,
-    setLang : {(value: Lang)}
+    setLang: { (value: Lang) }
+
+    config: Config,
+    setConfig: { (value: Config) }
+
+    pretty: { (value: number): number }
 
     // setCurrentTx: { (item: CurrentTx): void }
 }
@@ -70,9 +76,11 @@ const AppContext = createContext<AppContextType>({} as AppContextType);
 
 export function AppProvider({ children }: { children: ReactNode; }) {
 
-    const [lang, setLang] = useState<Lang>(getLanguageFromCache());
 
-    const [platform, setPlatform] = useState<Platform | null>(getPlatformInfoFromCache(new web3.PublicKey(config.stacking_config)));
+    const [lang, setLang] = useState<Lang>(getLanguageFromCache());
+    const [config, setConfig] = useState<Config>(environmentConfig());
+
+    const [platform, setPlatform] = useState<Platform | null>(getPlatformInfoFromCache(config.stacking_config));
     const [nftMultMap, setMultMap] = useState<RankMultiplyerMap | null>(null);
 
     const [userNfts, updateNfts] = useState<Nft[]>([]);
@@ -101,17 +109,21 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         setCounter(nftsTabClickCounter + 1);
     }
 
+    function pretty(value: number): number {
+        return Math.round(((value / config.reward_token_decimals) + Number.EPSILON) * 100) / 100
+    }
+
     function calcBasicIncomePerNft(): number {
         if (platform != null) {
             if (platform.emissionType == 3) { // fixed per nft, all time
                 return platform.baseEmissions;
             } else {
                 if (platform.emissionType == 2) {
-                    
+
                     // this reward you can get if you stake 1 your nft
                     // const stakedUnitsValue = (platform.stakedUnits > 0 ? ((platform.stakedUnits + BASIS_POINTS_100P) / BASIS_POINTS_100P) : 1);
                     const stakedUnitsValue = (platform.stakedUnits > 0 ? ((platform.stakedUnits) / BASIS_POINTS_100P) : 1);
-                    
+
                     return platform.baseEmissions / stakedUnitsValue;
                 } else {
                     console.warn('platform', JSON.stringify(platform))
@@ -189,7 +201,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
     useEffect(() => {
 
-        getPlatformInfo(config.disable_cache, web3Handler, new web3.PublicKey(config.stacking_config)).then((platform) => {
+        getPlatformInfo(global_config.disable_cache, web3Handler, config.stacking_config).then((platform) => {
             setPlatform(platform);
         }).catch((e) => {
             toast.error('error while fetching staking config: ' + e.message)
@@ -288,7 +300,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
             const savedIncomeValues = incomeNewValue;
 
-            getStakeOwnerForWallet(connectedWallet.publicKey).then(async (stakeOwnerAddress) => {
+            getStakeOwnerForWallet(config, connectedWallet.publicKey).then(async (stakeOwnerAddress) => {
 
                 // connection expected to be always available 
                 return StakeOwner.fetch(web3Handler, stakeOwnerAddress);
@@ -380,7 +392,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
             // @todo add changes counter to staking config account
             // and use it for caching 
-            getOrConstruct<RankMultiplyerMap>(config.disable_cache, "rank_multiplyer", async () => {
+            getOrConstruct<RankMultiplyerMap>(global_config.disable_cache, "rank_multiplyer", async () => {
 
                 let result: RankMultiplyerMap = {};
 
@@ -425,7 +437,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             setCurtx(getCurrentTx(connectedWallet));
 
             // probably just use useMemo
-            getStakedNftsCached(web3Handler, connectedWallet.publicKey).then((stakedNfts) => {
+            getStakedNftsCached(config, web3Handler, connectedWallet.publicKey).then((stakedNfts) => {
                 updateStakedNfts(stakedNfts);
             });
 
@@ -448,7 +460,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
         const txhandler = new TxHandler(web3Handler, connectedWallet, []);
 
-        if (config.debug_simulate_tx) {
+        if (global_config.debug_simulate_tx) {
             toast.warn("simulation of tx enabled. look into console for more info")
             txhandler.simulate(ixs, signers);
         } else {
@@ -526,7 +538,10 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
             // lang 
             lang,
-            setLang
+            setLang,
+
+            config,
+            pretty
 
         } as AppContextType;
 
@@ -538,7 +553,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         web3Handler, connectedWallet,
         nftMultMap,
         curtx, userUpdatesCounter,
-        lang
+        lang,
+        config
     ]);
 
     return (

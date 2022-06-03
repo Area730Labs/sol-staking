@@ -1,11 +1,12 @@
 import { GridItem } from "@chakra-ui/layout";
 import NftSelectorGrid from "./components/nftselectorgrid";
-import config from "./config.json"
 import appTheme from "./state/theme"
+import global_config from "./config.json"
+
 
 export default function EmptyRow() {
 
-    const maxPerRow = config.max_nfts_per_row;
+    const maxPerRow = global_config.max_nfts_per_row;
     const nftsPlaceholders = [];
 
     // @todo use nft layout 

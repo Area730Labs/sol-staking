@@ -1,12 +1,10 @@
 import { Image } from "@chakra-ui/image";
 import { Box, HStack, Text } from "@chakra-ui/layout";
 import SmallNftBlock from "./smallnftblock";
-import { getFakeNftImage } from "./components/nft"
-
+import global_config from "./config.json"
 import appTheme from "./state/theme"
 import { useAppContext } from "./state/app";
 
-import config from "./config.json"
 import Nft, { fromStakeReceipt } from "./types/Nft";
 import { Tooltip } from "@chakra-ui/tooltip";
 
@@ -27,13 +25,15 @@ export default function SmallStakedNftsList() {
 
     const { stackedNfts, setNftsTab } = useAppContext();
 
+    const config = global_config;
+
     function showStakedNfts() {
         setNftsTab("unstake");
     }
 
     if (stackedNfts.length == 0) {
         return <HStack>
-            {[...Array(config.max_nfts_per_row)].map((object, i) => <SmallNftBlock key={i}/>)}
+            {[...Array(config.max_nfts_per_row)].map((object, i) => <SmallNftBlock key={i} />)}
         </HStack>
     }
 

@@ -26,7 +26,7 @@ export function NftSelection(props: NftSelectionProps | any) {
   useEffect(() => {
     if (ctx.nftMultMap != null) {
       setMult(ctx.nftMultMap[nftInfo.address.toBase58()] / 10000)
-      setDailyIncome(ctx.incomePerNftCalculator(props.item)/config.reward_token_decimals)
+      setDailyIncome(ctx.pretty(ctx.incomePerNftCalculator(props.item)))
     }
   }, [ctx.platform, ctx.nftMultMap])
 
@@ -98,7 +98,7 @@ export function NftSelection(props: NftSelectionProps | any) {
       <Text width="100%" marginTop="2" color="black" marginBottom="2">{nftInfo.name}</Text>
     </Box>
     <MultiplicationWithSuggestion value={mult}>
-      ~{dailyIncome} {config.reward_token_name}
+      ~{dailyIncome} {ctx.config.reward_token_name}
     </MultiplicationWithSuggestion>
     {props.children}
   </GridItem>

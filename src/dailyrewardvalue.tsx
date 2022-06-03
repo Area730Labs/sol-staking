@@ -2,12 +2,9 @@ import { Box, Text } from "@chakra-ui/layout";
 import { useEffect, useState } from "react"
 import { useAppContext } from "./state/app";
 
-import config from "./config.json"
-import { pretty } from "./data/uitls";
-
 export default function DailyRewardValue() {
 
-    const { platform, basicIncomePerNft } = useAppContext();
+    const { platform, basicIncomePerNft, config, pretty } = useAppContext();
     const [reward, setReward] = useState(0);
 
     useEffect(() => {
@@ -24,7 +21,7 @@ export default function DailyRewardValue() {
             fontWeight="bold"
             // color="black"
             fontSize="md"
-            // backgroundColor={appTheme.stressColor2}
+        // backgroundColor={appTheme.stressColor2}
         >{reward} {config.reward_token_name}</Box>
     day/NFT
     </>

@@ -12,7 +12,10 @@ import { StakeNftBumps } from "./idl/types/StakeNftBumps"
 import { Nft } from "./types";
 
 import nftsRaw from "../data/nfts.json"
-import config from "../config.json"
+import global_config from "../config.json"
+
+import { Config } from "../types/config"
+
 import BN from "bn.js"
 
 import { toast } from "react-toastify";
@@ -72,7 +75,7 @@ export function createResizeObjectIx(typ: number, address: PublicKey, signer: Wa
     return resizeObject(args, accounts);
 }
 
-export function createStakeNftIx(mint: PublicKey, owner: WalletAdapter): TransactionInstruction {
+export function createStakeNftIx(config: Config, mint: PublicKey, owner: WalletAdapter): TransactionInstruction {
 
     const tree = getMerkleTree();
 
@@ -89,8 +92,8 @@ export function createStakeNftIx(mint: PublicKey, owner: WalletAdapter): Transac
 
     const proof = tree.getProofArray(indexStaked);
 
-    const [stakingReceipt, receiptBump] = calcAddressWithSeed("receipt", mint);
-    const [stakingDeposit, depositBump] = calcAddressWithSeed("deposit", mint);
+    const [stakingReceipt, receiptBump] = calcAddressWithSeed(config, "receipt", mint);
+    const [stakingDeposit, depositBump] = calcAddressWithSeed(config, "deposit", mint);
 
     const userTokenAccount = findAssociatedTokenAddress(owner.publicKey, mint);
 
@@ -103,9 +106,9 @@ export function createStakeNftIx(mint: PublicKey, owner: WalletAdapter): Transac
         rank: nftToStake.props.rank,
     } as StakeNftArgs, {
         staker: owner.publicKey,
-        platformConfig: new PublicKey(config.platform_config),
-        stakingConfig: new PublicKey(config.stacking_config),
-        escrow: new PublicKey(config.escrow),
+        platformConfig: config.platform_config,
+        stakingConfig: config.stacking_config,
+        escrow: config.escrow,
         stakingReceipt: stakingReceipt,
         mint: mint,
         stakerNftAccount: userTokenAccount,
@@ -117,7 +120,7 @@ export function createStakeNftIx(mint: PublicKey, owner: WalletAdapter): Transac
     } as StakeNftAccounts)
 }
 
-export function calcAddressWithSeed(seed: string, address: PublicKey): [PublicKey, number] {
+export function calcAddressWithSeed(config: Config, seed: string, address: PublicKey): [PublicKey, number] {
     const buffers = [Buffer.from(seed, 'utf8'), address.toBuffer()];
 
     return PublicKey.findProgramAddressSync(
@@ -125,7 +128,7 @@ export function calcAddressWithSeed(seed: string, address: PublicKey): [PublicKe
     );
 }
 
-export function calcAddressWithTwoSeeds(seed: string, seed2: Buffer, address: PublicKey): [PublicKey, number] {
+export function calcAddressWithTwoSeeds(config: Config, seed: string, seed2: Buffer, address: PublicKey): [PublicKey, number] {
     const buffers = [Buffer.from(seed, 'utf8'), seed2, address.toBuffer()];
 
     return PublicKey.findProgramAddressSync(
@@ -134,7 +137,7 @@ export function calcAddressWithTwoSeeds(seed: string, seed2: Buffer, address: Pu
 }
 
 
-export function getProgramPDA(seed: string): [PublicKey, number] {
+export function getProgramPDA(config: Config, seed: string): [PublicKey, number] {
     const buffers = [Buffer.from(seed, 'utf8')];
 
     return PublicKey.findProgramAddressSync(
@@ -142,10 +145,10 @@ export function getProgramPDA(seed: string): [PublicKey, number] {
     );
 }
 
-export function createPlatformConfig(wallet: WalletAdapter): TransactionInstruction {
+export function createPlatformConfig(config: Config, wallet: WalletAdapter): TransactionInstruction {
 
-    const [configAccount, configBump] = getProgramPDA("config");
-    const [escrowAccount, escrowBump] = getProgramPDA("escrow");
+    const [configAccount, configBump] = getProgramPDA(config, "config");
+    const [escrowAccount, escrowBump] = getProgramPDA(config, "escrow");
 
     const platformConfigIx = addPlatformConfig({
         freeStakingWithdrawFee: new BN(LAMPORTS_PER_SOL * 0.05),
@@ -166,6 +169,7 @@ export function createPlatformConfig(wallet: WalletAdapter): TransactionInstruct
 }
 
 export function createUpdateStakingPlatformIx(
+    config: Config,
     owner: PublicKey,
     stakingConfig: PublicKey,
     baseEmissions: BN,
@@ -174,7 +178,7 @@ export function createUpdateStakingPlatformIx(
     spanDuration: BN
 ): TransactionInstruction {
 
-    const [configAddress, configBump] = getProgramPDA("config");
+    const [configAddress, configBump] = getProgramPDA(config, "config");
 
     const now = new Date();
 
@@ -253,6 +257,7 @@ export function createUpdateStakingPlatformIx(
 }
 
 export function createStackingPlatform(
+    config: Config,
     rewardsMint: PublicKey,
     platformOwner: PublicKey,
     baseEmissions: BN,
@@ -263,16 +268,16 @@ export function createStackingPlatform(
 
     const alias = new Keypair();
 
-    const [stakingConfig, sconfBump] = calcAddressWithSeed("staking", alias.publicKey);
+    const [stakingConfig, sconfBump] = calcAddressWithSeed(config, "staking", alias.publicKey);
 
     console.log("config alias: ", alias.publicKey.toBase58())
 
 
-    const [configAddress, configBump] = getProgramPDA("config");
-    const [escrowAddress, escrowBump] = getProgramPDA("escrow");
+    const [configAddress, configBump] = getProgramPDA(config, "config");
+    const [escrowAddress, escrowBump] = getProgramPDA(config, "escrow");
 
     const [rewardsAccount, rewardsBump] = PublicKey.findProgramAddressSync(
-        [Buffer.from("rewards", 'utf8'), alias.publicKey.toBuffer(), rewardsMint.toBuffer()], new PublicKey(config.program_id)
+        [Buffer.from("rewards", 'utf8'), alias.publicKey.toBuffer(), rewardsMint.toBuffer()], config.program_id
     );
 
     console.log("rewards: ", rewardsAccount.toBase58())
@@ -346,9 +351,9 @@ export function createStackingPlatform(
     const accounts = {
         alias: alias.publicKey,
         platformConfig: configAddress,
-        treasuryWallet: new PublicKey(config.treasury_wallet),
+        treasuryWallet: config.treasury_wallet,
         stakingConfig: stakingConfig,
-        escrow: new PublicKey(config.escrow),
+        escrow: config.escrow,
         mint: rewardsMint,
         rewardsAccount: rewardsAccount,
         owner: platformOwner,
@@ -365,13 +370,13 @@ export function createStackingPlatform(
  * 
  * @param stackingReceipt item to collect rewards of  
  */
-function createClaimIx(mint: PublicKey, staker: PublicKey, stakeOwner: PublicKey): TransactionInstruction {
+function createClaimIx(config: Config, mint: PublicKey, staker: PublicKey, stakeOwner: PublicKey): TransactionInstruction {
 
-    const [stakingReceiptAddr, bump] = calcAddressWithSeed("receipt", mint);
+    const [stakingReceiptAddr, bump] = calcAddressWithSeed(config, "receipt", mint);
 
     const accounts = {
         staker: staker,
-        stakingConfig: new PublicKey(config.stacking_config),
+        stakingConfig: config.stacking_config,
         stakeOwner: stakeOwner,
         stakingReceipt: stakingReceiptAddr
     } as ClaimLightAccounts;
@@ -379,11 +384,11 @@ function createClaimIx(mint: PublicKey, staker: PublicKey, stakeOwner: PublicKey
     return claimLight(accounts);
 }
 
-function createStakeOwnerIx(staker: PublicKey, stakeOwner: PublicKey): TransactionInstruction {
+function createStakeOwnerIx(config: Config, staker: PublicKey, stakeOwner: PublicKey): TransactionInstruction {
 
     const accounts = {
         staker: staker,
-        stakingConfig: new PublicKey(config.stacking_config),
+        stakingConfig: config.stacking_config,
         stakeOwner: stakeOwner,
         // rent: SYSVAR_RENT_PUBKEY,
         systemProgram: SystemProgram.programId
@@ -392,20 +397,20 @@ function createStakeOwnerIx(staker: PublicKey, stakeOwner: PublicKey): Transacti
     return createStakeOwner(accounts);
 }
 
-function createClaimStakeOwnerIx(staker: PublicKey, stakeOwner: PublicKey, mint: PublicKey): TransactionInstruction {
+function createClaimStakeOwnerIx(config: Config, staker: PublicKey, stakeOwner: PublicKey, mint: PublicKey): TransactionInstruction {
 
 
     const stakerAccount = findAssociatedTokenAddress(staker, mint);
 
     const accounts = {
         staker: staker,
-        platformConfig: new PublicKey(config.platform_config),
-        stakingConfig: new PublicKey(config.stacking_config),
+        platformConfig: config.platform_config,
+        stakingConfig: config.stacking_config,
         stakeOwner: stakeOwner,
-        escrow: new PublicKey(config.escrow),
+        escrow: config.escrow,
         rewardsMint: mint,
         stakerRewardsAccount: stakerAccount,
-        stakingRewardsAccount: new PublicKey(config.rewards_token_account),
+        stakingRewardsAccount: config.rewards_token_account,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId
     } as ClaimStakeOwnerAccounts;
@@ -413,17 +418,17 @@ function createClaimStakeOwnerIx(staker: PublicKey, stakeOwner: PublicKey, mint:
     return claimStakeOwner(accounts);
 }
 
-function createUnstakeNftIx(mint: PublicKey, staker: PublicKey): TransactionInstruction {
+function createUnstakeNftIx(config: Config, mint: PublicKey, staker: PublicKey): TransactionInstruction {
 
     const stakerAccount = findAssociatedTokenAddress(staker, mint)
-    const [stakingDeposit, depositBump] = calcAddressWithSeed("deposit", mint);
-    const [stakingReceipt, receiptBump] = calcAddressWithSeed("receipt", mint);
+    const [stakingDeposit, depositBump] = calcAddressWithSeed(config, "deposit", mint);
+    const [stakingReceipt, receiptBump] = calcAddressWithSeed(config, "receipt", mint);
 
 
     const accounts = {
         staker: staker,
-        stakingConfig: new PublicKey(config.stacking_config),
-        escrow: new PublicKey(config.escrow),
+        stakingConfig: config.stacking_config,
+        escrow: config.escrow,
         receipt: stakingReceipt,
         mint: mint,
         stakerNftAccount: stakerAccount,

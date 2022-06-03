@@ -1,16 +1,11 @@
 import { Box } from "@chakra-ui/layout";
 import { createInitializeMintInstruction, createMintToInstruction, getMinimumBalanceForRentExemptAccount, MintLayout, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { Keypair, PublicKey, SystemInstruction, SystemProgram } from "@solana/web3.js";
+import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
 import BN from "bn.js";
-import { Signer } from "crypto";
-import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { TxHandler } from "./blockchain/handler";
-import { PlatformConfig } from "./blockchain/idl/accounts/PlatformConfig";
 import { createPlatformConfig, createResizeObjectIx, createStackingPlatform, createUpdateStakingPlatformIx, getMerkleTree } from "./blockchain/instructions";
 import { Button } from "./components/button";
 import { useAppContext } from "./state/app";
-import config from "./config.json"
 
 export default function CreateMintButton() {
 
@@ -51,7 +46,7 @@ export default function CreateMintButton() {
 
 export function DevButtons() {
 
-    const { wallet, solanaConnection, sendTx } = useAppContext();
+    const { wallet, solanaConnection, sendTx, config } = useAppContext();
 
     function updatePlatformButtonHandler() {
 
@@ -70,6 +65,7 @@ export function DevButtons() {
         const spanDurationDays = parseInt(prompt("span duration days: ")) * 86400;
 
         ixs.push(createUpdateStakingPlatformIx(
+            config,
             owner,
             configAddr,
             new BN(dailyPerNft * config.reward_token_decimals),
@@ -99,6 +95,7 @@ export function DevButtons() {
         const spanDurationDays = parseInt(prompt("span duration days: ")) * 86400;
 
         const ix = createStackingPlatform(
+            config,
             mint,
             owner,
             new BN(dailyPerNft),
@@ -143,11 +140,11 @@ export function DevButtons() {
         });
     }
 
-    if (wallet != null && wallet.publicKey.toBase58() === config.treasury_wallet) {
+    if (wallet != null && wallet.publicKey === config.treasury_wallet) {
         return <Box py="8">
             <Button size="sm" onClick={() => {
 
-                const ix = createPlatformConfig(wallet);
+                const ix = createPlatformConfig(config, wallet);
 
                 console.log('platform config ix ', ix)
 

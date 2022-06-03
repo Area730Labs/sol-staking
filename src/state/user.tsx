@@ -3,15 +3,17 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import { StakingReceipt, StakingReceiptJSON } from "../blockchain/idl/accounts/StakingReceipt";
 import { getAllNfts, getStakedNfts } from "../blockchain/nfts";
 import { constructCacheKey, getOrConstruct } from "../types/cacheitem";
-import config from "../config.json"
 import Nft from "../types/Nft";
 import nftsAvailable from '../data/nfts.json'
 import { calcAddressWithTwoSeeds } from "../blockchain/instructions";
 
-export async function getStakedNftsCached(solanaConnection: Connection, wallet: PublicKey, force: boolean = false,): Promise<StakingReceipt[]> {
+import { Config } from "../types/config"
+import global_config from "../config.json"
+
+export async function getStakedNftsCached(config: Config, solanaConnection: Connection, wallet: PublicKey, force: boolean = false,): Promise<StakingReceipt[]> {
     return getOrConstruct<StakingReceipt[]>(force, "staked_by", async () => {
-        return getStakedNfts(solanaConnection, wallet);
-    }, config.caching.staked_nfts, wallet.toBase58()).then((staked) => {
+        return getStakedNfts(config, solanaConnection, wallet);
+    }, global_config.caching.staked_nfts, wallet.toBase58()).then((staked) => {
 
         var result = [];
 
@@ -46,13 +48,14 @@ export function cleanCacheUponStake(wallet: PublicKey) {
 }
 
 
-export function getStakeOwnerForWallet(wallet: PublicKey): Promise<PublicKey> {
+export function getStakeOwnerForWallet(config: Config, wallet: PublicKey): Promise<PublicKey> {
 
     return getOrConstruct<PublicKey>(false, "stake_owner_addr", () => {
 
         const [stakeOwnerAddress, bump] = calcAddressWithTwoSeeds(
+            config,
             "stake_owner",
-            new PublicKey(config.stacking_config_alias).toBuffer(),
+            config.stacking_config_alias.toBuffer(),
             wallet
         )
 
@@ -80,7 +83,7 @@ export function getStakeOwnerForWallet(wallet: PublicKey): Promise<PublicKey> {
 export function getNftsInWalletCached(wallet: PublicKey, connection: Connection, force: boolean = false): Promise<Nft[]> {
     return getOrConstruct<PublicKey[]>(force, "wallet_nfts", async () => {
         return getAllNfts(connection, wallet);
-    }, config.caching.wallet_nfts, wallet.toBase58()).then((items) => {
+    }, global_config.caching.wallet_nfts, wallet.toBase58()).then((items) => {
 
         let result = [] as PublicKey[];
 

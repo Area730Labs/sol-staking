@@ -1,29 +1,41 @@
 {
-
-     "stacking_config_alias": "HfQpdVtLEiZTo9admjbpUSRVfMfZ4Ntm6h35fHDks1cu",
-     "rewards_token_account": "8ZebwqJbecECXsKL6iKqBet7wg5VcE8PvrmW7jHa8Mmu",
-     "stacking_config": "GMuCmwt4buqeBX4t126RCkPJQEVXDW93Dr58aqBaLaNS",
-
-     "platform_config": "EKscV66g7uxuXPsQbsWwvaopdp16jbEe99yGFHQAaoeY",
-     "treasury_wallet": "ft7JZKLj5yNjvRwW2zbQVSvf25MVUHrHuXiqyzKDPvX",
-
-     "escrow": "GoVdRBBar4NsaALK1mtR3hv2zT67btBxBhbcny5x9tSU",
-     "program_id": "HDmvmVjbr4d2TTdWSfevBK2uyiAy4A3FrBMNFd9uQoZ5",
-
-     "cluster_url": "https://api.devnet.solana.com",
-
-     "reward_image":"https://www.orca.so/static/media/samo.e4c98a37.png",
-     "reward_token_name": "SAMO",
-     "reward_token_decimals": 1000000000,
-     "rewards_mint": "5tgyTiconR365e9beKg8PiMiVje1e8bL6CU3tdYmz3my",
-
+     "env": {
+          "dev": {
+               "stacking_config_alias": "HfQpdVtLEiZTo9admjbpUSRVfMfZ4Ntm6h35fHDks1cu",
+               "rewards_token_account": "8ZebwqJbecECXsKL6iKqBet7wg5VcE8PvrmW7jHa8Mmu",
+               "stacking_config": "GMuCmwt4buqeBX4t126RCkPJQEVXDW93Dr58aqBaLaNS",
+               "platform_config": "EKscV66g7uxuXPsQbsWwvaopdp16jbEe99yGFHQAaoeY",
+               "treasury_wallet": "ft7JZKLj5yNjvRwW2zbQVSvf25MVUHrHuXiqyzKDPvX",
+               "escrow": "GoVdRBBar4NsaALK1mtR3hv2zT67btBxBhbcny5x9tSU",
+               "program_id": "HDmvmVjbr4d2TTdWSfevBK2uyiAy4A3FrBMNFd9uQoZ5",
+               "cluster_url": "https://api.devnet.solana.com",
+               "reward_image": "https://www.orca.so/static/media/samo.e4c98a37.png",
+               "reward_token_name": "SAMO",
+               "reward_token_decimals": 1000000000,
+               "rewards_mint": "5tgyTiconR365e9beKg8PiMiVje1e8bL6CU3tdYmz3my"
+          },
+          "prod": {
+               "stacking_config_alias": "HfQpdVtLEiZTo9admjbpUSRVfMfZ4Ntm6h35fHDks1cu",
+               "rewards_token_account": "8ZebwqJbecECXsKL6iKqBet7wg5VcE8PvrmW7jHa8Mmu",
+               "stacking_config": "GMuCmwt4buqeBX4t126RCkPJQEVXDW93Dr58aqBaLaNS",
+               "platform_config": "EKscV66g7uxuXPsQbsWwvaopdp16jbEe99yGFHQAaoeY",
+               "treasury_wallet": "ft7JZKLj5yNjvRwW2zbQVSvf25MVUHrHuXiqyzKDPvX",
+               "escrow": "GoVdRBBar4NsaALK1mtR3hv2zT67btBxBhbcny5x9tSU",
+               "program_id": "HDmvmVjbr4d2TTdWSfevBK2uyiAy4A3FrBMNFd9uQoZ5",
+               "cluster_url": "https://api.devnet.solana.com",
+               "reward_image": "https://www.orca.so/static/media/samo.e4c98a37.png",
+               "reward_token_name": "SAMO",
+               "reward_token_decimals": 1000000000,
+               "rewards_mint": "5tgyTiconR365e9beKg8PiMiVje1e8bL6CU3tdYmz3my"
+          }
+     },
      "caching": {
           "staked_nfts": 600,
           "platform": 15,
           "wallet_nfts": 60
      },
      "disable_cache": true,
-     "debug_simulate_tx" :false,
+     "debug_simulate_tx": false,
      "max_items_per_stake": 3,
      "max_items_per_unstake": 5,
      "max_nfts_per_row": 4,

@@ -1,26 +1,25 @@
 import { Text } from "@chakra-ui/layout"
 import { PublicKey } from "@solana/web3.js";
-import { useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
 import Countup from "./components/countup"
-import config from "./config.json"
 import { useAppContext } from "./state/app"
+import { Config } from "./types/config"
 
-function getCacheKey() {
+function getCacheKey(config: Config) {
     return "total_claimed" + new PublicKey(config.stacking_config);
 }
 
 export default function TotalClaimed() {
 
+    const { platform, config } = useAppContext();
 
-    const prevCachedValue = localStorage.getItem(getCacheKey());
+    const prevCachedValue = localStorage.getItem(getCacheKey(config));
     let prevClaimed = 0;
-    
+
     if (prevCachedValue != null) {
         prevClaimed = parseFloat(prevCachedValue);
     }
 
-    const { platform } = useAppContext();
     const [claimedValue, setClaimed] = useState(prevClaimed);
 
     // console.log("claimed value by default : ",claimedValue)
@@ -31,13 +30,13 @@ export default function TotalClaimed() {
 
             if (!isNaN(value)) {
 
-                localStorage.setItem(getCacheKey(), value + "");
+                localStorage.setItem(getCacheKey(config), value + "");
 
                 setClaimed(value);
                 // toast.info(`setting value of total claimed ${value}`)
             }
         }
-    }, [platform]);
+    }, [platform,config]);
 
     return <Text fontSize="6xl" fontWeight="bold" color="white" textAlign="center" fontFamily="helvetica">
         <Countup number={claimedValue} float={true} /> {config.reward_token_name}

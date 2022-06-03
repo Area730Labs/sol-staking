@@ -32,7 +32,6 @@ import { WalletConnectButton } from "./components/walletconnect"
 import { WalletAdapter, WalletReadyState } from "@solana/wallet-adapter-base"
 import { Connection, PublicKey } from "@solana/web3.js"
 
-import config from "./config.json"
 import { getStakeOwnerForWallet } from "./state/user"
 import MainPageContainer from "./components/mainpagecontainer"
 import { ASSOCIATED_TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, TOKEN_PROGRAM_ID } from "@solana/spl-token"
@@ -50,9 +49,9 @@ import nfts from "./data/nfts.json"
 import { WarningIcon } from "@chakra-ui/icons"
 import { StakingReceipt } from "./blockchain/idl/accounts/StakingReceipt"
 import { ModalProvider, useModal } from "./state/modal"
-import { pretty } from "./data/uitls"
 import { Label } from "./components/label"
 import LangSelector from "./components/langselector"
+import global_config from "./config.json"
 
 function HistoryActionNftLink(props: any) {
   return <Image cursor="pointer" src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="46px" />
@@ -73,6 +72,9 @@ function InfoColumn(props: any) {
 }
 
 function RewardImage(props: any) {
+
+  const { config } = useAppContext();
+
   return <Box
     height="100px"
     width="100px"
@@ -91,7 +93,7 @@ function RewardImage(props: any) {
   >
     <Box
       position="absolute"
-      backgroundImage={"url(" + props.img + ")"}
+      backgroundImage={"url(" + config.reward_image + ")"}
       width="92px"
       backgroundSize="100%"
       backgroundPosition="center"
@@ -106,8 +108,6 @@ function AppMainModal() {
 
   const { modalVisible, setModalVisible, modalContent, taxModal } = useModal();
   // todo fix tax modal  :)
-
-
 
   return <Modal
     isVisible={modalVisible}
@@ -238,7 +238,7 @@ function UnstakeTaxModal() {
 
   return <Box>
     <VStack textAlign="left" >
-      <Text fontSize="2xl" color={appTheme.stressColor}> <WarningIcon /> <Text display="inline-block" fontWeight="bold">{pretty(totalTax)}</Text> <Label>Unstake tax</Label></Text>
+      <Text fontSize="2xl" color={appTheme.stressColor}> <WarningIcon /> <Text display="inline-block" fontWeight="bold">{ctx.pretty(totalTax)}</Text> <Label>Unstake tax</Label></Text>
       <Text fontSize="sm">{taxedItems.length} <Label>items are subject to pay taxes from</Label>.</Text>
 
       {/* <Text fontSize="xs"  >wait at least 7 days before unstaking to keep all your gains</Text> */}
@@ -258,7 +258,7 @@ function UnstakeTaxModal() {
             <VStack alignItems="left">
               {/* <Text fontSize="xs">{fromStakeReceipt(it.receipt).name}</Text> */}
               <Text >staked for {prettyTime(it.staked_for)}</Text>
-              <Text fontWeight="bold" color="white"> <Box display="inline-block" p="3px" borderRadius={appTheme.borderRadius} backgroundColor={appTheme.stressColor}>-{pretty(it.tax)} ({(Math.ceil(100 * pretty(it.tax) / pretty(it.income)))}%)</Box></Text>
+              <Text fontWeight="bold" color="white"> <Box display="inline-block" p="3px" borderRadius={appTheme.borderRadius} backgroundColor={appTheme.stressColor}>-{ctx.pretty(it.tax)} ({(Math.ceil(100 * ctx.pretty(it.tax) / ctx.pretty(it.income)))}%)</Box></Text>
             </VStack>
           </HStack>
         })}
@@ -274,7 +274,7 @@ function UnstakeTaxModal() {
           px="10px"
           borderRadius={"15px"}
           backgroundColor={appTheme.stressColor2}
-        >{pretty(earningsMinusTax)}</Text>
+        >{ctx.pretty(earningsMinusTax)}</Text>
         </Button>
         <Button size="md" onClick={closeTaxModal}><Label>Cancel</Label></Button>
       </Box>
@@ -284,25 +284,25 @@ function UnstakeTaxModal() {
 
 async function claimPendingrewardsHandlerImpl(ctx: AppContextType) {
 
-  const { wallet, solanaConnection, stackedNfts, sendTx } = ctx;
+  const { wallet, solanaConnection, stackedNfts, sendTx, config } = ctx;
 
   let ixs = [];
 
   // check if stake owner is created before
-  const stakeOwnerAddress = await getStakeOwnerForWallet(wallet.publicKey);
+  const stakeOwnerAddress = await getStakeOwnerForWallet(config, wallet.publicKey);
 
-  const rewardsTokenMint = new PublicKey(config.rewards_mint);
+  const rewardsTokenMint = config.rewards_mint;
   const tokAcc = findAssociatedTokenAddress(wallet.publicKey, rewardsTokenMint);
 
   StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeOwnerInfo: StakeOwner) => {
 
     if (stakeOwnerInfo == null) {
-      ixs.push(createStakeOwnerIx(wallet.publicKey, stakeOwnerAddress));
+      ixs.push(createStakeOwnerIx(config, wallet.publicKey, stakeOwnerAddress));
     }
 
     for (var it of stackedNfts) {
       // ixs.push(createUnstakeNftIx(it))
-      ixs.push(createClaimIx(it.mint, it.staker, stakeOwnerAddress))
+      ixs.push(createClaimIx(config, it.mint, it.staker, stakeOwnerAddress))
     }
 
     // check if user has token account
@@ -319,7 +319,7 @@ async function claimPendingrewardsHandlerImpl(ctx: AppContextType) {
 
     }
   }).then(() => {
-    ixs.push(createClaimStakeOwnerIx(wallet.publicKey, stakeOwnerAddress, rewardsTokenMint));
+    ixs.push(createClaimStakeOwnerIx(config, wallet.publicKey, stakeOwnerAddress, rewardsTokenMint));
 
     sendTx(ixs, 'claim').catch((e) => {
       toast.error(`Unable to claim: ${e.message}`)
@@ -354,7 +354,7 @@ function ClaimPendingRewardsButton() {
 
 function PendingRewards(props: any) {
 
-  let { pendingRewards } = useAppContext();
+  let { pendingRewards, config, pretty } = useAppContext();
 
   return <Box position="absolute" right="-50px" top="-32px" >
     {pendingRewards > 0 ?
@@ -433,7 +433,7 @@ export function App() {
                   <Box>
                     <VStack textAlign="center" >
                       <Text fontSize="sm" fontWeight="bold"><Label>Rewards</Label></Text>
-                      <RewardImage img={config.reward_image} />
+                      <RewardImage />
                       <DailyRewardValue />
                     </VStack>
                   </Box>
@@ -467,7 +467,7 @@ export function App() {
                         <Text >
                           <Label>Total Claimed</Label>
                         </Text>
-                        <Text fontSize="xl">{pretty(238923392323323)}</Text>
+                        <Text fontSize="xl">{23833.93}</Text>
                       </HistoryAction>
                       <HistoryAction>
                         <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> staked
@@ -505,7 +505,7 @@ function AllStakedNfts() {
   // }
 
   return <HStack>
-    {nfts.slice(0, config.max_nfts_per_row - 1).map((object, i) =>
+    {nfts.slice(0, global_config.max_nfts_per_row - 1).map((object, i) =>
       <StakedSmallNft key={i} item={{
         image: object.image,
         address: new PublicKey(object.address),
