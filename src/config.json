@@ -13,7 +13,8 @@
                "reward_token_name": "SAMO",
                "reward_token_decimals": 1000000000,
                "rewards_mint": "5tgyTiconR365e9beKg8PiMiVje1e8bL6CU3tdYmz3my",
-               "main_image":"https://4czjblv4exlnkapuju5tmwmv42t262b5s6sknjhdfrfjrbcotczq.arweave.net/4LKQrrwl1tUB9E07NlmV5qevaD2XpKak4yxKmIROmLM?ext=png"
+               "main_image":"https://4czjblv4exlnkapuju5tmwmv42t262b5s6sknjhdfrfjrbcotczq.arweave.net/4LKQrrwl1tUB9E07NlmV5qevaD2XpKak4yxKmIROmLM?ext=png",
+               "label": "Okay Bears"
           },
           "prod": {
                "stacking_config_alias": "5ckMb8o4uaeG6RMYR2QpadPRtLUG3yUCV26apAWZTn5B",
@@ -28,7 +29,8 @@
                "rewards_mint": "DPuGqV7jq9PEbcRU7bWzuaJx5bGiaVj4cNWhWjTdWAKi",
                "platform_config": "9h7gEQuoRUTBDG6zTpKysE7BGa1sQw6UWGyFcpnxyHLP",
                "escrow": "DJZ78XMwXXr9TSQWWtpgVBrxZViz2DD5Kq7hkwN4Pv8F",
-               "treasury_wallet": "CUnDxJCbAEtrN9yruSfWx1oD8dFj7os78Rfqe9LHaMDy"
+               "treasury_wallet": "CUnDxJCbAEtrN9yruSfWx1oD8dFj7os78Rfqe9LHaMDy",
+               "label": "Dope Apes"
           }
      },
      "caching": {
@@ -41,6 +43,5 @@
      "max_items_per_stake": 3,
      "max_items_per_unstake": 5,
      "max_nfts_per_row": 4,
-     "small_staked_nfts_list_size": 3,
-     "label": "Dope Apes"
+     "small_staked_nfts_list_size": 3
 }

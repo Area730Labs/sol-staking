@@ -3,23 +3,24 @@ import config_file from "../config.json"
 
 export interface Config {
 
-    stacking_config_alias: PublicKey,
-    rewards_token_account: PublicKey,
-    stacking_config: PublicKey,
+    stacking_config_alias: PublicKey
+    rewards_token_account: PublicKey
+    stacking_config: PublicKey
 
-    platform_config: PublicKey,
-    treasury_wallet: PublicKey,
-    escrow: PublicKey,
-    program_id: PublicKey,
+    platform_config: PublicKey
+    treasury_wallet: PublicKey
+    escrow: PublicKey
+    program_id: PublicKey
 
-    cluster_url: string,
+    cluster_url: string
 
-    reward_image: string,
+    reward_image: string
     reward_token_name: string
     reward_token_decimals: number
-    rewards_mint: PublicKey,
+    rewards_mint: PublicKey
 
     main_image: string
+    label: string
 }
 
 export function fromJson(object: any): Config {
@@ -40,7 +41,8 @@ export function fromJson(object: any): Config {
         reward_token_decimals: object.reward_token_decimals,
         rewards_mint: new PublicKey(object.rewards_mint),
 
-        main_image: object.main_image
+        main_image: object.main_image,
+        label : object.label
     }
 }
 

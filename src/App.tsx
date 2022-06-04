@@ -424,11 +424,7 @@ export function App() {
               <MainPageContainer>
                 <HStack spacing={4} alignItems="flex-start">
                   <Box>
-                    <VStack alignItems="flex-start">
-                      <Text fontWeight="bold">{global_config.label}</Text>
-                    <MainImage/>
-                      <StakePlatformStats />
-                    </VStack>
+                    <StakingInfo />
                   </Box>
                   <Box>
                     <VStack textAlign="center" >
@@ -523,7 +519,19 @@ function AllStakedNfts() {
 
 function MainImage() {
 
-  const {config} = useAppContext();
+  const { config } = useAppContext();
 
-  return   <Image src={config.main_image} borderRadius={appTheme.borderRadius} width="250px" boxShadow="dark" />
+  return <Image src={config.main_image} borderRadius={appTheme.borderRadius} width="250px" boxShadow="dark" />
+}
+
+
+function StakingInfo() {
+
+  const { config } = useAppContext();
+
+  return <VStack alignItems="flex-start">
+    <Text fontWeight="bold">{config.label}</Text>
+    <MainImage />
+    <StakePlatformStats />
+  </VStack>
 }
