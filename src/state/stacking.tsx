@@ -2,18 +2,17 @@ import { createContext, ReactNode, useContext, useEffect, useMemo, useState } fr
 import { toast } from "react-toastify";
 import { StakingReceipt } from "../blockchain/idl/accounts/StakingReceipt";
 import { BASIS_POINTS_100P, prettyNumber } from "../data/uitls";
-import Nft, { fromStakeReceipt } from "../types/Nft";
+import Nft from "../types/Nft";
 import Platform, { matchRule } from "../types/paltform";
 import { RankMultiplyerMap, useAppContext } from "./app";
 import { getPlatformInfo, getPlatformInfoFromCache } from "./platform";
 import global_config from '../config.json'
 import { Config } from "../types/config";
-import { TaxedItem } from "../App";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 import { getNftsInWalletCached, getStakedNftsCached, getStakeOwnerForWallet } from "./user";
 import { getOrConstruct } from "../types/cacheitem";
 import { PublicKey } from "@solana/web3.js";
-// import nfts from "../data/nfts.json";
+import { TaxedItem } from "../types/taxeditem";
 
 export interface StakingContextType {
     config: Config,
@@ -38,6 +37,7 @@ export interface StakingContextType {
     getTaxedItems: { (): [TaxedItem[], number] }
 
     pretty: { (value: number): number }
+    fromStakeReceipt: { (receipt: StakingReceipt): Nft }
 }
 
 const StakingContext = createContext<StakingContextType>(null);
@@ -53,15 +53,32 @@ export function StakingProvider({ children, config, nfts }: { children: ReactNod
 
     const compressed = nfts.map((it, idx) => {
         return [
-          it.address,
-          it.name,
-          it.image,
-          it.props.rank
+            it.address,
+            it.name,
+            it.image,
+            it.props.rank
         ];
     });
 
-    console.log('compressed size',JSON.stringify(compressed).length)
+    console.log('compressed size', JSON.stringify(compressed).length)
 
+    function fromStakeReceipt(receipt: StakingReceipt): Nft {
+
+        const receiptMint = receipt.mint.toBase58();
+
+        for (var it of nfts) {
+            if (it.address === receiptMint) {
+                return {
+                    image: it.image,
+                    address: new PublicKey(it.address),
+                    name: it.name,
+                    props: it.props
+                } as Nft
+            }
+        }
+
+        throw new Error("looks like nft data is not present in context ");
+    }
 
     // for background tasks
     const [curInterval, setCurInterval] = useState(null);
@@ -377,7 +394,8 @@ export function StakingProvider({ children, config, nfts }: { children: ReactNod
             getTaxedItems,
 
             config,
-            pretty
+            pretty,
+            fromStakeReceipt
         }
 
         return result;

@@ -8,6 +8,8 @@ import { createAssociatedTokenAccountInstruction } from "@solana/spl-token";
 import { getStakeOwnerForWallet } from "../state/user";
 import { Label } from "./label";
 import { Button } from "./button";
+import { Box } from "@chakra-ui/layout";
+import Countup from "./countup";
 
 export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, stakingctx: StakingContextType) {
 
@@ -80,3 +82,20 @@ export function ClaimPendingRewardsButton() {
 
     return (<Button typ="black" marginLeft="10px" onClick={claimPendingRewardsHandler}><Label>Claim pending rewards</Label></Button>)
 }
+
+
+export function PendingRewards(props: any) {
+
+    let { pendingRewards, config, pretty } = useStaking();
+  
+    return <Box position="absolute" right="-50px" top="-32px" >
+      {pendingRewards > 0 ?
+        <Box
+          borderRadius="25px"
+          backgroundColor="rgb(237,41,57)"
+          p="2"
+          px="4"
+        >+<Countup float="true" number={pretty(pendingRewards)} timems="300" /> {config.reward_token_name}</Box>
+        : null}
+    </Box>
+  }

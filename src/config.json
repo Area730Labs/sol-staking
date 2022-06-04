@@ -1,6 +1,6 @@
 {
      "env": {
-          "dev": {
+          "prod": {
                "stacking_config_alias": "HfQpdVtLEiZTo9admjbpUSRVfMfZ4Ntm6h35fHDks1cu",
                "rewards_token_account": "8ZebwqJbecECXsKL6iKqBet7wg5VcE8PvrmW7jHa8Mmu",
                "stacking_config": "GMuCmwt4buqeBX4t126RCkPJQEVXDW93Dr58aqBaLaNS",
@@ -15,7 +15,7 @@
                "main_image":"https://4czjblv4exlnkapuju5tmwmv42t262b5s6sknjhdfrfjrbcotczq.arweave.net/4LKQrrwl1tUB9E07NlmV5qevaD2XpKak4yxKmIROmLM?ext=png",
                "label": "Okay Bears"
           },
-          "prod": {
+          "prod1": {
                "stacking_config_alias": "5ckMb8o4uaeG6RMYR2QpadPRtLUG3yUCV26apAWZTn5B",
                "rewards_token_account": "Ce8XSXKQ9mkgAq3Ta5M7w8tgaJy3vYBjXjcq4R9avN7v",
                "stacking_config": "8ELy89juk6mLawcr3F37nmFNWrffJvqsHniLFHQGUcaV",
@@ -29,6 +29,21 @@
                "escrow": "DJZ78XMwXXr9TSQWWtpgVBrxZViz2DD5Kq7hkwN4Pv8F",
                "treasury_wallet": "CUnDxJCbAEtrN9yruSfWx1oD8dFj7os78Rfqe9LHaMDy",
                "label": "Dope Apes"
+          },
+          "prod_1": {
+               "stacking_config_alias": "5ckMb8o4uaeG6RMYR2QpadPRtLUG3yUCV26apAWZTn5B",
+               "rewards_token_account": "Ce8XSXKQ9mkgAq3Ta5M7w8tgaJy3vYBjXjcq4R9avN7v",
+               "stacking_config": "8ELy89juk6mLawcr3F37nmFNWrffJvqsHniLFHQGUcaV",
+               "reward_image": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/DPuGqV7jq9PEbcRU7bWzuaJx5bGiaVj4cNWhWjTdWAKi/logo.png",
+               "reward_token_name": "DOPE",
+               "main_image":"https://cz367cli53snzddalaws2v6ox6lu2ilhmafc3uajtobqzfuw.arweave.net/Fnfvi_Wju5NyMYFgtLVfOv5dNI-WdgCi3QCZuDDJaWs?ext=png",
+               "reward_token_decimals": 1000000000,
+               "program_id": "stkqdwwENqh935UFNAbgJY2deqWcRxDEEzR68GBgo68",
+               "rewards_mint": "DPuGqV7jq9PEbcRU7bWzuaJx5bGiaVj4cNWhWjTdWAKi",
+               "platform_config": "9h7gEQuoRUTBDG6zTpKysE7BGa1sQw6UWGyFcpnxyHLP",
+               "escrow": "DJZ78XMwXXr9TSQWWtpgVBrxZViz2DD5Kq7hkwN4Pv8F",
+               "treasury_wallet": "CUnDxJCbAEtrN9yruSfWx1oD8dFj7os78Rfqe9LHaMDy",
+               "label": "Little Dope Apes"
           }
      },
      "caching": {
@@ -42,5 +57,5 @@
      "max_items_per_unstake": 5,
      "max_nfts_per_row": 4,
      "small_staked_nfts_list_size": 3,
-     "cluster_url": "https://api.mainnet-beta.solana.com"
+     "cluster_url": "https://api.devnet.solana.com"
 }

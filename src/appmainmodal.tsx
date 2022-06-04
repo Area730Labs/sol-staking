@@ -2,7 +2,6 @@ import { WarningIcon } from "@chakra-ui/icons";
 import { Box, HStack, Text, VStack } from "@chakra-ui/layout";
 
 import { useMemo } from "react";
-import { TaxedItem } from "./App";
 import { Button } from "./components/button";
 import { Label } from "./components/label";
 import Modal from "./components/modal";
@@ -13,7 +12,7 @@ import { useModal } from "./state/modal";
 import { StakingContextType, useStaking } from "./state/stacking";
 
 import appTheme from "./state/theme"
-import { fromStakeReceipt } from "./types/Nft";
+import { TaxedItem } from "./types/taxeditem";
 
 function UnstakeTaxModal() {
 
@@ -21,7 +20,7 @@ function UnstakeTaxModal() {
 
   const { setModalVisible, setTaxModal } = useModal();
   const ctx = useAppContext();
-  const { stackedNfts, calculateIncomeWithTaxes, platform, pendingRewards, pretty, config } = useStaking();
+  const { stackedNfts, calculateIncomeWithTaxes, platform, pendingRewards, pretty, config, fromStakeReceipt } = useStaking();
 
   function closeTaxModal() {
     setModalVisible(false)

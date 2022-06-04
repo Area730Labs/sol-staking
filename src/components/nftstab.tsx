@@ -9,7 +9,6 @@ import EmptyRow from "../emptyrow";
 import NftsSelector from "../stake";
 import { useAppContext } from "../state/app";
 import { getStakeOwnerForWallet } from "../state/user";
-import { fromStakeReceipt } from "../types/Nft"
 import appTheme from "../state/theme"
 import config from "../config.json"
 import MainPageContainer from "./mainpagecontainer";
@@ -69,7 +68,7 @@ export function StakeNftsListTab(props: NftTabContentProps) {
 
 export function StakedNftsListTab(props: NftTabContentProps) {
 
-    const { stackedNfts, dailyRewards, config, pretty } = useStaking();
+    const { stackedNfts, dailyRewards, config, pretty,fromStakeReceipt } = useStaking();
     const { sendTx } = useAppContext();
     
     async function unstakeSelectedItems(

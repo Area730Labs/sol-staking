@@ -18,10 +18,12 @@ export default function StakeButton() {
         setNftsTab("stake");
 
         if (wallet == null) {
+            
             setModalContent(<Box>
                 <Text fontSize="xl">Connect your wallet first</Text>
                 <WalletConnectButton />
             </Box>)
+
             setModalVisible(true);
         }
     }

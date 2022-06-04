@@ -100,7 +100,6 @@ export default function Fadeable(props: FadeableProps | any) {
         }
     }, [isVisible]);
 
-
     const result = useMemo(() => {
         return <Box
             display={actualVisible ? "block" : "none"}

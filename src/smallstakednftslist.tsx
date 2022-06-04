@@ -5,7 +5,7 @@ import global_config from "./config.json"
 import appTheme from "./state/theme"
 import { useAppContext } from "./state/app";
 
-import Nft, { fromStakeReceipt } from "./types/Nft";
+import Nft from "./types/Nft";
 import { Tooltip } from "@chakra-ui/tooltip";
 import { useStaking } from "./state/stacking";
 
@@ -15,17 +15,25 @@ export interface StakedSmallNftProps {
 }
 
 export function StakedSmallNft(props: StakedSmallNftProps | any) {
-    return <SmallNftBlock {...props}>
-        <Tooltip label={props.item.name} fontSize='md'>
-            <Image cursor="pointer" src={props.item.image} borderRadius={appTheme.borderRadius} width="64px" />
-        </Tooltip>
-    </SmallNftBlock>
+
+    if (props.item !== null) {
+
+        const { item, ...rest } = props;
+
+        return <SmallNftBlock {...rest}>
+            <Tooltip label={props.item.name} fontSize='md'>
+                <Image cursor="pointer" src={props.item.image} borderRadius={appTheme.borderRadius} width="64px" />
+            </Tooltip>
+        </SmallNftBlock>
+    } else {
+        return null;
+    }
 }
 
 export default function SmallStakedNftsList() {
 
     const { setNftsTab } = useAppContext();
-    const { stackedNfts } = useStaking();
+    const { stackedNfts, fromStakeReceipt } = useStaking();
 
     const config = global_config;
 

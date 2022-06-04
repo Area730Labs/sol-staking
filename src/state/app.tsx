@@ -1,23 +1,11 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import * as web3 from '@solana/web3.js'
 import { WalletAdapter } from "@solana/wallet-adapter-base";
-import Nft, { fromStakeReceipt } from "../types/Nft";
 import { toast, ToastOptions, Icons } from 'react-toastify';
-
-import global_config from '../config.json'
-import { getNftsInWalletCached, getStakedNftsCached, getStakeOwnerForWallet } from "./user";
-import { StakingReceipt } from "../blockchain/idl/accounts/StakingReceipt";
-import Platform, { matchRule } from "../types/paltform";
-import { getPlatformInfo, getPlatformInfoFromCache } from "./platform";
-import { getOrConstruct } from "../types/cacheitem";
 import { TxHandler } from "../blockchain/handler";
-import { BASIS_POINTS_100P, prettyNumber } from "../data/uitls";
-import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
-import { TaxedItem } from "../App";
-
 import { CurrentTx, getCurrentTx, storeCurrentTx } from "./currenttx"
 import { getLanguageFromCache, Lang } from "../components/langselector";
-import { Config, environmentConfig } from "../types/config"
+import global_config from '../config.json'
 
 export type RankMultiplyerMap = { [key: string]: number }
 export type NftsSelectorTab = "stake" | "unstake"
