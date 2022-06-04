@@ -51,6 +51,18 @@ export function StakingProvider({ children, config, nfts }: { children: ReactNod
     const [pendingRewards, setPendingRewards] = useState<number>(0);
     const [dailyRewards, setDailyrewards] = useState(0);
 
+    const compressed = nfts.map((it, idx) => {
+        return [
+          it.address,
+          it.name,
+          it.image,
+          it.props.rank
+        ];
+    });
+
+    console.log('compressed size',JSON.stringify(compressed).length)
+
+
     // for background tasks
     const [curInterval, setCurInterval] = useState(null);
 

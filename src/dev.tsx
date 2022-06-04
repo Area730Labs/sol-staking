@@ -2,11 +2,14 @@ import { Box } from "@chakra-ui/layout";
 import { createInitializeMintInstruction, createMintToInstruction, getMinimumBalanceForRentExemptAccount, MintLayout, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
 import BN from "bn.js";
+import { useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { createPlatformConfig, createResizeObjectIx, createStackingPlatform, createUpdateStakingPlatformIx, getMerkleTree } from "./blockchain/instructions";
 import { Button } from "./components/button";
+import Fadeable from "./components/fadeable";
 import { useAppContext } from "./state/app";
 import { useStaking } from "./state/stacking";
+import appTheme from "./state/theme"
 
 export default function CreateMintButton() {
 
@@ -48,7 +51,7 @@ export default function CreateMintButton() {
 export function DevButtons() {
 
     const { wallet, solanaConnection, sendTx } = useAppContext();
-    const {config} = useStaking();
+    const { config } = useStaking();
 
     function updatePlatformButtonHandler() {
 
@@ -92,7 +95,7 @@ export function DevButtons() {
 
         const whitelist = getMerkleTree();
 
-        const dailyPerNft = parseInt(prompt("enter number of tokens per nft"))*config.reward_token_decimals;
+        const dailyPerNft = parseInt(prompt("enter number of tokens per nft")) * config.reward_token_decimals;
 
         const emissionType = parseInt(prompt("emission type : 2 - fixed per span, 3 - fixed per nft"));
         const spanDurationDays = parseInt(prompt("span duration days: ")) * 86400;
@@ -143,8 +146,14 @@ export function DevButtons() {
         });
     }
 
-    if (wallet != null && wallet.publicKey.toBase58() === config.treasury_wallet.toBase58()) {
-        return <Box py="8">
+    const [showFade, setFade] = useState(false);
+
+    const mainVisible = useMemo(() => {
+        return wallet != null && wallet.publicKey.toBase58() === config.treasury_wallet.toBase58()
+    }, [wallet, config]);
+
+    return <Fadeable isVisible={mainVisible}>
+        <Box py="8">
             <Button size="sm" onClick={() => {
 
                 const ix = createPlatformConfig(config, wallet);
@@ -166,8 +175,41 @@ export function DevButtons() {
             <Button size="sm" onClick={mintToTreasury}>Mint Tokens</Button>
             <Button typ="black" size="sm" onClick={updatePlatformButtonHandler}>Update</Button>
 
+            <Button size="sm" onClick={() => setFade(!showFade)}>Fade</Button>
+
+            <Fadeable
+                isVisible={showFade}
+                fadesize={7}
+                type={"scale"}
+                position="absolute" bottom="20px"
+                left="0"
+                right="0"
+
+                margin="0 auto"
+
+                width={["100%", "350px", "500px"]}
+                zIndex="20"
+                backgroundColor="whiteAlpha.900"
+                alignSelf="stretch"
+                color="black"
+                p="16"
+                borderRadius={appTheme.borderRadius}>
+
+                <Button typ="black" > perfomr some action <Box
+                    display="inline"
+                    right="-15px"
+                    top="-15px"
+                    p="1"
+                    px="2.5"
+                    width="8"
+                    backgroundColor={appTheme.stressColor}
+                    borderRadius="50%"
+                >1</Box>
+
+                </Button>
+                {/* <Button>Cancel</Button> */}
+            </Fadeable>
         </Box>
-    } else {
-        return null;
-    }
+    </Fadeable>
+
 }
