@@ -6,6 +6,7 @@ import { CheckIcon } from "@chakra-ui/icons";
 import { Image } from "@chakra-ui/image";
 import { useAppContext } from "../state/app";
 import config from "../config.json";
+import { useStaking } from "../state/stacking";
 
 export interface NftSelectionProps {
   item: Nft
@@ -16,6 +17,8 @@ export interface NftSelectionProps {
 export function NftSelection(props: NftSelectionProps | any) {
 
   const ctx = useAppContext();
+  const staking = useStaking();
+
   const [selected, setSelected] = useState<boolean>(false);
   const [mult, setMult] = useState(0);
   const [dailyIncome, setDailyIncome] = useState(0);
@@ -24,11 +27,11 @@ export function NftSelection(props: NftSelectionProps | any) {
   const borderSize = props.borderSize ?? 4;
 
   useEffect(() => {
-    if (ctx.nftMultMap != null) {
-      setMult(ctx.nftMultMap[nftInfo.address.toBase58()] / 10000)
-      setDailyIncome(ctx.pretty(ctx.incomePerNftCalculator(props.item)))
+    if (staking.nftMultMap != null) {
+      setMult(staking.nftMultMap[nftInfo.address.toBase58()] / 10000)
+      setDailyIncome(staking.pretty(staking.incomePerNftCalculator(props.item)))
     }
-  }, [ctx.platform, ctx.nftMultMap])
+  }, [staking.platform, staking.nftMultMap])
 
   function clickHandler() {
 
@@ -98,7 +101,7 @@ export function NftSelection(props: NftSelectionProps | any) {
       <Text width="100%" marginTop="2" color="black" marginBottom="2">{nftInfo.name}</Text>
     </Box>
     <MultiplicationWithSuggestion value={mult}>
-      ~{dailyIncome} {ctx.config.reward_token_name}
+      ~{dailyIncome} {staking.config.reward_token_name}
     </MultiplicationWithSuggestion>
     {props.children}
   </GridItem>

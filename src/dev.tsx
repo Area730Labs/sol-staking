@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { createPlatformConfig, createResizeObjectIx, createStackingPlatform, createUpdateStakingPlatformIx, getMerkleTree } from "./blockchain/instructions";
 import { Button } from "./components/button";
 import { useAppContext } from "./state/app";
+import { useStaking } from "./state/stacking";
 
 export default function CreateMintButton() {
 
@@ -46,7 +47,8 @@ export default function CreateMintButton() {
 
 export function DevButtons() {
 
-    const { wallet, solanaConnection, sendTx, config } = useAppContext();
+    const { wallet, solanaConnection, sendTx } = useAppContext();
+    const {config} = useStaking();
 
     function updatePlatformButtonHandler() {
 

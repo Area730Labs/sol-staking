@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import HistoryAction from "./components/historyaction";
 import { Stat } from "./components/stat";
 import nfts from "./data/nfts.json";
-import { useAppContext } from "./state/app";
 import {prettyNumber} from "./data/uitls"
+import { useStaking } from "./state/stacking";
 
 export interface PlatformStats {
     totalStacked: number,
@@ -14,7 +14,7 @@ export interface PlatformStats {
 
 export default function StakePlatformStats() {
 
-    const { platform } = useAppContext();
+    const { platform } = useStaking();
 
     const [info, setInfo] = useState<PlatformStats>({
         totalStacked: 0,

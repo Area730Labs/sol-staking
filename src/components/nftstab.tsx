@@ -15,6 +15,7 @@ import config from "../config.json"
 import MainPageContainer from "./mainpagecontainer";
 import { Button } from "./button";
 import { Label } from "./label";
+import { useStaking } from "../state/stacking";
 
 export interface NftsTabProps {
     heading: JSX.Element
@@ -40,7 +41,8 @@ interface NftTabContentProps {
 
 export function StakeNftsListTab(props: NftTabContentProps) {
 
-    const { nftsInWallet, sendTx, setNftsTab, config } = useAppContext();
+    const { sendTx, setNftsTab } = useAppContext();
+    const { nftsInWallet, config } = useStaking();
 
     function stakeSelectedItems(
         wallet: WalletAdapter,
@@ -67,8 +69,9 @@ export function StakeNftsListTab(props: NftTabContentProps) {
 
 export function StakedNftsListTab(props: NftTabContentProps) {
 
-    const { stackedNfts, sendTx, dailyRewards, config, pretty } = useAppContext();
-
+    const { stackedNfts, dailyRewards, config, pretty } = useStaking();
+    const { sendTx } = useAppContext();
+    
     async function unstakeSelectedItems(
         wallet: WalletAdapter,
         solanaConnection: Connection,

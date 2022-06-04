@@ -13,6 +13,7 @@ import { Button } from "./components/button";
 import NftSelectorGrid from "./components/nftselectorgrid";
 import React, { ReactNode } from "react";
 import global_config from "./config.json"
+import { useStaking } from "./state/stacking";
 
 export interface NftsSelectorProps {
     items: Nft[]
@@ -33,7 +34,8 @@ export interface NftsSelectorProps {
 
 export default function NftsSelector(props: NftsSelectorProps) {
 
-    const { wallet, solanaConnection, config } = useAppContext();
+    const { wallet, solanaConnection } = useAppContext();
+    const { config } = useStaking();
 
     const [selectedItems, setSelectedItems] = React.useState<{ [key: string]: boolean }>({});
     const [selectedItemsCount, setSelectedItemsCount] = React.useState(0);

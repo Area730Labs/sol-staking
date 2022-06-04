@@ -12,7 +12,7 @@ export interface Config {
     escrow: PublicKey
     program_id: PublicKey
 
-    cluster_url: string
+    // cluster_url: string
 
     reward_image: string
     reward_token_name: string
@@ -34,7 +34,7 @@ export function fromJson(object: any): Config {
         escrow: new PublicKey(object.escrow),
         program_id: new PublicKey(object.program_id),
 
-        cluster_url: object.cluster_url,
+        // cluster_url: object.cluster_url,
 
         reward_image: object.reward_image,
         reward_token_name: object.reward_token_name,

@@ -7,6 +7,7 @@ import { useAppContext } from "./state/app";
 
 import Nft, { fromStakeReceipt } from "./types/Nft";
 import { Tooltip } from "@chakra-ui/tooltip";
+import { useStaking } from "./state/stacking";
 
 
 export interface StakedSmallNftProps {
@@ -23,7 +24,8 @@ export function StakedSmallNft(props: StakedSmallNftProps | any) {
 
 export default function SmallStakedNftsList() {
 
-    const { stackedNfts, setNftsTab } = useAppContext();
+    const { setNftsTab } = useAppContext();
+    const { stackedNfts } = useStaking();
 
     const config = global_config;
 

@@ -1,10 +1,10 @@
 import { Box, Text } from "@chakra-ui/layout";
 import { useEffect, useState } from "react"
-import { useAppContext } from "./state/app";
+import { useStaking } from "./state/stacking";
 
 export default function DailyRewardValue() {
 
-    const { platform, basicIncomePerNft, config, pretty } = useAppContext();
+    const { platform, basicIncomePerNft, config, pretty } = useStaking();
     const [reward, setReward] = useState(0);
 
     useEffect(() => {

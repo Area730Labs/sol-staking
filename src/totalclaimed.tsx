@@ -2,7 +2,7 @@ import { Text } from "@chakra-ui/layout"
 import { PublicKey } from "@solana/web3.js";
 import { useEffect, useState } from "react";
 import Countup from "./components/countup"
-import { useAppContext } from "./state/app"
+import { useStaking } from "./state/stacking";
 import { Config } from "./types/config"
 
 function getCacheKey(config: Config) {
@@ -11,7 +11,7 @@ function getCacheKey(config: Config) {
 
 export default function TotalClaimed() {
 
-    const { platform, config } = useAppContext();
+    const { platform, config } = useStaking();
 
     const prevCachedValue = localStorage.getItem(getCacheKey(config));
     let prevClaimed = 0;

@@ -10,7 +10,6 @@ import { StakingReceipt } from "../blockchain/idl/accounts/StakingReceipt";
 import Platform, { matchRule } from "../types/paltform";
 import { getPlatformInfo, getPlatformInfoFromCache } from "./platform";
 import { getOrConstruct } from "../types/cacheitem";
-import nfts from "../data/nfts.json";
 import { TxHandler } from "../blockchain/handler";
 import { BASIS_POINTS_100P, prettyNumber } from "../data/uitls";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
@@ -26,11 +25,6 @@ export type TransactionType = "stake" | "unstake" | "platform" | "claim" | "othe
 export type SendTxFuncType = { (ixs: web3.TransactionInstruction[], typ: TransactionType, signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
 
 export interface AppContextType {
-
-    pendingRewards: number
-    setPendingRewards: any
-    dailyRewards: number
-
     // solana 
     solanaConnection: web3.Connection
     setSolanaNode: any
@@ -39,37 +33,16 @@ export interface AppContextType {
     wallet: WalletAdapter | null
     setWalletAdapter: any
 
-    // user 
-    nftsInWallet: Nft[],
-    // updateNftsList: any
-    stackedNfts: StakingReceipt[]
-    updateStakedNfts: { (items: StakingReceipt[]): void }
-
     nftsTab: NftsSelectorTab
     nftsTabCounter: number
     setNftsTab: { (tabl: NftsSelectorTab): void }
 
     scrollRef: any
 
-    platform: Platform | null
-    nftMultMap: RankMultiplyerMap | null
-
     sendTx: SendTxFuncType
-    incomePerNftCalculator: { (item: Nft): number }
-    basicIncomePerNft: { (): number }
-    calculateIncomeWithTaxes: { (item: StakingReceipt): [number, number, number] }
-
-    getTaxedItems: { (): [TaxedItem[], number] }
 
     lang: Lang,
     setLang: { (value: Lang) }
-
-    config: Config,
-    setConfig: { (value: Config) }
-
-    pretty: { (value: number): number }
-
-    // setCurrentTx: { (item: CurrentTx): void }
 }
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
@@ -77,18 +50,7 @@ const AppContext = createContext<AppContextType>({} as AppContextType);
 export function AppProvider({ children }: { children: ReactNode; }) {
 
     const [lang, setLang] = useState<Lang>(getLanguageFromCache());
-    const [config, setConfig] = useState<Config>(environmentConfig());
-
-    const [platform, setPlatform] = useState<Platform | null>(getPlatformInfoFromCache(config.stacking_config));
-    const [nftMultMap, setMultMap] = useState<RankMultiplyerMap | null>(null);
-
-    const [userNfts, updateNfts] = useState<Nft[]>([]);
-
-    const [solanaNode, setSolanaNode] = useState<string>(config.cluster_url)
-
-    const [stackedNfts, updateStakedNfts] = useState<StakingReceipt[]>([] as StakingReceipt[]);
-    const [pendingRewards, setPendingRewards] = useState<number>(0);
-    const [dailyRewards, setDailyrewards] = useState(0);
+    const [solanaNode, setSolanaNode] = useState<string>(global_config.cluster_url)
     const [connectedWallet, setWallet] = useState<WalletAdapter | null>(null);
 
     const [nftsTabClickCounter, setCounter] = useState(0);
@@ -96,8 +58,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
     const [curtx, setCurtx] = useState<CurrentTx | null>(null);
     const [userUpdatesCounter, setUserUpdatesCounter] = useState(0);
-
-    const [curInterval, setCurInterval] = useState(null);
 
     const web3Handler = useMemo(() => {
         return new web3.Connection(solanaNode, 'confirmed');
@@ -107,213 +67,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         setNftsTab(openedTab);
         setCounter(nftsTabClickCounter + 1);
     }
-
-    function pretty(value: number): number {
-        return Math.round(((value / config.reward_token_decimals) + Number.EPSILON) * 100) / 100
-    }
-
-    function calcBasicIncomePerNft(): number {
-        if (platform != null) {
-            if (platform.emissionType == 3) { // fixed per nft, all time
-                return platform.baseEmissions;
-            } else {
-                if (platform.emissionType == 2) {
-
-                    // this reward you can get if you stake 1 your nft
-                    // const stakedUnitsValue = (platform.stakedUnits > 0 ? ((platform.stakedUnits + BASIS_POINTS_100P) / BASIS_POINTS_100P) : 1);
-                    const stakedUnitsValue = (platform.stakedUnits > 0 ? ((platform.stakedUnits) / BASIS_POINTS_100P) : 1);
-
-                    return platform.baseEmissions / stakedUnitsValue;
-                } else {
-                    console.warn('platform', JSON.stringify(platform))
-                    toast.error(`Unable to calc income per nft for emission type of platform (${platform.emissionType})`)
-                    return 0;
-                }
-            }
-        } else {
-            return 0;
-        }
-    }
-
-    function calculateIncomeWithTaxes(item: StakingReceipt): [number, number, number] {
-
-        const rewards_amount_daily = incomePerNftCalculator(fromStakeReceipt(item));
-        const rewards_per_minute = rewards_amount_daily / (60 * 24);
-
-        // @todo test only
-        let day_seconds = 60 * 10;
-        let cur_ts = new Date().getTime() / 1000;
-
-        let staked_diff = cur_ts - item.stakedAt.toNumber();
-        let staking_days = staked_diff / day_seconds;
-
-        let matched_rule = matchRule(platform.taxRule, staking_days);
-
-        // calc tax percent
-        let tax_bp = matched_rule.value;
-        let tax_value = 0;
-
-        let rewards_diff = cur_ts - item.lastClaim.toNumber();
-        let staked_minutes = rewards_diff / 60;
-
-        let rewards_amount = staked_minutes * rewards_per_minute;
-
-        if (tax_bp != 0) {
-
-            if (matched_rule.valueIsBp != 1) {
-                tax_bp = matched_rule.value * 100;
-            }
-
-            // check if its not bigger than 10000
-            if (tax_bp > BASIS_POINTS_100P) {
-                console.log("tax is more than 100%");
-                return [0, 0, staked_diff];
-            }
-
-            tax_value = rewards_amount * tax_bp / BASIS_POINTS_100P;
-        }
-
-        return [tax_value, rewards_amount, staked_diff];
-    }
-
-    function incomePerNftCalculator(item: Nft): number {
-        const basicIncomePerNft = calcBasicIncomePerNft();
-        if (nftMultMap == null) {
-            return basicIncomePerNft;
-        } else {
-
-            const itemAddr = item.address.toBase58();
-            const multBb = nftMultMap[itemAddr];
-            const finalResult = basicIncomePerNft * multBb / BASIS_POINTS_100P;
-            console.log(` --- ${itemAddr} `);
-            console.log(` --  mult ${multBb} `)
-            console.log(` --  final ${pretty(finalResult)} `)
-
-            const multFact = finalResult / basicIncomePerNft;
-
-            console.log(` --  base mult fact: ${prettyNumber(multFact)}`)
-            console.log(' ')
-
-            return finalResult;
-        }
-    }
-
-    useEffect(() => {
-
-        getPlatformInfo(global_config.disable_cache, web3Handler, config.stacking_config).then((platform) => {
-            setPlatform(platform);
-        }).catch((e) => {
-            toast.error('error while fetching staking config: ' + e.message)
-        })
-
-    }, []);
-
-    useEffect(() => {
-
-        if (curInterval != null) {
-            clearInterval(curInterval);
-        }
-
-        if (stackedNfts.length > 0) {
-            setCurInterval(setInterval(() => {
-
-                // calc inco me 
-                let income = 0;
-
-                const curTimestamp = (new Date()).getTime() / 1000;
-
-                for (var it of stackedNfts) {
-
-                    const perDay = incomePerNftCalculator(fromStakeReceipt(it));
-
-                    const tick_size = 1;
-
-                    let income_per_tick = perDay / (86400 / tick_size);
-
-                    const diff = Math.floor((curTimestamp - it.lastClaim.toNumber()) / tick_size);
-
-                    if (diff > 0) {
-
-                        const incomePerStakedItem = diff * income_per_tick;
-
-                        // console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
-
-                        income += incomePerStakedItem;
-                    }
-                    // else {
-                    // console.log(' -- staked item diff is 0?. item\'s last claim. now ',it.lastClaim.toNumber(),new Date().getTime()/1000)
-                    // }
-                }
-
-                let incomeNewValue = income;
-
-                if (incomeNewValue == 0) {
-                    console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
-                }
-
-                setPendingRewards(incomeNewValue);
-
-            }, 15000));
-        }
-    }, [stackedNfts])
-
-    useEffect(() => {
-
-        if (platform != null && connectedWallet != null && nftMultMap != null && stackedNfts.length > 0) {
-
-            // calc inco me 
-            let income = 0;
-
-            const curTimestamp = (new Date()).getTime() / 1000;
-
-            let dailyRewardsValue = 0;
-
-            for (var it of stackedNfts) {
-
-                const perDay = incomePerNftCalculator(fromStakeReceipt(it));
-
-                let income_per_minute = perDay / (24 * 60);
-
-                dailyRewardsValue += perDay;
-
-                const diff = (curTimestamp - it.lastClaim.toNumber()) / 60;
-                if (diff > 0) {
-
-                    const incomePerStakedItem = diff * income_per_minute;
-
-                    console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
-
-                    income += incomePerStakedItem;
-                }
-            }
-
-            setDailyrewards(dailyRewardsValue);
-
-            let incomeNewValue = income;
-
-            if (incomeNewValue == 0) {
-                console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
-            }
-
-            setPendingRewards(incomeNewValue);
-
-            const savedIncomeValues = incomeNewValue;
-
-            getStakeOwnerForWallet(config, connectedWallet.publicKey).then(async (stakeOwnerAddress) => {
-
-                // connection expected to be always available 
-                return StakeOwner.fetch(web3Handler, stakeOwnerAddress);
-            }).then((stake_owner) => {
-                if (stake_owner != null) {
-                    const totalRewards = savedIncomeValues + stake_owner.balance.toNumber();
-                    setPendingRewards(totalRewards);
-                }
-            });
-        }
-        // todo handle wallet disconnection
-        // need to set ZERO earnings
-
-    }, [stackedNfts, platform, connectedWallet, nftMultMap]);
 
     useEffect(() => {
 
@@ -352,7 +105,10 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                     case 'claim': {
                         const timeTook = new Date().getTime() - curtx.CreatedAt;
                         console.log('calc income for time when tx were confirming', timeTook)
-                        setPendingRewards(0);
+                        // setPendingRewards(0);
+
+                        toast.info('unable to set setPendingRewards(0). they moved to staking context')
+
                         setUserUpdatesCounter(userUpdatesCounter + 1);
                         break;
                     }
@@ -385,43 +141,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         }
     }, [curtx]);
 
-    useEffect(() => {
-
-        if (platform != null) {
-
-            // @todo add changes counter to staking config account
-            // and use it for caching 
-            getOrConstruct<RankMultiplyerMap>(global_config.disable_cache, "rank_multiplyer", async () => {
-
-                let result: RankMultiplyerMap = {};
-
-                const rule = platform.multiplyRule;
-
-                for (var it of nfts) {
-                    const matched = matchRule(rule, it.props.rank)
-                    if (matched != null) {
-
-                        let bp_value = matched.value;
-                        if (!matched.valueIsBp) {
-                            bp_value = matched.value * 100;
-                            // check max BP value cap
-                        }
-
-                        result[it.address] = bp_value;
-                    } else {
-                        // 1
-                        result[it.address] = BASIS_POINTS_100P;
-                    }
-                }
-
-                return result;
-            }, 86400 * 30).then((map) => {
-                setMultMap(map);
-            });
-
-        }
-    }, [platform]);
-
     function setCurTxWrapper(tx: CurrentTx) {
         if (connectedWallet != null) {
             storeCurrentTx(tx, connectedWallet);
@@ -435,18 +154,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
             setCurtx(getCurrentTx(connectedWallet));
 
-            // probably just use useMemo
-            getStakedNftsCached(config, web3Handler, connectedWallet.publicKey).then((stakedNfts) => {
-                updateStakedNfts(stakedNfts);
-            });
-
-            getNftsInWalletCached(connectedWallet.publicKey as web3.PublicKey, web3Handler).then(items => {
-                updateNfts(items);
-            })
-
         } else {
-            updateStakedNfts([]);
-            updateNfts([]);
+
             setCurTxWrapper(null);
         }
     }, [connectedWallet, userUpdatesCounter]);
@@ -479,41 +188,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         }
     }
 
-    function getTaxedItems(): [TaxedItem[], number] {
-        var result = [] as TaxedItem[];
-        var totalTax = 0;
-
-        for (var it of stackedNfts) {
-
-            const [taxes, income, stake_diff] = calculateIncomeWithTaxes(it);
-
-            if (taxes > 0) {
-                result.push({
-                    tax: taxes,
-                    income: income,
-                    receipt: it,
-                    staked_for: stake_diff,
-                });
-
-                totalTax += taxes;
-            }
-        }
-
-        return [result, totalTax];
-    }
-
     const memoedValue = useMemo(() => {
         const curCtx = {
-
-            // user wallet nfts
-            nftsInWallet: userNfts,
-            stackedNfts,
-            updateStakedNfts,
-
-            // rewards  
-            pendingRewards,
-            setPendingRewards,
-            dailyRewards,
 
             // wallet
             solanaConnection: web3Handler,
@@ -526,34 +202,21 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             setNftsTab: changeNftsTab,
             nftsTabCounter: nftsTabClickCounter,
 
-            platform,
-            nftMultMap,
-
             sendTx,
-            incomePerNftCalculator,
-            basicIncomePerNft: calcBasicIncomePerNft,
-            calculateIncomeWithTaxes,
-            getTaxedItems,
 
             // lang 
             lang,
-            setLang,
-
-            config,
-            pretty
+            setLang
 
         } as AppContextType;
 
         return curCtx
 
     }, [,
-        pendingRewards, userNfts, stackedNfts,
         nftsTab, nftsTabClickCounter,
         web3Handler, connectedWallet,
-        nftMultMap,
         curtx, userUpdatesCounter,
         lang,
-        config
     ]);
 
     return (
