@@ -1,5 +1,4 @@
 import { Box } from "@chakra-ui/layout";
-import { ChakraComponent, ChakraProps } from "@chakra-ui/system";
 import { useEffect, useMemo, useState } from "react";
 import appTheme from "../state/theme"
 

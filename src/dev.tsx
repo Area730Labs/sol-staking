@@ -50,7 +50,7 @@ export default function CreateMintButton() {
 
 export function DevButtons() {
 
-    const { wallet, solanaConnection, sendTx } = useAppContext();
+    const { wallet, sendTx } = useAppContext();
     const { config } = useStaking();
 
     function updatePlatformButtonHandler() {
@@ -62,7 +62,7 @@ export function DevButtons() {
 
         let ixs = [];
 
-        if (prompt("are there changes in smart contract") != "") {
+        if (prompt("are there changes in smart contract") !== "") {
             ixs.push(createResizeObjectIx(1, configAddr, wallet))
         }
 

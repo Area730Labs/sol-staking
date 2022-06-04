@@ -11,7 +11,6 @@ export function WalletConnectButton(props: WalletConnectButtonProps) {
 
     const { setWalletAdapter } = useAppContext();
 
-
     const walletConnectButtonHandler = function () {
 
         let phantomWallet = new phantom.PhantomWalletAdapter();
