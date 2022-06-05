@@ -2,8 +2,7 @@ import { HStack } from "@chakra-ui/layout";
 import { useEffect, useState } from "react";
 import HistoryAction from "./components/historyaction";
 import { Stat } from "./components/stat";
-import nfts from "./data/nfts.json";
-import {prettyNumber} from "./data/uitls"
+import { prettyNumber } from "./data/uitls"
 import { useStaking } from "./state/stacking";
 
 export interface PlatformStats {
@@ -14,7 +13,7 @@ export interface PlatformStats {
 
 export default function StakePlatformStats() {
 
-    const { platform } = useStaking();
+    const { platform, nfts } = useStaking();
 
     const [info, setInfo] = useState<PlatformStats>({
         totalStacked: 0,

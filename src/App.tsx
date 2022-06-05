@@ -21,7 +21,7 @@ import AppMainModal from "./appmainmodal"
 import { SelectedStakingMainActions, StakingMainInfo } from "./components/selectedstakingmainactions"
 
 import appTheme from "./state/theme"
-import nfts from "./data/nfts.dev.json"
+import nfts from "./data/nfts.json"
 
 export function App() {
 

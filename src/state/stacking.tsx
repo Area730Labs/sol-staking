@@ -16,6 +16,7 @@ import { TaxedItem } from "../types/taxeditem";
 
 export interface StakingContextType {
     config: Config,
+    nfts: any[]
 
     pendingRewards: number
     setPendingRewards: any
@@ -340,7 +341,7 @@ export function StakingProvider({ children, config, nfts }: { children: ReactNod
                 updateStakedNfts(stakedNfts);
             });
 
-            getNftsInWalletCached(wallet.publicKey as PublicKey, solanaConnection).then(items => {
+            getNftsInWalletCached({ nfts } as StakingContextType, wallet.publicKey as PublicKey, solanaConnection).then(items => {
                 updateNfts(items);
             })
 
@@ -395,7 +396,9 @@ export function StakingProvider({ children, config, nfts }: { children: ReactNod
 
             config,
             pretty,
-            fromStakeReceipt
+            fromStakeReceipt,
+
+            nfts
         }
 
         return result;

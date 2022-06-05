@@ -41,7 +41,8 @@ interface NftTabContentProps {
 export function StakeNftsListTab(props: NftTabContentProps) {
 
     const { sendTx, setNftsTab } = useAppContext();
-    const { nftsInWallet, config } = useStaking();
+    const staking = useStaking();
+    const { nftsInWallet, config } = staking;
 
     function stakeSelectedItems(
         wallet: WalletAdapter,
@@ -52,7 +53,7 @@ export function StakeNftsListTab(props: NftTabContentProps) {
         let instructions = [] as TransactionInstruction[];
 
         for (var it in selectedItems) {
-            instructions.push(createStakeNftIx(config, new PublicKey(it), wallet as WalletAdapter));
+            instructions.push(createStakeNftIx(staking, new PublicKey(it), wallet as WalletAdapter));
         }
 
         return sendTx(instructions, 'stake').catch((e) => {
@@ -68,9 +69,9 @@ export function StakeNftsListTab(props: NftTabContentProps) {
 
 export function StakedNftsListTab(props: NftTabContentProps) {
 
-    const { stackedNfts, dailyRewards, config, pretty,fromStakeReceipt } = useStaking();
+    const { stackedNfts, dailyRewards, config, pretty, fromStakeReceipt } = useStaking();
     const { sendTx } = useAppContext();
-    
+
     async function unstakeSelectedItems(
         wallet: WalletAdapter,
         solanaConnection: Connection,

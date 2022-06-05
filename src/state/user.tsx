@@ -4,11 +4,11 @@ import { StakingReceipt, StakingReceiptJSON } from "../blockchain/idl/accounts/S
 import { getAllNfts, getStakedNfts } from "../blockchain/nfts";
 import { constructCacheKey, getOrConstruct } from "../types/cacheitem";
 import Nft from "../types/Nft";
-import nftsAvailable from '../data/nfts.json'
 import { calcAddressWithTwoSeeds } from "../blockchain/instructions";
 
 import { Config } from "../types/config"
 import global_config from "../config.json"
+import { StakingContextType } from "./stacking";
 
 export async function getStakedNftsCached(config: Config, solanaConnection: Connection, wallet: PublicKey, force: boolean = false,): Promise<StakingReceipt[]> {
     return getOrConstruct<StakingReceipt[]>(force, "staked_by", async () => {
@@ -80,7 +80,7 @@ export function getStakeOwnerForWallet(config: Config, wallet: PublicKey): Promi
  * @param force 
  * @returns 
  */
-export function getNftsInWalletCached(wallet: PublicKey, connection: Connection, force: boolean = false): Promise<Nft[]> {
+export function getNftsInWalletCached(staking: StakingContextType, wallet: PublicKey, connection: Connection, force: boolean = false): Promise<Nft[]> {
     return getOrConstruct<PublicKey[]>(force, "wallet_nfts", async () => {
         return getAllNfts(connection, wallet);
     }, global_config.caching.wallet_nfts, wallet.toBase58()).then((items) => {
@@ -107,7 +107,7 @@ export function getNftsInWalletCached(wallet: PublicKey, connection: Connection,
             let found = null;
             const addr = it.toBase58();
 
-            for (var item of nftsAvailable) {
+            for (var item of staking.nfts) {
                 if (addr == item.address) {
                     found = item;
                     break;

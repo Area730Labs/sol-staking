@@ -51,13 +51,14 @@ export default function CreateMintButton() {
 export function DevButtons() {
 
     const { wallet, sendTx } = useAppContext();
-    const { config } = useStaking();
+    const staking = useStaking();
+    const {config} = staking;
 
     function updatePlatformButtonHandler() {
 
         const owner = wallet.publicKey;
-        const whitelist = getMerkleTree();
-        const configAddr = new PublicKey(config.stacking_config);
+        const whitelist = getMerkleTree(staking);
+        const configAddr = new PublicKey(staking.config.stacking_config);
         const dailyPerNft = parseInt(prompt("enter number of tokens per nft"));
 
         let ixs = [];
@@ -70,10 +71,10 @@ export function DevButtons() {
         const spanDurationDays = parseInt(prompt("span duration days: ")) * 86400;
 
         ixs.push(createUpdateStakingPlatformIx(
-            config,
+            staking.config,
             owner,
             configAddr,
-            new BN(dailyPerNft * config.reward_token_decimals),
+            new BN(dailyPerNft * staking.config.reward_token_decimals),
             whitelist,
             parseInt(emissionType),
             new BN(spanDurationDays)));
@@ -93,15 +94,15 @@ export function DevButtons() {
         const mint = new PublicKey(token);
         const owner = wallet.publicKey;
 
-        const whitelist = getMerkleTree();
+        const whitelist = getMerkleTree(staking);
 
-        const dailyPerNft = parseInt(prompt("enter number of tokens per nft")) * config.reward_token_decimals;
+        const dailyPerNft = parseInt(prompt("enter number of tokens per nft")) * staking.config.reward_token_decimals;
 
         const emissionType = parseInt(prompt("emission type : 2 - fixed per span, 3 - fixed per nft"));
         const spanDurationDays = parseInt(prompt("span duration days: ")) * 86400;
 
         const ix = createStackingPlatform(
-            config,
+            staking.config,
             mint,
             owner,
             new BN(dailyPerNft),
@@ -149,14 +150,14 @@ export function DevButtons() {
     const [showFade, setFade] = useState(false);
 
     const mainVisible = useMemo(() => {
-        return wallet != null && wallet.publicKey.toBase58() === config.treasury_wallet.toBase58()
-    }, [wallet, config]);
+        return wallet != null && wallet.publicKey.toBase58() === staking.config.treasury_wallet.toBase58()
+    }, [wallet, staking.config]);
 
     return <Fadeable isVisible={mainVisible}>
         <Box py="8">
             <Button size="sm" onClick={() => {
 
-                const ix = createPlatformConfig(config, wallet);
+                const ix = createPlatformConfig(staking.config, wallet);
 
                 console.log('platform config ix ', ix)
 

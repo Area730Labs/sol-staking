@@ -12,7 +12,6 @@ import appTheme from "../state/theme"
 import Address from "./address";
 import { Tooltip } from "@chakra-ui/tooltip";
 import HistoryAction from "./historyaction";
-import nfts from "../data/nfts.json"
 import SmallStakedNftsList, { StakedSmallNft } from "../smallstakednftslist";
 import SmallNftBlock from "../smallnftblock";
 import { PublicKey } from "@solana/web3.js";
@@ -20,6 +19,7 @@ import global_config from "../config.json"
 import { Image } from "@chakra-ui/image";
 
 import { getFakeNftImage } from "../components/nft"
+import { useStaking } from "../state/stacking";
 
 function HistoryActionNftLink(props: any) {
     return <Image cursor="pointer" src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="46px" />
@@ -67,6 +67,8 @@ export function SelectedStakingMainActions() {
 }
 
 function AllStakedNfts() {
+
+    const { nfts } = useStaking();
 
     return <HStack>
         {nfts.slice(0, global_config.max_nfts_per_row - 1).map((object, i) =>

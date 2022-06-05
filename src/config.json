@@ -1,6 +1,6 @@
 {
      "env": {
-          "prod": {
+          "dev": {
                "stacking_config_alias": "HfQpdVtLEiZTo9admjbpUSRVfMfZ4Ntm6h35fHDks1cu",
                "rewards_token_account": "8ZebwqJbecECXsKL6iKqBet7wg5VcE8PvrmW7jHa8Mmu",
                "stacking_config": "GMuCmwt4buqeBX4t126RCkPJQEVXDW93Dr58aqBaLaNS",
@@ -15,7 +15,7 @@
                "main_image":"https://4czjblv4exlnkapuju5tmwmv42t262b5s6sknjhdfrfjrbcotczq.arweave.net/4LKQrrwl1tUB9E07NlmV5qevaD2XpKak4yxKmIROmLM?ext=png",
                "label": "Okay Bears"
           },
-          "prod1": {
+          "prod": {
                "stacking_config_alias": "5ckMb8o4uaeG6RMYR2QpadPRtLUG3yUCV26apAWZTn5B",
                "rewards_token_account": "Ce8XSXKQ9mkgAq3Ta5M7w8tgaJy3vYBjXjcq4R9avN7v",
                "stacking_config": "8ELy89juk6mLawcr3F37nmFNWrffJvqsHniLFHQGUcaV",

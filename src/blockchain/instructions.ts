@@ -11,7 +11,6 @@ import { PlatformBumps } from "./idl/types/PlatformBumps";
 import { StakeNftBumps } from "./idl/types/StakeNftBumps"
 import { Nft } from "./types";
 
-import nftsRaw from "../data/nfts.json"
 import global_config from "../config.json"
 
 import { Config } from "../types/config"
@@ -29,12 +28,13 @@ import { Rule } from "./idl/types/Rule";
 import { Condition } from "./idl/types/Condition";
 import { updateStaking, UpdateStakingAccounts, UpdateStakingArgs } from "./idl/instructions/updateStaking";
 import { resizeObject, ResizeObjectAccounts } from "./idl/instructions/resizeObject";
+import { StakingContextType } from "../state/stacking";
 
 
-export function getMerkleTree(): MerkleTree {
+export function getMerkleTree(staking: StakingContextType): MerkleTree {
 
     const leaves = buildLeaves(
-        nftsRaw.map((e, i) => ({
+        staking.nfts.map((e, i) => ({
             address: new PublicKey(e.address),
             props: e.props,
             name: e.name,
@@ -75,15 +75,15 @@ export function createResizeObjectIx(typ: number, address: PublicKey, signer: Wa
     return resizeObject(args, accounts);
 }
 
-export function createStakeNftIx(config: Config, mint: PublicKey, owner: WalletAdapter): TransactionInstruction {
+export function createStakeNftIx(config: StakingContextType, mint: PublicKey, owner: WalletAdapter): TransactionInstruction {
 
-    const tree = getMerkleTree();
+    const tree = getMerkleTree(config);
 
-    const indexStaked = nftsRaw.findIndex(
+    const indexStaked = config.nfts.findIndex(
         (e) => e.address === mint.toBase58()
     );
 
-    const nftToStake = nftsRaw[indexStaked];
+    const nftToStake = config.nfts[indexStaked];
 
     if (indexStaked == -1) {
         toast.warn(`This is not whitelisted nft : ${mint.toBase58()}`)
@@ -92,8 +92,8 @@ export function createStakeNftIx(config: Config, mint: PublicKey, owner: WalletA
 
     const proof = tree.getProofArray(indexStaked);
 
-    const [stakingReceipt, receiptBump] = calcAddressWithSeed(config, "receipt", mint);
-    const [stakingDeposit, depositBump] = calcAddressWithSeed(config, "deposit", mint);
+    const [stakingReceipt, receiptBump] = calcAddressWithSeed(config.config, "receipt", mint);
+    const [stakingDeposit, depositBump] = calcAddressWithSeed(config.config, "deposit", mint);
 
     const userTokenAccount = findAssociatedTokenAddress(owner.publicKey, mint);
 
@@ -106,9 +106,9 @@ export function createStakeNftIx(config: Config, mint: PublicKey, owner: WalletA
         rank: nftToStake.props.rank,
     } as StakeNftArgs, {
         staker: owner.publicKey,
-        platformConfig: config.platform_config,
-        stakingConfig: config.stacking_config,
-        escrow: config.escrow,
+        platformConfig: config.config.platform_config,
+        stakingConfig: config.config.stacking_config,
+        escrow: config.config.escrow,
         stakingReceipt: stakingReceipt,
         mint: mint,
         stakerNftAccount: userTokenAccount,
