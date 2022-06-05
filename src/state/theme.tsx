@@ -9,6 +9,7 @@ const styles = {
         return themeColor(a)
     },
     borderRadius: "6px",
+    borderRadiusXl: "12px",
     transition: "all 0.2s ease",
     transitionXl: "all 0.5s ease",
     transition2xl: "all 0.8s ease",

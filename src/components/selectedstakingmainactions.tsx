@@ -33,9 +33,6 @@ function InfoColumn(props: any) {
         borderRadius={appTheme.borderRadius}
         transition='all 0.2s  ease'
         p="3"
-        _hover={{
-            backgroundColor: "rgb(13 15 53 / 60%)"
-        }}
     >
         {props.children}
     </VStack>)
@@ -104,7 +101,13 @@ export function StakingMainInfo(props: any) {
         newAction("claimed")
     ];
 
-    return <MainPageContainer {...props}>
+    return <MainPageContainer {...props}
+        _hover={{
+            backgroundColor: "whiteAlpha.100"
+        }}
+        transition={appTheme.transition}
+        borderRadius={appTheme.borderRadiusXl}
+    >
         <HStack spacing={4} alignItems="flex-start">
             <Box>
                 <StakingInfo />
