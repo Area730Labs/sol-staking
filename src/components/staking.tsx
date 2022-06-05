@@ -24,10 +24,8 @@ export function Staking(props: StakingProviderProps) {
     const [expanded, expand] = useState(false);
 
     return <StakingProvider config={props.config} nfts={props.nfts}>
-        <VStack spacing={8} fontSize="xl">
-            <SelectedStakingMainActions />
-            <StakingMainInfo />
-        </VStack>
+        <SelectedStakingMainActions />
+        <StakingMainInfo paddingTop="10" />
         <NftSelectorTabs />
     </StakingProvider>
 }

@@ -1,6 +1,9 @@
 import { Container } from "@chakra-ui/layout";
 
 export default function MainPageContainer(props: any) {
+
+    const { children, ...rest } = props;
+
     return (
         <Container
             maxW='container.lg'
@@ -8,7 +11,7 @@ export default function MainPageContainer(props: any) {
             zIndex="10"
             textAlign="center"
             overflowY="hidden"
-            {...props}>{props.children}
+            {...rest}>{children}
         </Container>
     )
 }

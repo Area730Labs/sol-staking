@@ -26,7 +26,9 @@ function HistoryActionNftLink(props: any) {
 }
 
 function InfoColumn(props: any) {
+
     return (<VStack
+
         alignItems="flex-start"
         borderRadius={appTheme.borderRadius}
         transition='all 0.2s  ease'
@@ -85,7 +87,7 @@ function AllStakedNfts() {
     </HStack>
 }
 
-export function StakingMainInfo() {
+export function StakingMainInfo(props: any) {
 
     function newAction(operation: string) {
         return {
@@ -102,13 +104,13 @@ export function StakingMainInfo() {
         newAction("claimed")
     ];
 
-    return <MainPageContainer>
+    return <MainPageContainer {...props}>
         <HStack spacing={4} alignItems="flex-start">
             <Box>
                 <StakingInfo />
             </Box>
             <Box>
-                <VStack textAlign="center" >
+                <VStack textAlign="center" paddingTop="3">
                     <Text fontSize="sm" fontWeight="bold"><Label>Rewards</Label></Text>
                     <RewardImage />
                     <DailyRewardValue />
