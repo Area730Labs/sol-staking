@@ -4,6 +4,7 @@ import {
   VStack,
   Grid,
   theme,
+  Flex,
 } from "@chakra-ui/react"
 
 import { AppProvider } from "./state/app"
@@ -22,6 +23,7 @@ import { SelectedStakingMainActions, StakingMainInfo } from "./components/select
 
 import appTheme from "./state/theme"
 import nfts from "./data/nfts.json"
+import { Staking } from "./components/staking";
 
 export function App() {
 
@@ -38,25 +40,19 @@ export function App() {
       pauseOnHover
     />
     <AppProvider>
-      <StakingProvider config={fromJson(global_config.env.prod)} nfts={nfts}>
-        <ModalProvider>
-          <AppMainModal />
-          <Box fontSize="xl" backgroundColor={appTheme.themeColor}>
-            <Grid minH="10vh" p={3}>
-              <Box justifySelf="flex-end" fontSize="sm">
-                <LangSelector />
-              </Box>
-              <VStack spacing={8} >
-                <SelectedStakingMainActions />
-                <StakingMainInfo />
-              </VStack>
-            </Grid>
+      <ModalProvider>
+        <AppMainModal />
+        <Box backgroundColor={appTheme.themeColor}>
+          <Grid p={3} pb="0">
+            <Box justifySelf="flex-end" fontSize="sm">
+              <LangSelector />
+            </Box>
+          </Grid>
+          <Box>
+            <Staking config={fromJson(global_config.env.prod)} nfts={nfts} />
           </Box>
-          <Box backgroundColor={appTheme.themeColor}>
-            <NftSelectorTabs />
-          </Box>
-        </ModalProvider>
-      </StakingProvider>
+        </Box>
+      </ModalProvider>
     </AppProvider>
   </ChakraProvider>
 }

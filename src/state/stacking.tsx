@@ -43,7 +43,13 @@ export interface StakingContextType {
 
 const StakingContext = createContext<StakingContextType>(null);
 
-export function StakingProvider({ children, config, nfts }: { children: ReactNode, config: Config, nfts: any[] }) {
+export interface StakingProviderProps {
+    children?: ReactNode,
+    config: Config,
+    nfts: any[]
+}
+
+export function StakingProvider({ children, config, nfts }: StakingProviderProps) {
 
     const [platform, setPlatform] = useState<Platform | null>(getPlatformInfoFromCache(config.stacking_config));
     const [nftMultMap, setMultMap] = useState<RankMultiplyerMap | null>(null);
@@ -52,16 +58,17 @@ export function StakingProvider({ children, config, nfts }: { children: ReactNod
     const [pendingRewards, setPendingRewards] = useState<number>(0);
     const [dailyRewards, setDailyrewards] = useState(0);
 
-    const compressed = nfts.map((it, idx) => {
-        return [
-            it.address,
-            it.name,
-            it.image,
-            it.props.rank
-        ];
-    });
+    // const compressed = nfts.map((it, idx) => {
+    //     return [
+    //         it.address,
+    //         it.name,
+    //         it.image,
+    //         it.props.rank
+    //     ];
+    // });
 
-    console.log('compressed size', JSON.stringify(compressed).length)
+    // console.log('uncompressed size',JSON.stringify(nfts).length)
+    // console.log('compressed size', JSON.stringify(compressed).length)
 
     function fromStakeReceipt(receipt: StakingReceipt): Nft {
 

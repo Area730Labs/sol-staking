@@ -7,7 +7,7 @@ import MainPageContainer from "./mainpagecontainer";
 import { ClaimPendingRewardsButton, PendingRewards } from "./pendingrewards";
 import RewardImage from "./rewardimage";
 import StakeButton from "./stakebutton";
-import { StakingInfo } from "./stakinginfo";
+import { StakingInfo } from "./staking";
 import appTheme from "../state/theme"
 import Address from "./address";
 import { Tooltip } from "@chakra-ui/tooltip";
@@ -42,12 +42,10 @@ function InfoColumn(props: any) {
 export function SelectedStakingMainActions() {
     return <>
         <MainPageContainer>
-
             <Box bottom="20px" textAlign="center" pt="10">
                 <TotalClaimed />
                 <Text fontSize="2xl" color="white"><Label>total claimed rewards</Label></Text>
             </Box>
-
         </MainPageContainer>
         <Container
             maxW='container.lg'
