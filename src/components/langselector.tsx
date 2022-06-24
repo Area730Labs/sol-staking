@@ -2,6 +2,7 @@ import { SettingsIcon } from "@chakra-ui/icons";
 import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/menu";
 import { Button } from "@chakra-ui/react"
 import { ReactNode } from "react";
+import { toast } from "react-toastify";
 import { useAppContext } from "../state/app";
 
 
@@ -33,6 +34,9 @@ function Language(props: { children: ReactNode }) {
 }
 
 export default function LangSelector() {
+
+    const { setSolanaNode } = useAppContext();
+
     return <Menu>
         <MenuButton as={Button} rightIcon={<SettingsIcon />}>
             Settings
@@ -40,6 +44,12 @@ export default function LangSelector() {
         <MenuList>
             <Language>zh</Language>
             <Language>en</Language>
+            <MenuItem onClick={() => {
+                toast.info("using devnet ... ")
+
+                setSolanaNode("https://api.devnet.solana.com");
+
+            }}>Use devnet</MenuItem>
         </MenuList>
     </Menu>
 }

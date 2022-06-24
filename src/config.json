@@ -13,7 +13,9 @@
                "reward_token_decimals": 1000000000,
                "rewards_mint": "5tgyTiconR365e9beKg8PiMiVje1e8bL6CU3tdYmz3my",
                "main_image":"https://4czjblv4exlnkapuju5tmwmv42t262b5s6sknjhdfrfjrbcotczq.arweave.net/4LKQrrwl1tUB9E07NlmV5qevaD2XpKak4yxKmIROmLM?ext=png",
-               "label": "Okay Bears"
+               "label": "Okay Bears",
+               
+               "api_staking_uid" : "ad3d99af-1ff1-4239-ab23-1bd17984ea8e"
           },
           "prod": {
                "stacking_config_alias": "5ckMb8o4uaeG6RMYR2QpadPRtLUG3yUCV26apAWZTn5B",
@@ -28,7 +30,9 @@
                "platform_config": "9h7gEQuoRUTBDG6zTpKysE7BGa1sQw6UWGyFcpnxyHLP",
                "escrow": "DJZ78XMwXXr9TSQWWtpgVBrxZViz2DD5Kq7hkwN4Pv8F",
                "treasury_wallet": "CUnDxJCbAEtrN9yruSfWx1oD8dFj7os78Rfqe9LHaMDy",
-               "label": "Dope Apes"
+               "label": "Dope Apes",
+
+               "api_staking_uid" : "ad3d99af-1ff1-4239-ab23-1bd17984ea8e"
           },
           "prod_1": {
                "stacking_config_alias": "5ckMb8o4uaeG6RMYR2QpadPRtLUG3yUCV26apAWZTn5B",

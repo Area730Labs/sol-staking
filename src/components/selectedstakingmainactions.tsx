@@ -86,20 +86,7 @@ function AllStakedNfts() {
 
 export function StakingMainInfo(props: any) {
 
-    function newAction(operation: string) {
-        return {
-            performer: "skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY",
-            operation: operation,
-            date: new Date()
-        }
-    }
-
-    let activityFeed = [
-        newAction("staked"),
-        // newAction("staked"),
-        newAction("withdrawn"),
-        newAction("claimed")
-    ];
+    const {activity} = useStaking();
 
     return <MainPageContainer {...props}
         _hover={{
@@ -124,13 +111,13 @@ export function StakingMainInfo(props: any) {
                     <Text fontSize="sm" fontWeight="bold"><Label>All staked</Label></Text>
                     <AllStakedNfts />
                     <Text fontSize="sm" fontWeight="bold"><Label>Activity feed</Label></Text>
-                    {activityFeed.map((object, i) => <HistoryAction key={i}>
-                        <Tooltip label={object.date.toUTCString()} fontSize='md'>
+                    {activity.map((object, i) => <HistoryAction key={i}>
+                        <Tooltip label={object.blockchain_time.toUTCString()} fontSize='md'>
                             <HStack justifyContent="flex-end" key={i}>
                                 <Box justifySelf="flex-start" textAlign="left">
                                     at
                                 <Address addr={object.performer} />
-                                    <Text>{object.operation}</Text>
+                                    <Text>{object.typ}</Text>
                                 </Box>
                                 <Box marginLeft="auto">
                                     <HistoryActionNftLink />

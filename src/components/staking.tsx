@@ -25,7 +25,7 @@ export function Staking(props: StakingProviderProps) {
     const [expanded, expand] = useState(false);
 
     return <Box onClick={() => {
-        expand(!expanded);
+        expand(true);
     }}>
         <StakingProvider config={props.config} nfts={props.nfts}>
             <Fadeable isVisible={expanded}>

@@ -5,7 +5,7 @@ import { BASIS_POINTS_100P, prettyNumber } from "../data/uitls";
 import Nft from "../types/Nft";
 import Platform, { matchRule } from "../types/paltform";
 import { RankMultiplyerMap, useAppContext } from "./app";
-import { getPlatformInfo, getPlatformInfoFromCache } from "./platform";
+import { getPlatformInfo, getPlatformInfoFromCache, getStakingActivityFromCache } from "./platform";
 import global_config from '../config.json'
 import { Config } from "../types/config";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
@@ -13,6 +13,8 @@ import { getNftsInWalletCached, getStakedNftsCached, getStakeOwnerForWallet } fr
 import { getOrConstruct } from "../types/cacheitem";
 import { PublicKey } from "@solana/web3.js";
 import { TaxedItem } from "../types/taxeditem";
+import { Operation } from "../types/operation";
+import { Api } from "../api";
 
 export interface StakingContextType {
     config: Config,
@@ -39,6 +41,8 @@ export interface StakingContextType {
 
     pretty: { (value: number): number }
     fromStakeReceipt: { (receipt: StakingReceipt): Nft }
+
+    activity: Operation[]
 }
 
 const StakingContext = createContext<StakingContextType>(null);
@@ -57,6 +61,9 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     const [stackedNfts, updateStakedNfts] = useState<StakingReceipt[]>([] as StakingReceipt[]);
     const [pendingRewards, setPendingRewards] = useState<number>(0);
     const [dailyRewards, setDailyrewards] = useState(0);
+    const [activity, setActivity] = useState<Operation[]>(getStakingActivityFromCache(config.stacking_config))
+
+    const [api, setApi] = useState<Api>(new Api("https://cldfn.com", "/staking/", config.api_staking_uid));
 
     // const compressed = nfts.map((it, idx) => {
     //     return [
@@ -305,6 +312,30 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
         if (platform != null) {
 
+            getOrConstruct<Operation[]>(global_config.disable_cache, "staking_activity", async () => {
+                return api.history().then((response) => {
+                    return response.data.items
+                }).then((rawitems) => {
+                    let result = [];
+
+                    for (var it of rawitems) {
+                        result.push({
+                            typ: it.operation_type,
+                            blockchain_time: new Date(it.create_time),
+                            performer: new PublicKey(it.performer),
+                            mint: (it.mint != null && it.mint != "") ? new PublicKey(it.mint) : null,
+                            transaction: it.transaction,
+                            value: it.value
+                        } as Operation)
+                    }
+
+                    return result;
+                })
+            }, 60, config.stacking_config.toBase58()).then(items => {
+                setActivity(items);
+            });
+
+
             // @todo add changes counter to staking config account
             // and use it for caching 
             getOrConstruct<RankMultiplyerMap>(global_config.disable_cache, "rank_multiplyer", async () => {
@@ -405,13 +436,15 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
             pretty,
             fromStakeReceipt,
 
-            nfts
+            nfts,
+            activity
         }
 
         return result;
     }, [
         pendingRewards, userNfts, stackedNfts,
-        nftMultMap
+        nftMultMap,
+        activity
     ]);
 
     return (

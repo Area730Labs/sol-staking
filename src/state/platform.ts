@@ -4,8 +4,48 @@ import CacheItem, { constructCacheKey, getOrConstruct } from "../types/cacheitem
 import Platform from "../types/paltform";
 import config from "../config.json"
 import { toast } from "react-toastify";
+import { Operation } from "../types/operation";
 
 const cache_key_prefix: string = "platform_config";
+const platform_activity_cache: string = "staking_activity";
+
+export function putStakingActivityToCache(items :Operation[],platformKey: PublicKey) {
+    const cacheKey = constructCacheKey(platform_activity_cache, [platformKey.toBase58()]);
+    localStorage.setItem(cacheKey,JSON.stringify(items));
+}
+
+export function activityFromJson(json: CacheItem) {
+
+    let result = [];
+
+    for (var it of  json.data) {
+        result.push({
+            typ: it.typ,
+            blockchain_time: new Date(it.blockchain_time),
+            performer: new PublicKey(it.performer),
+            mint: (it.mint != "" && it.mint != null) ? new PublicKey(it.mint) : null,
+            value: it.value
+        } as Operation);
+    }
+
+    return result;
+}
+
+export function getStakingActivityFromCache(platformKey: PublicKey): Operation[] {
+
+    let result = [];
+
+    const cacheKey = constructCacheKey(platform_activity_cache, [platformKey.toBase58()]);
+    const cachedItem = localStorage.getItem(cacheKey);
+
+    if (cachedItem != null) {
+
+        const cachedArray = JSON.parse(cachedItem) as CacheItem;
+        return activityFromJson(cachedArray);
+    }
+
+    return result;
+}
 
 /**
  * Returns null if no cache exists
