@@ -23,11 +23,19 @@ export default function Address(props: AddressArgs | any) {
         linkText = addrStr.substr(0, shortLength) + "..." + addrStr.substr(addrLen - shortLength)
     }
 
-    return <Link href={"https://solscan.io/address/" + addrStr}>
+    // return 
+    return <Box display="inline-block" cursor={"pointer"}>
         <Box p={1.5}
-            border="1px solid green"
+            // onClick={() => {
+            //     window.open("https://solscan.io/address/" + addrStr,"_blank")
+            // }}
+            // border="1px solid green"
             borderRadius={appTheme.borderRadius}
             display="inline"
-        >{linkText}</Box>
-    </Link>
+            backgroundColor={appTheme.themeColorAlpha(0.5)}
+            _hover={{
+                backgroundColor: appTheme.themeColorAlpha(0.9) 
+            }}
+        ><Link _activeLink={{textDecoration:"none"}} _hover={{textDecoration:"none"}} href={"https://solscan.io/address/" + addrStr}>{linkText}</Link></Box>
+    </Box>
 }

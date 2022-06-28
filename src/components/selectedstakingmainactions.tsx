@@ -1,4 +1,4 @@
-import { Box, Container, HStack, Text, VStack } from "@chakra-ui/layout";
+import { Box, Container, HStack, Text, VStack, Grid, GridItem } from "@chakra-ui/layout";
 import DailyRewardValue from "../dailyrewardvalue";
 import { DevButtons } from "../dev";
 import TotalClaimed from "../totalclaimed";
@@ -10,19 +10,23 @@ import StakeButton from "./stakebutton";
 import { StakingInfo } from "./staking";
 import appTheme from "../state/theme"
 import Address from "./address";
-import { Tooltip } from "@chakra-ui/tooltip";
 import HistoryAction from "./historyaction";
 import SmallStakedNftsList, { StakedSmallNft } from "../smallstakednftslist";
 import SmallNftBlock from "../smallnftblock";
 import { PublicKey } from "@solana/web3.js";
 import global_config from "../config.json"
 import { Image } from "@chakra-ui/image";
-
-import { getFakeNftImage } from "../components/nft"
 import { useStaking } from "../state/stacking";
+import { useMemo } from "react";
+import { Operation } from "../types/operation";
+import { Nft as NftType } from "../blockchain/types";
+import Moment from "react-moment";
 
-function HistoryActionNftLink(props: any) {
-    return <Image cursor="pointer" src={getFakeNftImage()} borderRadius={appTheme.borderRadius} width="46px" />
+
+function HistoryActionNftLink(props: {nft: NftType}) {
+    return <Box>
+        <Image cursor="pointer" src={props.nft.image} borderRadius={appTheme.borderRadius} width="46px" />
+    </Box>
 }
 
 function InfoColumn(props: any) {
@@ -84,9 +88,109 @@ function AllStakedNfts() {
     </HStack>
 }
 
+export interface HistoryOperationProps {
+    label: string
+    performer: PublicKey
+
+    mint? : PublicKey
+
+    children?: JSX.Element
+    middleContent?: JSX.Element
+    time : Date
+}
+
+function HistoryOperation(props: HistoryOperationProps) {
+
+    const {getNft} = useStaking();
+
+    let childContent = props.children;
+    if (childContent == null) {
+
+        if (props.mint != null) {
+            let nft = getNft(props.mint);
+
+            childContent =  <HistoryActionNftLink nft={nft}/>
+        }
+    }
+   
+    return <Grid
+        position="relative"
+        templateColumns='repeat(5, 1fr)'
+        justifyContent="stretch"
+        placeItems="center stretch"
+    >
+        <GridItem colSpan={3} justifySelf="start">
+            <Grid templateRows="repeat(2,1fr)" gap={2}>
+                <Box justifySelf={"start"}>
+                    <Text display="inline"  fontWeight="bold"><Label>{props.label}</Label></Text>
+                    <Text display="inline" color="#c7c7c7"> {props.time?<Moment fromNow date={props.time} />:null}</Text>
+                </Box>
+                <Address addr={props.performer} shortLength={8} />
+            </Grid>
+        </GridItem>
+        <GridItem  justifySelf="start">
+            {props.middleContent}
+        </GridItem>
+        <GridItem justifySelf="end">
+            {childContent}
+        </GridItem>
+
+    </Grid>
+}
+
+export function ClaimOperation({ operation: object }: { operation: Operation }) {
+
+    const { pretty, config } = useStaking();
+
+    const claimAmount = <Box
+        position="absolute"
+        top="10px"
+        opacity={0.9}
+        backgroundColor={appTheme.stressColor2} fontWeight="bold" color="black" p="6px" borderRadius={appTheme.borderRadiusXl}>
+        <Text textAlign="left" fontSize={"md"}>+ {pretty(object.value)}</Text>
+    </Box>
+
+    return <HistoryOperation time={object.blockchain_time} performer={object.performer} label="claimed" middleContent={claimAmount}>
+        <Box
+            p="3px"
+            backgroundColor="white"
+            borderRadius="50%"
+        >
+            <Box
+                backgroundImage={"url(" + config.reward_image + ")"}
+                backgroundSize="100%"
+                backgroundPosition="center"
+                borderRadius="50%"
+                height="50px"
+                width="50px"
+            ></Box>
+        </Box>
+    </HistoryOperation>
+}
+
+export function OperationDecect({ operation: op }: { operation: Operation }) {
+
+    if (op.typ == 3) {
+        return <ClaimOperation operation={op} />
+    } else if (op.typ == 1) {
+        return <HistoryOperation mint={op.mint} time={op.blockchain_time} label="staked" performer={op.performer}/>
+    } else if (op.typ == 2) {
+        return <HistoryOperation mint={op.mint} time={op.blockchain_time} label="unstaked" performer={op.performer}/>
+    }
+
+    return <></>
+}
+
 export function StakingMainInfo(props: any) {
 
-    const {activity} = useStaking();
+    const { activity } = useStaking();
+
+
+    const activityList = useMemo(() => {
+        return activity.map((object, i) => <HistoryAction key={i} paddingTop="4px">
+                <OperationDecect operation={object}></OperationDecect>
+        </HistoryAction>)
+    }, [activity]);
 
     return <MainPageContainer {...props}
         _hover={{
@@ -111,20 +215,7 @@ export function StakingMainInfo(props: any) {
                     <Text fontSize="sm" fontWeight="bold"><Label>All staked</Label></Text>
                     <AllStakedNfts />
                     <Text fontSize="sm" fontWeight="bold"><Label>Activity feed</Label></Text>
-                    {activity.map((object, i) => <HistoryAction key={i}>
-                        <Tooltip label={object.blockchain_time.toUTCString()} fontSize='md'>
-                            <HStack justifyContent="flex-end" key={i}>
-                                <Box justifySelf="flex-start" textAlign="left">
-                                    at
-                                <Address addr={object.performer} />
-                                    <Text>{object.typ}</Text>
-                                </Box>
-                                <Box marginLeft="auto">
-                                    <HistoryActionNftLink />
-                                </Box>
-                            </HStack>
-                        </Tooltip>
-                    </HistoryAction>)}
+                    {activityList}
                 </InfoColumn>
             </Box>
             <Box>
@@ -140,10 +231,10 @@ export function StakingMainInfo(props: any) {
                     </HistoryAction>
                     <HistoryAction>
                         <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> staked
-</HistoryAction>
+                    </HistoryAction>
                     <HistoryAction>
                         <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> withdrawed
-</HistoryAction>
+                    </HistoryAction>
                     {/* <HistoryAction>
     <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> claimed
 </HistoryAction> */}

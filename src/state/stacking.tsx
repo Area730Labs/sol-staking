@@ -43,6 +43,8 @@ export interface StakingContextType {
     fromStakeReceipt: { (receipt: StakingReceipt): Nft }
 
     activity: Operation[]
+
+    getNft(key: PublicKey) : Nft | null
 }
 
 const StakingContext = createContext<StakingContextType>(null);
@@ -77,12 +79,12 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     // console.log('uncompressed size',JSON.stringify(nfts).length)
     // console.log('compressed size', JSON.stringify(compressed).length)
 
-    function fromStakeReceipt(receipt: StakingReceipt): Nft {
+    function getNft(pk : PublicKey) : Nft | null {
 
-        const receiptMint = receipt.mint.toBase58();
+        let pk_str = pk.toBase58();
 
         for (var it of nfts) {
-            if (it.address === receiptMint) {
+            if (it.address === pk_str) {
                 return {
                     image: it.image,
                     address: new PublicKey(it.address),
@@ -92,7 +94,14 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
             }
         }
 
-        throw new Error("looks like nft data is not present in context ");
+       return null;
+    }
+
+    function fromStakeReceipt(receipt: StakingReceipt): Nft {
+
+        const receiptMint = receipt.mint;
+
+        return getNft(receiptMint);
     }
 
     // for background tasks
@@ -313,6 +322,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         if (platform != null) {
 
             getOrConstruct<Operation[]>(global_config.disable_cache, "staking_activity", async () => {
+                
                 return api.history().then((response) => {
                     return response.data.items
                 }).then((rawitems) => {
@@ -437,7 +447,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
             fromStakeReceipt,
 
             nfts,
-            activity
+            activity,
+            getNft
         }
 
         return result;
