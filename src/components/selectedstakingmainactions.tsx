@@ -1,4 +1,4 @@
-import { Box, Container, HStack, Text, VStack, Grid, GridItem } from "@chakra-ui/layout";
+import { Box, Container, HStack, Text, VStack, Grid, GridItem, Flex } from "@chakra-ui/layout";
 import DailyRewardValue from "../dailyrewardvalue";
 import { DevButtons } from "../dev";
 import TotalClaimed from "../totalclaimed";
@@ -23,7 +23,7 @@ import { Nft as NftType } from "../blockchain/types";
 import Moment from "react-moment";
 
 
-function HistoryActionNftLink(props: {nft: NftType}) {
+function HistoryActionNftLink(props: { nft: NftType }) {
     return <Box>
         <Image cursor="pointer" src={props.nft.image} borderRadius={appTheme.borderRadius} width="46px" />
     </Box>
@@ -31,15 +31,19 @@ function HistoryActionNftLink(props: {nft: NftType}) {
 
 function InfoColumn(props: any) {
 
-    return (<VStack
+    let { children, ...rest } = props;
 
-        alignItems="flex-start"
-        borderRadius={appTheme.borderRadius}
-        transition='all 0.2s  ease'
-        p="3"
-    >
-        {props.children}
-    </VStack>)
+    return (
+        <Grid
+            justifyContent="stretch"
+            borderRadius={appTheme.borderRadius}
+            transition="all 0.2s  ease"
+            textAlign="left"
+            p="3"
+            gap="6px"
+            {...rest}
+        >{children}</Grid>
+    )
 }
 
 export function SelectedStakingMainActions() {
@@ -71,48 +75,49 @@ function AllStakedNfts() {
 
     const { nfts } = useStaking();
 
-    return <HStack>
+    return <Grid
+        templateColumns='repeat(4, 1fr)'
+        justifyContent="space-between"
+        placeItems="center"
+        gap="2"
+    >
         {nfts.slice(0, global_config.max_nfts_per_row - 1).map((object, i) =>
             <StakedSmallNft key={i} item={{
                 image: object.image,
                 address: new PublicKey(object.address),
                 name: object.name
-            }} />)
-        }
+            }} />
+        )}
         <SmallNftBlock>
             <Box paddingTop="10px">
                 <Text>+</Text>
                 <Text>more</Text>
             </Box>
         </SmallNftBlock>
-    </HStack>
+    </Grid>
 }
 
 export interface HistoryOperationProps {
     label: string
     performer: PublicKey
-
-    mint? : PublicKey
-
+    mint?: PublicKey
     children?: JSX.Element
     middleContent?: JSX.Element
-    time : Date
+    time: Date
 }
 
 function HistoryOperation(props: HistoryOperationProps) {
 
-    const {getNft} = useStaking();
-
+    const { getNft } = useStaking();
     let childContent = props.children;
-    if (childContent == null) {
 
+    if (childContent == null) {
         if (props.mint != null) {
             let nft = getNft(props.mint);
-
-            childContent =  <HistoryActionNftLink nft={nft}/>
+            childContent = <HistoryActionNftLink nft={nft} />
         }
     }
-   
+
     return <Grid
         position="relative"
         templateColumns='repeat(5, 1fr)'
@@ -122,13 +127,13 @@ function HistoryOperation(props: HistoryOperationProps) {
         <GridItem colSpan={3} justifySelf="start">
             <Grid templateRows="repeat(2,1fr)" gap={2}>
                 <Box justifySelf={"start"}>
-                    <Text display="inline"  fontWeight="bold"><Label>{props.label}</Label></Text>
-                    <Text display="inline" color="#c7c7c7"> {props.time?<Moment fromNow date={props.time} />:null}</Text>
+                    <Text display="inline" fontWeight="bold"><Label>{props.label}</Label></Text>
+                    <Text display="inline" color="#c7c7c7"> {props.time ? <Moment fromNow date={props.time} /> : null}</Text>
                 </Box>
                 <Address addr={props.performer} shortLength={8} />
             </Grid>
         </GridItem>
-        <GridItem  justifySelf="start">
+        <GridItem justifySelf="start">
             {props.middleContent}
         </GridItem>
         <GridItem justifySelf="end">
@@ -173,9 +178,9 @@ export function OperationDecect({ operation: op }: { operation: Operation }) {
     if (op.typ == 3) {
         return <ClaimOperation operation={op} />
     } else if (op.typ == 1) {
-        return <HistoryOperation mint={op.mint} time={op.blockchain_time} label="staked" performer={op.performer}/>
+        return <HistoryOperation mint={op.mint} time={op.blockchain_time} label="staked" performer={op.performer} />
     } else if (op.typ == 2) {
-        return <HistoryOperation mint={op.mint} time={op.blockchain_time} label="unstaked" performer={op.performer}/>
+        return <HistoryOperation mint={op.mint} time={op.blockchain_time} label="unstaked" performer={op.performer} />
     }
 
     return <></>
@@ -185,10 +190,9 @@ export function StakingMainInfo(props: any) {
 
     const { activity } = useStaking();
 
-
     const activityList = useMemo(() => {
         return activity.map((object, i) => <HistoryAction key={i} paddingTop="4px">
-                <OperationDecect operation={object}></OperationDecect>
+            <OperationDecect operation={object}></OperationDecect>
         </HistoryAction>)
     }, [activity]);
 

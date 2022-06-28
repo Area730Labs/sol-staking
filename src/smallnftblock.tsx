@@ -5,7 +5,7 @@ export default function SmallNftBlock(props: any) {
   
     return (
       <Box color="black"
-        backgroundColor="white"
+        backgroundColor="whiteAlpha.300"
         width="64px"
         height="64px"
         overflowY="hidden"
