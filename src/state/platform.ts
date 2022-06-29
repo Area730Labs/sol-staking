@@ -8,6 +8,7 @@ import { Operation } from "../types/operation";
 
 const cache_key_prefix: string = "platform_config";
 const platform_activity_cache: string = "staking_activity";
+export const platform_staked_cache : string = "staked_cache";
 
 export function putStakingActivityToCache(items :Operation[],platformKey: PublicKey) {
     const cacheKey = constructCacheKey(platform_activity_cache, [platformKey.toBase58()]);
@@ -31,6 +32,18 @@ export function activityFromJson(json: CacheItem) {
     return result;
 }
 
+export function pkArrayFromJson(json: CacheItem) : PublicKey[]{
+
+    let result = [];
+
+    for (var it of  json.data) {
+        result.push(new PublicKey(it));
+    }
+
+    return result;
+}
+
+
 export function getStakingActivityFromCache(platformKey: PublicKey): Operation[] {
 
     let result = [];
@@ -42,6 +55,22 @@ export function getStakingActivityFromCache(platformKey: PublicKey): Operation[]
 
         const cachedArray = JSON.parse(cachedItem) as CacheItem;
         return activityFromJson(cachedArray);
+    }
+
+    return result;
+}
+
+export function getStakedFromCache(platformKey: PublicKey): PublicKey[] {
+
+    let result = [];
+
+    const cacheKey = constructCacheKey(platform_staked_cache, [platformKey.toBase58()]);
+    const cachedItem = localStorage.getItem(cacheKey);
+
+    if (cachedItem != null) {
+
+        const cachedArray = JSON.parse(cachedItem) as CacheItem;
+        return pkArrayFromJson(cachedArray);
     }
 
     return result;

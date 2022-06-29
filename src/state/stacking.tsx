@@ -5,7 +5,7 @@ import { BASIS_POINTS_100P, prettyNumber } from "../data/uitls";
 import Nft from "../types/Nft";
 import Platform, { matchRule } from "../types/paltform";
 import { RankMultiplyerMap, useAppContext } from "./app";
-import { getPlatformInfo, getPlatformInfoFromCache, getStakingActivityFromCache } from "./platform";
+import { getPlatformInfo, getPlatformInfoFromCache, getStakedFromCache, getStakingActivityFromCache, platform_staked_cache } from "./platform";
 import global_config from '../config.json'
 import { Config } from "../types/config";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
@@ -45,6 +45,8 @@ export interface StakingContextType {
     activity: Operation[]
 
     getNft(key: PublicKey) : Nft | null
+    platform_staked : PublicKey[]
+
 }
 
 const StakingContext = createContext<StakingContextType>(null);
@@ -64,6 +66,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     const [pendingRewards, setPendingRewards] = useState<number>(0);
     const [dailyRewards, setDailyrewards] = useState(0);
     const [activity, setActivity] = useState<Operation[]>(getStakingActivityFromCache(config.stacking_config))
+   
+    const [staked, setStaked] = useState<PublicKey[]>(getStakedFromCache(config.stacking_config))
 
     const [api, setApi] = useState<Api>(new Api("https://cldfn.com", "/staking/", config.api_staking_uid));
 
@@ -187,14 +191,14 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
             const itemAddr = item.address.toBase58();
             const multBb = nftMultMap[itemAddr];
             const finalResult = basicIncomePerNft * multBb / BASIS_POINTS_100P;
-            console.log(` --- ${itemAddr} `);
-            console.log(` --  mult ${multBb} `)
-            console.log(` --  final ${pretty(finalResult)} `)
+            // console.log(` --- ${itemAddr} `);
+            // console.log(` --  mult ${multBb} `)
+            // console.log(` --  final ${pretty(finalResult)} `)
 
             const multFact = finalResult / basicIncomePerNft;
 
-            console.log(` --  base mult fact: ${prettyNumber(multFact)}`)
-            console.log(' ')
+            // console.log(` --  base mult fact: ${prettyNumber(multFact)}`)
+            // console.log(' ')
 
             return finalResult;
         }
@@ -321,8 +325,25 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
         if (platform != null) {
 
+            getOrConstruct<PublicKey[]>(global_config.disable_cache, platform_staked_cache, async () => {
+
+                return api.history().then((response) => {
+                    return response.data.items
+                }).then((rawitems) => {
+                    let result = [];
+
+                    for (var it of rawitems) {
+                        result.push(new PublicKey(it))
+                    }
+
+                    return result;
+                })
+            }, 60, config.stacking_config.toBase58()).then(items => {
+                setStaked(items);
+            });
+
             getOrConstruct<Operation[]>(global_config.disable_cache, "staking_activity", async () => {
-                
+
                 return api.history().then((response) => {
                     return response.data.items
                 }).then((rawitems) => {
@@ -448,7 +469,9 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
             nfts,
             activity,
-            getNft
+            getNft,
+
+            platform_staked: staked
         }
 
         return result;

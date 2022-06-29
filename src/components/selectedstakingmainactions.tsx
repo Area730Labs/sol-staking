@@ -22,6 +22,7 @@ import { Operation } from "../types/operation";
 import { Nft as NftType } from "../blockchain/types";
 import Moment from "react-moment";
 
+import config from "../config.json";
 
 function HistoryActionNftLink(props: { nft: NftType }) {
     return <Box>
@@ -73,7 +74,7 @@ export function SelectedStakingMainActions() {
 
 function AllStakedNfts() {
 
-    const { nfts } = useStaking();
+    const { getNft, platform_staked } = useStaking();
 
     return <Grid
         templateColumns='repeat(4, 1fr)'
@@ -81,13 +82,14 @@ function AllStakedNfts() {
         placeItems="center"
         gap="2"
     >
-        {nfts.slice(0, global_config.max_nfts_per_row - 1).map((object, i) =>
-            <StakedSmallNft key={i} item={{
-                image: object.image,
-                address: new PublicKey(object.address),
-                name: object.name
-            }} />
+        {platform_staked.slice(0, global_config.max_nfts_per_row - 1).map((object, i) =>
+            <StakedSmallNft key={i} item={getNft(object)} />
         )}
+        {platform_staked.length < config.small_staked_nfts_list_size ? (
+            [...Array(config.max_nfts_per_row - platform_staked.length - 1)].map((object, i) => <SmallNftBlock key={i} />)
+        ) : null}
+
+
         <SmallNftBlock>
             <Box paddingTop="10px">
                 <Text>+</Text>
@@ -136,7 +138,7 @@ function HistoryOperation(props: HistoryOperationProps) {
         <GridItem justifySelf="start">
             {props.middleContent}
         </GridItem>
-        <GridItem justifySelf="end">
+        <GridItem justifySelf="end" >
             {childContent}
         </GridItem>
 

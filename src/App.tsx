@@ -1,10 +1,8 @@
 import {
   ChakraProvider,
   Box,
-  VStack,
   Grid,
   theme,
-  Flex,
 } from "@chakra-ui/react"
 
 import { AppProvider } from "./state/app"
@@ -12,14 +10,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 
 
-import { NftSelectorTabs } from "./components/nftstab"
 import { ModalProvider } from "./state/modal"
-import { StakingProvider, useStaking } from "./state/stacking"
 import { fromJson } from "./types/config"
 import LangSelector from "./components/langselector"
 import global_config from "./config.json"
 import AppMainModal from "./appmainmodal"
-import { SelectedStakingMainActions, StakingMainInfo } from "./components/selectedstakingmainactions"
 
 import appTheme from "./state/theme"
 import nfts from "./data/nfts.json"

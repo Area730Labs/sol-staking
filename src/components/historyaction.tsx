@@ -8,7 +8,6 @@ export default function HistoryAction(props: any) {
 
     return <Box
         minW="100%"
-        height="64px"
         borderRadius={appTheme.borderRadius}
         textAlign="center"
         cursor="pointer"

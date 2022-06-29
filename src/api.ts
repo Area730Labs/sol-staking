@@ -16,6 +16,10 @@ export class Api {
         return this.sendRequest("GET", `${this.staking_uid}/history?limit=${limit}`);
     }
 
+    public staked(limit: number = 10, before: number = new Date().getTime()): Promise<any> {
+        return this.sendRequest("GET", `${this.staking_uid}/staked?limit=${limit}`);
+    }
+
     private sendRequest(rm: Method, method: string, args?: any): Promise<any> {
 
         const url = this.host + this.prefix + method
