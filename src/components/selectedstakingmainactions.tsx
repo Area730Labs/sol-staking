@@ -76,9 +76,10 @@ function AllStakedNfts() {
 
     const { getNft, platform_staked } = useStaking();
 
-    return <Grid
-        templateColumns='repeat(4, 1fr)'
-        justifyContent="space-between"
+    return <Flex
+        // templateColumns='repeat(4, 1fr)'
+        // justifyContent="space-between"
+        justifyItems="center"
         placeItems="center"
         gap="2"
     >
@@ -96,7 +97,7 @@ function AllStakedNfts() {
                 <Text>more</Text>
             </Box>
         </SmallNftBlock>
-    </Grid>
+    </Flex>
 }
 
 export interface HistoryOperationProps {
@@ -205,28 +206,30 @@ export function StakingMainInfo(props: any) {
         transition={appTheme.transition}
         borderRadius={appTheme.borderRadiusXl}
     >
-        <HStack spacing={4} alignItems="flex-start">
-            <Box>
+        <Grid gap={4} alignItems="flex-start"
+            templateColumns={['repeat(1, 1fr)','repeat(1, 1fr)', 'repeat(6, 1fr)']}
+        >
+            <GridItem colSpan={[1,1,3]}>
                 <StakingInfo />
-            </Box>
-            <Box>
+            </GridItem>
+            <GridItem>
                 <VStack textAlign="center" paddingTop="3">
                     <Text fontSize="sm" fontWeight="bold"><Label>Rewards</Label></Text>
                     <RewardImage />
                     <DailyRewardValue />
                 </VStack>
-            </Box>
-            <Box>
+            </GridItem>
+            <GridItem>
                 <InfoColumn>
-                    <Text fontSize="sm" fontWeight="bold"><Label>All staked</Label></Text>
+                    <Text fontSize={["xl","xl","sm"]} fontWeight="bold"><Label>All staked</Label></Text>
                     <AllStakedNfts />
                     <Text fontSize="sm" fontWeight="bold"><Label>Activity feed</Label></Text>
                     {activityList}
                 </InfoColumn>
-            </Box>
-            <Box>
+            </GridItem>
+            <GridItem>
                 <InfoColumn>
-                    <Text fontSize="sm" fontWeight="bold"><Label>Your position</Label></Text>
+                    <Text fontSize={["xl","xl","sm"]} fontWeight="bold"><Label>Your position</Label></Text>
                     <SmallStakedNftsList />
                     <Text fontSize="sm" fontWeight="bold"><Label>Activity feed</Label></Text>
                     <HistoryAction textAlign="left">
@@ -245,8 +248,8 @@ export function StakingMainInfo(props: any) {
     <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> claimed
 </HistoryAction> */}
                 </InfoColumn>
-            </Box>
-        </HStack>
+            </GridItem>
+        </Grid>
     </MainPageContainer>
 
 }
