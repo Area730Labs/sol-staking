@@ -8,7 +8,6 @@ import { ClaimPendingRewardsButton, PendingRewards } from "./pendingrewards";
 import RewardImage from "./rewardimage";
 import StakeButton from "./stakebutton";
 import { StakingInfo } from "./staking";
-import appTheme from "../state/theme"
 import Address from "./address";
 import HistoryAction from "./historyaction";
 import SmallStakedNftsList, { StakedSmallNft } from "../smallstakednftslist";
@@ -23,6 +22,7 @@ import { Nft as NftType } from "../blockchain/types";
 import Moment from "react-moment";
 
 import config from "../config.json";
+import appTheme from "../state/theme"
 
 function HistoryActionNftLink(props: { nft: NftType }) {
     return <Box>
@@ -41,35 +41,10 @@ function InfoColumn(props: any) {
             transition="all 0.2s  ease"
             textAlign="left"
             p="3"
-            gap="6px"
+            gap="8px"
             {...rest}
         >{children}</Grid>
     )
-}
-
-export function SelectedStakingMainActions() {
-    return <>
-        <MainPageContainer>
-            <Box bottom="20px" textAlign="center" pt="10">
-                <TotalClaimed />
-                <Text fontSize="2xl" color="white"><Label>total claimed rewards</Label></Text>
-            </Box>
-        </MainPageContainer>
-        <Container
-            maxW='container.lg'
-            color='white'
-            zIndex="10"
-            textAlign="center"
-        >
-            <StakeButton />
-            <Box display="inline-block" position="relative">
-                <ClaimPendingRewardsButton />
-                <PendingRewards />
-            </Box>
-            <DevButtons />
-        </Container>
-
-    </>
 }
 
 function AllStakedNfts() {
@@ -77,7 +52,7 @@ function AllStakedNfts() {
     const { getNft, platform_staked } = useStaking();
 
     return <Flex
-        // templateColumns='repeat(4, 1fr)'
+        // templateColumns='repeat(5, 1fr)'
         // justifyContent="space-between"
         justifyItems="center"
         placeItems="center"
@@ -194,7 +169,7 @@ export function StakingMainInfo(props: any) {
     const { activity } = useStaking();
 
     const activityList = useMemo(() => {
-        return activity.map((object, i) => <HistoryAction key={i} paddingTop="4px">
+        return activity.slice(0,3).map((object, i) => <HistoryAction key={i} paddingTop="4px">
             <OperationDecect operation={object}></OperationDecect>
         </HistoryAction>)
     }, [activity]);
@@ -206,10 +181,11 @@ export function StakingMainInfo(props: any) {
         transition={appTheme.transition}
         borderRadius={appTheme.borderRadiusXl}
     >
-        <Grid gap={4} alignItems="flex-start"
-            templateColumns={['repeat(1, 1fr)','repeat(1, 1fr)', 'repeat(6, 1fr)']}
+        <Grid gap={4}
+            alignItems="flex-start"
+            templateColumns={['repeat(1, 1fr)', 'repeat(1, 1fr)', 'repeat(6, 1fr)']}
         >
-            <GridItem colSpan={[1,1,3]}>
+            <GridItem colSpan={[1, 1, 3]}>
                 <StakingInfo />
             </GridItem>
             <GridItem>
@@ -217,20 +193,49 @@ export function StakingMainInfo(props: any) {
                     <Text fontSize="sm" fontWeight="bold"><Label>Rewards</Label></Text>
                     <RewardImage />
                     <DailyRewardValue />
+                    <Box textAlign="center" pt="10">
+                        <Text fontSize="2xl" color="white"><Label>claimed</Label></Text>
+                        <TotalClaimed />
+                    </Box>
                 </VStack>
             </GridItem>
             <GridItem>
                 <InfoColumn>
-                    <Text fontSize={["xl","xl","sm"]} fontWeight="bold"><Label>All staked</Label></Text>
+                    <Text fontSize={["xl", "xl", "sm"]} fontWeight="bold"><Label>Staked NFT</Label></Text>
                     <AllStakedNfts />
                     <Text fontSize="sm" fontWeight="bold"><Label>Activity feed</Label></Text>
                     {activityList}
                 </InfoColumn>
             </GridItem>
             <GridItem>
-                <InfoColumn>
-                    <Text fontSize={["xl","xl","sm"]} fontWeight="bold"><Label>Your position</Label></Text>
-                    <SmallStakedNftsList />
+                <InfoColumn minW="240px" alignItems="flex-start">
+                    <Text fontSize={["xl", "xl", "sm"]} fontWeight="bold"><Label>Actions</Label></Text>
+                    {/* <Box
+                        minH="64px"
+                        minW="280px"
+                        borderRadius={appTheme.borderRadius}
+                        backgroundColor="whiteAlpha.200"
+                        textAlign="center"
+                        verticalAlign="center"
+                        display="flex"
+                    >
+                        <Label >Stake</Label>
+                    </Box>
+                    <Box
+                        minH="64px"
+                        minW="280px"
+                        borderRadius={appTheme.borderRadius}
+                        backgroundColor="whiteAlpha.200"
+                        textAlign="center"
+                    >
+                        Claim pending
+                    </Box> */}
+                    <StakeButton borderRadius={appTheme.borderRadiusXl}/>
+                    <ClaimPendingRewardsButton borderRadius={appTheme.borderRadiusXl}/>
+                    <PendingRewards />
+                    {/* <DevButtons /> */}
+
+                    {/* 
                     <Text fontSize="sm" fontWeight="bold"><Label>Activity feed</Label></Text>
                     <HistoryAction textAlign="left">
                         <Text >
@@ -243,7 +248,7 @@ export function StakingMainInfo(props: any) {
                     </HistoryAction>
                     <HistoryAction>
                         <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> withdrawed
-                    </HistoryAction>
+                    </HistoryAction> */}
                     {/* <HistoryAction>
     <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> claimed
 </HistoryAction> */}

@@ -4,7 +4,7 @@ import { StakingProvider, StakingProviderProps, useStaking } from "../state/stac
 import MainImage from "./mainimage";
 
 
-import { SelectedStakingMainActions, StakingMainInfo } from "./selectedstakingmainactions";
+import { StakingMainInfo } from "./selectedstakingmainactions";
 import { NftSelectorTabs } from "./nftstab";
 import { useState } from "react";
 import Fadeable from "./fadeable";
@@ -28,9 +28,6 @@ export function Staking(props: StakingProviderProps) {
         expand(true);
     }}>
         <StakingProvider config={props.config} nfts={props.nfts}>
-            <Fadeable isVisible={expanded}>
-                <SelectedStakingMainActions />
-            </Fadeable>
             <StakingMainInfo marginTop="10" p="3" />
             <Fadeable isVisible={expanded}>
                 <NftSelectorTabs />

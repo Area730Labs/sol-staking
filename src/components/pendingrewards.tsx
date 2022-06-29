@@ -10,6 +10,7 @@ import { Label } from "./label";
 import { Button } from "./button";
 import { Box } from "@chakra-ui/layout";
 import Countup from "./countup";
+import appTheme from "../state/theme"
 
 export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, stakingctx: StakingContextType) {
 
@@ -58,7 +59,7 @@ export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, sta
     });
 }
 
-export function ClaimPendingRewardsButton() {
+export function ClaimPendingRewardsButton(props: any) {
 
     const ctx = useAppContext();
     const staking = useStaking();
@@ -80,19 +81,22 @@ export function ClaimPendingRewardsButton() {
         }
     }
 
-    return (<Button typ="black" marginLeft="10px" onClick={claimPendingRewardsHandler}><Label>Claim pending rewards</Label></Button>)
+    return (<Button typ="black" onClick={claimPendingRewardsHandler} {...props}><Label>Claim</Label></Button>)
 }
 
 
 export function PendingRewards(props: any) {
 
-    let { pendingRewards, config, pretty } = useStaking();
+    let { config, pretty } = useStaking();
   
-    return <Box position="absolute" right="-50px" top="-32px" >
+    let pendingRewards = 50230000008;
+
+    return <Box  >
       {pendingRewards > 0 ?
         <Box
           borderRadius="25px"
-          backgroundColor="rgb(237,41,57)"
+        //   backgroundColor={}
+          border={`2px solid ${appTheme.stressColor2}`}
           p="2"
           px="4"
         >+<Countup float="true" number={pretty(pendingRewards)} timems="300" /> {config.reward_token_name}</Box>

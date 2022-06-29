@@ -8,7 +8,7 @@ import { WalletReadyState } from "@solana/wallet-adapter-base";
 import { Button } from "./button";
 import { Label } from "./label";
 
-export default function StakeButton() {
+export default function StakeButton(props: any) {
 
     const { wallet, setWalletAdapter, setNftsTab } = useAppContext();
     const { setModalContent, setModalVisible } = useModal();
@@ -64,5 +64,5 @@ export default function StakeButton() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [wallet]);
 
-    return <Button onClick={() => { stakeHandler() }}><Label>Stake</Label></Button>
+    return <Button onClick={() => { stakeHandler() }} {...props}><Label>Stake</Label></Button>
 }

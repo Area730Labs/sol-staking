@@ -59,7 +59,7 @@
      "debug_simulate_tx": false,
      "max_items_per_stake": 3,
      "max_items_per_unstake": 5,
-     "max_nfts_per_row": 4,
+     "max_nfts_per_row": 5,
      "small_staked_nfts_list_size": 3,
      "cluster_url": "https://api.mainnet-beta.solana.com"
 }

@@ -1,9 +1,10 @@
-import { Text } from "@chakra-ui/layout"
+import { Text,Box } from "@chakra-ui/layout"
 import { PublicKey } from "@solana/web3.js";
 import { useEffect, useState } from "react";
 import Countup from "./components/countup"
 import { useStaking } from "./state/stacking";
 import { Config } from "./types/config"
+import appTheme from "./state/theme"
 
 function getCacheKey(config: Config) {
     return "total_claimed" + new PublicKey(config.stacking_config);
@@ -38,7 +39,7 @@ export default function TotalClaimed() {
         }
     }, [platform,config]);
 
-    return <Text fontSize="6xl" fontWeight="bold" color="white" textAlign="center" fontFamily="helvetica">
-        {claimedValue > 0?<Countup number={claimedValue} float={true} />:0} {config.reward_token_name}
+    return <Text fontSize="xl" fontWeight="bold" color="white" textAlign="center" fontFamily="helvetica">
+        {claimedValue > 0?<Box borderRadius={appTheme.borderRadiusXl} backgroundColor={appTheme.stressColor2} color="black"><Countup number={claimedValue} float={true} /></Box>:0} {config.reward_token_name}
     </Text>
 }

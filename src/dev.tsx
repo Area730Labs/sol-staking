@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/layout";
+import { Box,Flex } from "@chakra-ui/layout";
 import { createInitializeMintInstruction, createMintToInstruction, getMinimumBalanceForRentExemptAccount, MintLayout, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
 import BN from "bn.js";
@@ -154,7 +154,7 @@ export function DevButtons() {
     }, [wallet, staking.config]);
 
     return <Fadeable isVisible={mainVisible}>
-        <Box py="8">
+        <Flex py="8" flexDirection={"column"} gap="2">
             <Button size="sm" onClick={() => {
 
                 const ix = createPlatformConfig(staking.config, wallet);
@@ -210,7 +210,7 @@ export function DevButtons() {
                 </Button>
                 {/* <Button>Cancel</Button> */}
             </Fadeable>
-        </Box>
+        </Flex>
     </Fadeable>
 
 }
