@@ -327,18 +327,23 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
             getOrConstruct<PublicKey[]>(global_config.disable_cache, platform_staked_cache, async () => {
 
-                return api.history().then((response) => {
+                return api.staked().then((response) => {
                     return response.data.items
                 }).then((rawitems) => {
                     let result = [];
 
+                    console.log('got raw staked items ...  ',rawitems)
+
                     for (var it of rawitems) {
-                        result.push(new PublicKey(it))
+                        result.push(new PublicKey(it.mint))
                     }
 
                     return result;
                 })
-            }, 60, config.stacking_config.toBase58()).then(items => {
+            }, 360, config.stacking_config.toBase58()).then(items => {
+
+                console.log('setting staked items to ... ',items)
+
                 setStaked(items);
             });
 
