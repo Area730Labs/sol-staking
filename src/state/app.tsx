@@ -1,12 +1,14 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import * as web3 from '@solana/web3.js'
+import {PublicKey} from '@solana/web3.js'
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { toast, ToastOptions, Icons } from 'react-toastify';
 import { TxHandler } from "../blockchain/handler";
 import { CurrentTx, getCurrentTx, storeCurrentTx } from "./currenttx"
 import { getLanguageFromCache, Lang } from "../components/langselector";
 import global_config from '../config.json'
-
+import { getAllNfts } from "../blockchain/nfts";
+import { getOrConstruct } from "../types/cacheitem";
 export type RankMultiplyerMap = { [key: string]: number }
 export type NftsSelectorTab = "stake" | "unstake"
 export type TransactionType = "stake" | "unstake" | "platform" | "claim" | "other"
@@ -46,6 +48,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
     const [curtx, setCurtx] = useState<CurrentTx | null>(null);
     const [userUpdatesCounter, setUserUpdatesCounter] = useState(0);
+
+    const [nfts,setNFts] = useState([]);
 
     const web3Handler = useMemo(() => {
         return new web3.Connection(solanaNode, 'confirmed');
@@ -141,6 +145,11 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         if (connectedWallet != null && connectedWallet.connected) {
 
             setCurtx(getCurrentTx(connectedWallet));
+
+            let all_nfts_cache =  getAllNfts(web3Handler, connectedWallet.publicKey);
+
+            console.log('all nfts cached',all_nfts_cache);
+
 
         } else {
 

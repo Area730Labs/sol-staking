@@ -9,6 +9,7 @@ import { calcAddressWithTwoSeeds } from "../blockchain/instructions";
 import { Config } from "../types/config"
 import global_config from "../config.json"
 import { StakingContextType } from "./stacking";
+import { config } from "process";
 
 export async function getStakedNftsCached(config: Config, solanaConnection: Connection, wallet: PublicKey, force: boolean = false,): Promise<StakingReceipt[]> {
     return getOrConstruct<StakingReceipt[]>(force, "staked_by", async () => {
@@ -71,17 +72,8 @@ export function getStakeOwnerForWallet(config: Config, wallet: PublicKey): Promi
 
 }
 
-
-/**
- * @todo add cache invalidation
- * 
- * @param wallet 
- * @param connection 
- * @param force 
- * @returns 
- */
-export function getNftsInWalletCached(staking: StakingContextType, wallet: PublicKey, connection: Connection, force: boolean = false): Promise<Nft[]> {
-    return getOrConstruct<PublicKey[]>(force, "wallet_nfts", async () => {
+async function get_cached_nfts_of_wallet(force: boolean,wallet : PublicKey, connection:Connection) : Promise<PublicKey[]>{
+    return getOrConstruct<PublicKey[]>(force, "wallet_nfts_global", async () => {
         return getAllNfts(connection, wallet);
     }, global_config.caching.wallet_nfts, wallet.toBase58()).then((items) => {
 
@@ -98,7 +90,20 @@ export function getNftsInWalletCached(staking: StakingContextType, wallet: Publi
 
         return result
 
-    }).then(function (resp) {
+    });
+}
+
+
+/**
+ * @todo add cache invalidation
+ * 
+ * @param wallet 
+ * @param connection 
+ * @param force 
+ * @returns 
+ */
+export function getNftsInWalletCached(staking: StakingContextType, wallet: PublicKey, connection: Connection, force: boolean = false): Promise<Nft[]> {
+    return get_cached_nfts_of_wallet(force,wallet,connection).then(function (resp) {
 
         // whitelist by data available
         let items = new Array<Nft>();

@@ -415,7 +415,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                 updateStakedNfts(stakedNfts);
             });
 
-            getNftsInWalletCached({ nfts } as StakingContextType, wallet.publicKey as PublicKey, solanaConnection).then(items => {
+            getNftsInWalletCached({ nfts} as StakingContextType, wallet.publicKey as PublicKey, solanaConnection).then(items => {
+                console.warn('found items for staking' ,items);
                 updateNfts(items);
             })
 

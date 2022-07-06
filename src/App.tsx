@@ -19,7 +19,7 @@ import AppMainModal from "./appmainmodal"
 import appTheme from "./state/theme"
 
 import nfts from "./data/nfts.json"
-import nfts_babies from "./data/nfts.json"
+import nfts_babies from "./data/dope_babiies.json"
 
 import { Staking } from "./components/staking";
 
