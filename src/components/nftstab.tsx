@@ -66,7 +66,6 @@ export function StakeNftsListTab(props: NftTabContentProps) {
     </NftsTab>
 }
 
-
 export function StakedNftsListTab(props: NftTabContentProps) {
 
     const { stackedNfts, dailyRewards, config, pretty, fromStakeReceipt } = useStaking();

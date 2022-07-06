@@ -87,9 +87,9 @@ export function ClaimPendingRewardsButton(props: any) {
 
 export function PendingRewards(props: any) {
 
-    let { config, pretty } = useStaking();
+    let { config, pretty,pendingRewards } = useStaking();
   
-    let pendingRewards = 50230000008;
+    // let pendingRewards = 50230000008;
 
     return <Box  >
       {pendingRewards > 0 ?

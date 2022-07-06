@@ -17,7 +17,10 @@ import global_config from "./config.json"
 import AppMainModal from "./appmainmodal"
 
 import appTheme from "./state/theme"
+
 import nfts from "./data/nfts.json"
+import nfts_babies from "./data/nfts.json"
+
 import { Staking } from "./components/staking";
 
 export function App() {
@@ -45,7 +48,7 @@ export function App() {
           </Grid>
           <Box>
             <Staking config={fromJson(global_config.env.prod)} nfts={nfts} />
-            <Staking config={fromJson(global_config.env.prod_1)} nfts={nfts} />
+            <Staking config={fromJson(global_config.env.prod_1)} nfts={nfts_babies} />
           </Box>
         </Box>
       </ModalProvider>

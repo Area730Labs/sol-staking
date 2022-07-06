@@ -193,7 +193,7 @@ export function StakingMainInfo(props: any) {
                     <Text fontSize="sm" fontWeight="bold"><Label>Rewards</Label></Text>
                     <RewardImage />
                     <DailyRewardValue />
-                    <Box textAlign="center" pt="10">
+                    <Box textAlign="center" pt="8">
                         <Text fontSize="2xl" color="white"><Label>claimed</Label></Text>
                         <TotalClaimed />
                     </Box>

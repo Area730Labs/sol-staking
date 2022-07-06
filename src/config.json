@@ -13,9 +13,7 @@
                "reward_token_decimals": 1000000000,
                "rewards_mint": "5tgyTiconR365e9beKg8PiMiVje1e8bL6CU3tdYmz3my",
                "main_image":"https://4czjblv4exlnkapuju5tmwmv42t262b5s6sknjhdfrfjrbcotczq.arweave.net/4LKQrrwl1tUB9E07NlmV5qevaD2XpKak4yxKmIROmLM?ext=png",
-               "label": "Okay Bears",
-               
-               "api_staking_uid" : "ad3d99af-1ff1-4239-ab23-1bd17984ea8e"
+               "label": "Okay Bears"
           },
           "prod": {
                "stacking_config_alias": "5ckMb8o4uaeG6RMYR2QpadPRtLUG3yUCV26apAWZTn5B",
@@ -30,24 +28,22 @@
                "platform_config": "9h7gEQuoRUTBDG6zTpKysE7BGa1sQw6UWGyFcpnxyHLP",
                "escrow": "DJZ78XMwXXr9TSQWWtpgVBrxZViz2DD5Kq7hkwN4Pv8F",
                "treasury_wallet": "CUnDxJCbAEtrN9yruSfWx1oD8dFj7os78Rfqe9LHaMDy",
-               "label": "Dope Apes",
-
-               "api_staking_uid" : "ad3d99af-1ff1-4239-ab23-1bd17984ea8e"
+               "label": "Dope Apes"
           },
           "prod_1": {
                "stacking_config_alias": "5ckMb8o4uaeG6RMYR2QpadPRtLUG3yUCV26apAWZTn5B",
                "rewards_token_account": "Ce8XSXKQ9mkgAq3Ta5M7w8tgaJy3vYBjXjcq4R9avN7v",
-               "stacking_config": "8ELy89juk6mLawcr3F37nmFNWrffJvqsHniLFHQGUcaV",
+               "stacking_config": "9TFvLfZxRbb3G4YuECtApzjHnGZCjB5PUJ3BF4QfNEi4",
                "reward_image": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/DPuGqV7jq9PEbcRU7bWzuaJx5bGiaVj4cNWhWjTdWAKi/logo.png",
                "reward_token_name": "DOPE",
-               "main_image":"https://cz367cli53snzddalaws2v6ox6lu2ilhmafc3uajtobqzfuw.arweave.net/Fnfvi_Wju5NyMYFgtLVfOv5dNI-WdgCi3QCZuDDJaWs?ext=png",
+               "main_image":"https://uogbvn2jve45snteqqdunpeeijkaksr56gtunsnkuoq5gcvqzkya.arweave.net/o4wat0mpOdk2ZIQHRryEQlQFSj3xp0bJqqOh0wqwyrA?ext=png",
                "reward_token_decimals": 1000000000,
                "program_id": "stkqdwwENqh935UFNAbgJY2deqWcRxDEEzR68GBgo68",
                "rewards_mint": "DPuGqV7jq9PEbcRU7bWzuaJx5bGiaVj4cNWhWjTdWAKi",
                "platform_config": "9h7gEQuoRUTBDG6zTpKysE7BGa1sQw6UWGyFcpnxyHLP",
                "escrow": "DJZ78XMwXXr9TSQWWtpgVBrxZViz2DD5Kq7hkwN4Pv8F",
                "treasury_wallet": "CUnDxJCbAEtrN9yruSfWx1oD8dFj7os78Rfqe9LHaMDy",
-               "label": "Little Dope Apes"
+               "label": "Dope Babies"
           }
      },
      "caching": {

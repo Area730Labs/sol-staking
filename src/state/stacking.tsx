@@ -69,7 +69,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
    
     const [staked, setStaked] = useState<PublicKey[]>(getStakedFromCache(config.stacking_config))
 
-    const [api, setApi] = useState<Api>(new Api("https://cldfn.com", "/staking/", config.api_staking_uid));
+    const [api, setApi] = useState<Api>(new Api("https://cldfn.com", "/staking/", config.stacking_config.toBase58()));
 
     // const compressed = nfts.map((it, idx) => {
     //     return [

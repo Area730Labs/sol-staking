@@ -6,7 +6,6 @@ export interface Config {
     stacking_config_alias: PublicKey
     rewards_token_account: PublicKey
     stacking_config: PublicKey
-    api_staking_uid: string
 
     platform_config: PublicKey
     treasury_wallet: PublicKey
@@ -29,7 +28,6 @@ export function fromJson(object: any): Config {
         stacking_config_alias: new PublicKey(object.stacking_config_alias),
         rewards_token_account: new PublicKey(object.rewards_token_account),
         stacking_config: new PublicKey(object.stacking_config),
-        api_staking_uid : object.api_staking_uid,
 
         platform_config: new PublicKey(object.platform_config),
         treasury_wallet: new PublicKey(object.treasury_wallet),
