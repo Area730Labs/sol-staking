@@ -233,7 +233,7 @@ export function StakingMainInfo(props: any) {
                     <StakeButton borderRadius={appTheme.borderRadiusXl}/>
                     <ClaimPendingRewardsButton borderRadius={appTheme.borderRadiusXl}/>
                     <PendingRewards />
-                    {/* <DevButtons /> */}
+                    <DevButtons />
 
                     {/* 
                     <Text fontSize="sm" fontWeight="bold"><Label>Activity feed</Label></Text>
