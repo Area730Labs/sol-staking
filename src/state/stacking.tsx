@@ -209,6 +209,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         getPlatformInfo(global_config.disable_cache, solanaConnection, config.stacking_config).then((platform) => {
             setPlatform(platform);
         }).catch((e) => {
+            console.error(e)
             toast.error('error while fetching staking config: ' + e.message)
         })
 
