@@ -2,6 +2,7 @@ import { PublicKey, Connection } from "@solana/web3.js"
 import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
+import { SolanaRpc } from "../../../state/app"
 
 export interface StakeOwnerFields {
   staker: PublicKey
@@ -37,7 +38,7 @@ export class StakeOwner {
   }
 
   static async fetch(
-    c: Connection,
+    c: SolanaRpc,
     address: PublicKey
   ): Promise<StakeOwner | null> {
     const info = await c.getAccountInfo(address)

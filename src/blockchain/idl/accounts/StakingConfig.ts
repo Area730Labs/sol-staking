@@ -4,6 +4,7 @@ import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript
 import {InitializeStakingBumpsFields,InitializeStakingBumpsJSON,InitializeStakingBumps} from "../types/InitializeStakingBumps" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
 import {RuleFields,RuleJSON,Rule} from "../types/Rule"
+import { SolanaRpc } from "../../../state/app"
 
 
 export interface StakingConfigFields {
@@ -142,7 +143,7 @@ export class StakingConfig {
   }
 
   static async fetch(
-    c: Connection,
+    c: SolanaRpc,
     address: PublicKey
   ): Promise<StakingConfig | null> {
     const info = await c.getAccountInfo(address)

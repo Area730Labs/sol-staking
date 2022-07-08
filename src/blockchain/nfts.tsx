@@ -3,8 +3,9 @@ import * as spl from '@solana/spl-token'
 import { StakingReceipt } from './idl/accounts/StakingReceipt';
 import global_config from "../config.json"
 import { Config } from "../types/config"
+import { SolanaRpc } from '../state/app';
 
-export async function getStakedNfts(config: Config, connection: solana.Connection, owner: solana.PublicKey): Promise<StakingReceipt[]> {
+export async function getStakedNfts(config: Config, connection: SolanaRpc, owner: solana.PublicKey): Promise<StakingReceipt[]> {
 
     const receiptAccounts = await connection.getProgramAccounts(config.program_id, {
         filters: [
@@ -30,7 +31,7 @@ export async function getStakedNfts(config: Config, connection: solana.Connectio
     return result;
 }
 
-export async function getAllNfts(connection: solana.Connection, owner: solana.PublicKey): Promise<solana.PublicKey[]> {
+export async function getAllNfts(connection: SolanaRpc, owner: solana.PublicKey): Promise<solana.PublicKey[]> {
 
     const accounts = await connection.getParsedTokenAccountsByOwner(owner, {
         programId: spl.TOKEN_PROGRAM_ID

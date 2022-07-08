@@ -22,7 +22,7 @@ export default function CreateMintButton() {
 
         let ixs = [];
 
-        const balanceNeeded = await getMinimumBalanceForRentExemptAccount(solanaConnection);
+        const balanceNeeded = await solanaConnection.getMinimumBalanceForRentExemptAccount();
 
         const createAccount = SystemProgram.createAccount({
             fromPubkey: owner,

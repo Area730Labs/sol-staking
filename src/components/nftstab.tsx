@@ -7,7 +7,7 @@ import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 import { createClaimIx, createStakeNftIx, createStakeOwnerIx, createUnstakeNftIx } from "../blockchain/instructions";
 import EmptyRow from "../emptyrow";
 import NftsSelector from "../stake";
-import { useAppContext } from "../state/app";
+import { SolanaRpc, useAppContext } from "../state/app";
 import { getStakeOwnerForWallet } from "../state/user";
 import appTheme from "../state/theme"
 import config from "../config.json"
@@ -46,7 +46,7 @@ export function StakeNftsListTab(props: NftTabContentProps) {
 
     function stakeSelectedItems(
         wallet: WalletAdapter,
-        solanaConnection: Connection,
+        solanaConnection: SolanaRpc,
         selectedItems: { [key: string]: boolean }
     ): Promise<any> {
 
@@ -73,7 +73,7 @@ export function StakedNftsListTab(props: NftTabContentProps) {
 
     async function unstakeSelectedItems(
         wallet: WalletAdapter,
-        solanaConnection: Connection,
+        solanaConnection: SolanaRpc,
         selectedItems: { [key: string]: boolean }
     ): Promise<any> {
 

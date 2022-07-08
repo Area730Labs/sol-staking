@@ -1,6 +1,6 @@
 import { Connection, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { toast } from "react-toastify";
-import { useAppContext } from "./state/app"
+import { SolanaRpc, useAppContext } from "./state/app"
 import Nft from "./types/Nft";
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { Box, GridItem } from "@chakra-ui/layout";
@@ -25,7 +25,7 @@ export interface NftsSelectorProps {
     actionHandler: {
         (
             wallet: WalletAdapter,
-            solanaConnection: Connection,
+            solanaConnection: SolanaRpc,
             selectedItems: { [key: string]: boolean }
         ): Promise<any>
     },
