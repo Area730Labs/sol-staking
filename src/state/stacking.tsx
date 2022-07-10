@@ -44,8 +44,8 @@ export interface StakingContextType {
 
     activity: Operation[]
 
-    getNft(key: PublicKey) : Nft | null
-    platform_staked : PublicKey[]
+    getNft(key: PublicKey): Nft | null
+    platform_staked: PublicKey[]
 
 }
 
@@ -66,7 +66,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     const [pendingRewards, setPendingRewards] = useState<number>(0);
     const [dailyRewards, setDailyrewards] = useState(0);
     const [activity, setActivity] = useState<Operation[]>(getStakingActivityFromCache(config.stacking_config))
-   
+
     const [staked, setStaked] = useState<PublicKey[]>(getStakedFromCache(config.stacking_config))
 
     const [api, setApi] = useState<Api>(new Api("https://cldfn.com", "/staking/", config.stacking_config.toBase58()));
@@ -83,7 +83,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     // console.log('uncompressed size',JSON.stringify(nfts).length)
     // console.log('compressed size', JSON.stringify(compressed).length)
 
-    function getNft(pk : PublicKey) : Nft | null {
+    function getNft(pk: PublicKey): Nft | null {
 
         let pk_str = pk.toBase58();
 
@@ -98,18 +98,23 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
             }
         }
 
-        console.error("unable to find an nft by pubkey : . number of nfts here ",pk.toBase58(),nfts.length);
+        let firstNft = nfts[0].address;
+        console.error("unable to find an nft by pubkey : . number of nfts here ", pk.toBase58(), nfts.length, firstNft);
 
-       return null;
+        return null;
     }
 
     function fromStakeReceipt(receipt: StakingReceipt): Nft {
 
         const receiptMint = receipt.mint;
 
-        console.warn('stake receipt mint : ',receiptMint.toBase58())
+        let nft_item = getNft(receiptMint);
 
-        return getNft(receiptMint);
+        if (nft_item == null) {
+            throw Error(`unable to get nft from stake receipt for mint : ${receiptMint}`);
+        }
+
+        return nft_item;
     }
 
     // for background tasks
@@ -228,41 +233,45 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         if (stackedNfts.length > 0) {
             setCurInterval(setInterval(() => {
 
-                // calc inco me 
-                let income = 0;
+                try {
+                    // calc inco me 
+                    let income = 0;
 
-                const curTimestamp = (new Date()).getTime() / 1000;
+                    const curTimestamp = (new Date()).getTime() / 1000;
 
-                for (var it of stackedNfts) {
+                    for (var it of stackedNfts) {
 
-                    const perDay = incomePerNftCalculator(fromStakeReceipt(it));
+                        const perDay = incomePerNftCalculator(fromStakeReceipt(it));
 
-                    const tick_size = 1;
+                        const tick_size = 1;
 
-                    let income_per_tick = perDay / (86400 / tick_size);
+                        let income_per_tick = perDay / (86400 / tick_size);
 
-                    const diff = Math.floor((curTimestamp - it.lastClaim.toNumber()) / tick_size);
+                        const diff = Math.floor((curTimestamp - it.lastClaim.toNumber()) / tick_size);
 
-                    if (diff > 0) {
+                        if (diff > 0) {
 
-                        const incomePerStakedItem = diff * income_per_tick;
+                            const incomePerStakedItem = diff * income_per_tick;
 
-                        // console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
+                            // console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
 
-                        income += incomePerStakedItem;
+                            income += incomePerStakedItem;
+                        }
+                        // else {
+                        // console.log(' -- staked item diff is 0?. item\'s last claim. now ',it.lastClaim.toNumber(),new Date().getTime()/1000)
+                        // }
                     }
-                    // else {
-                    // console.log(' -- staked item diff is 0?. item\'s last claim. now ',it.lastClaim.toNumber(),new Date().getTime()/1000)
-                    // }
+
+                    let incomeNewValue = income;
+
+                    if (incomeNewValue == 0) {
+                        console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
+                    }
+
+                    setPendingRewards(incomeNewValue);
+                } catch (e) {
+                    console.error(`got an error while updaing rewards: ${e.message}`)
                 }
-
-                let incomeNewValue = income;
-
-                if (incomeNewValue == 0) {
-                    console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
-                }
-
-                setPendingRewards(incomeNewValue);
 
             }, 15000));
         }
@@ -283,27 +292,26 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
             for (var it of stackedNfts) {
 
+                try {
+                    let item_from_stake_receipt = fromStakeReceipt(it);
 
-                console.warn(`stake receipt : ${JSON.stringify(it)}`)
+                    const perDay = incomePerNftCalculator(item_from_stake_receipt);
 
-                let item_from_stake_receipt = fromStakeReceipt(it);
+                    let income_per_minute = perDay / (24 * 60);
 
-                console.log('item from stake receipt:',item_from_stake_receipt);
+                    dailyRewardsValue += perDay;
 
-                const perDay = incomePerNftCalculator(item_from_stake_receipt);
+                    const diff = (curTimestamp - it.lastClaim.toNumber()) / 60;
+                    if (diff > 0) {
 
-                let income_per_minute = perDay / (24 * 60);
+                        const incomePerStakedItem = diff * income_per_minute;
 
-                dailyRewardsValue += perDay;
+                        console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
 
-                const diff = (curTimestamp - it.lastClaim.toNumber()) / 60;
-                if (diff > 0) {
-
-                    const incomePerStakedItem = diff * income_per_minute;
-
-                    console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
-
-                    income += incomePerStakedItem;
+                        income += incomePerStakedItem;
+                    }
+                } catch (e) {
+                    console.error(`got an error while updaing rewards: ${e.message}`)
                 }
             }
 
@@ -346,7 +354,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                 }).then((rawitems) => {
                     let result = [];
 
-                    console.log('got raw staked items ...  ',rawitems)
+                    console.log('got raw staked items ...  ', rawitems)
 
                     for (var it of rawitems) {
                         result.push(new PublicKey(it.mint))
@@ -356,7 +364,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                 })
             }, 360, config.stacking_config.toBase58()).then(items => {
 
-                console.log('setting staked items to ... ',items)
+                console.log('setting staked items to ... ', items)
 
                 setStaked(items);
             });
@@ -429,8 +437,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                 updateStakedNfts(stakedNfts);
             });
 
-            getNftsInWalletCached({ nfts} as StakingContextType, wallet.publicKey as PublicKey, solanaConnection).then(items => {
-                console.warn('found items for staking' ,items);
+            getNftsInWalletCached({ nfts } as StakingContextType, wallet.publicKey as PublicKey, solanaConnection).then(items => {
+                console.warn('found items for staking', items);
                 updateNfts(items);
             })
 
