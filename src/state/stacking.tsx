@@ -98,12 +98,16 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
             }
         }
 
+        console.error("unable to find an nft by pubkey : . number of nfts here ",pk.toBase58(),nfts.length);
+
        return null;
     }
 
     function fromStakeReceipt(receipt: StakingReceipt): Nft {
 
         const receiptMint = receipt.mint;
+
+        console.warn('stake receipt mint : ',receiptMint.toBase58())
 
         return getNft(receiptMint);
     }
@@ -275,9 +279,18 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
             let dailyRewardsValue = 0;
 
+            console.warn(`staked nfts length : ${stackedNfts.length}`)
+
             for (var it of stackedNfts) {
 
-                const perDay = incomePerNftCalculator(fromStakeReceipt(it));
+
+                console.warn(`stake receipt : ${JSON.stringify(it)}`)
+
+                let item_from_stake_receipt = fromStakeReceipt(it);
+
+                console.log('item from stake receipt:',item_from_stake_receipt);
+
+                const perDay = incomePerNftCalculator(item_from_stake_receipt);
 
                 let income_per_minute = perDay / (24 * 60);
 

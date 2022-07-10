@@ -8,14 +8,14 @@ import { CurrentTx, getCurrentTx, storeCurrentTx } from "./currenttx"
 import { getLanguageFromCache, Lang } from "../components/langselector";
 import global_config from '../config.json'
 import { getAllNfts } from "../blockchain/nfts";
-import { getOrConstruct } from "../types/cacheitem";
-import { Toast } from "react-toastify/dist/components";
 import { getMinimumBalanceForRentExemptAccount } from "@solana/spl-token";
+import * as phantom from "@solana/wallet-adapter-phantom";
+import { WalletReadyState } from "@solana/wallet-adapter-base";
+
 export type RankMultiplyerMap = { [key: string]: number }
 export type NftsSelectorTab = "stake" | "unstake"
 export type TransactionType = "stake" | "unstake" | "platform" | "claim" | "other"
 export type SendTxFuncType = { (ixs: web3.TransactionInstruction[], typ: TransactionType, signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
-
 export interface AppContextType {
     // solana 
     solanaConnection: SolanaRpc
@@ -119,6 +119,42 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         });
     }, [solanaNode]);
 
+    // @todo move into app state init
+    useEffect(() => {
+
+        if (connectedWallet == null) {
+            let phantomWallet = new phantom.PhantomWalletAdapter();
+
+            phantomWallet.on("readyStateChange", (newState) => {
+                console.log('newState => ', newState)
+
+                if (!(phantomWallet.connected || phantomWallet.connecting)) {
+                    phantomWallet.connect();
+                }
+            });
+
+            phantomWallet.on("connect", () => {
+                setWallet(phantomWallet);
+                // toast.info(<>Wallet connected</>);
+            });
+
+            phantomWallet.on("disconnect", () => {
+                setWallet(null);
+                // clean nfts in wallet too
+                // toast.info("wallet disconnected");
+            })
+
+            let currentWalletState = phantomWallet.readyState;
+            console.log('current wallet state = ', currentWalletState);
+
+            if (currentWalletState === WalletReadyState.Installed || currentWalletState === WalletReadyState.Loadable) {
+                // toast.warn('wallet installed or loadable')
+                phantomWallet.connect()
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [connectedWallet]);
+
     const rpc_wrapper: SolanaRpc = useMemo(() => {
 
         if (web3Handler != null) {
@@ -156,7 +192,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                         }>
                     >
                 > {
-                    return this.generate_result_promise(QueuedRpcRequestType.get_program_accs, [
+                    return this.generate_result_promise(QueuedRpcRequestType.get_parsed_token_accs, [
                         ownerAddress,
                         filter,
                         commitment
@@ -246,7 +282,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                         }
 
                     }
-                    await sleep(1300);
+                    await sleep(2000);
                 }
             })();
         }
