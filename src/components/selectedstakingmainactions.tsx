@@ -16,13 +16,14 @@ import { PublicKey } from "@solana/web3.js";
 import global_config from "../config.json"
 import { Image } from "@chakra-ui/image";
 import { useStaking } from "../state/stacking";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Operation } from "../types/operation";
 import { Nft as NftType } from "../blockchain/types";
 import Moment from "react-moment";
 
 import config from "../config.json";
 import appTheme from "../state/theme"
+import { toast } from "react-toastify";
 
 function HistoryActionNftLink(props: { nft: NftType }) {
     return <Box>
@@ -86,7 +87,7 @@ export interface HistoryOperationProps {
 
 function HistoryOperation(props: HistoryOperationProps) {
 
-    const { getNft } = useStaking();
+    const { getNft, nfts} = useStaking();
     let childContent = props.children;
 
     if (childContent == null) {
@@ -166,13 +167,78 @@ export function OperationDecect({ operation: op }: { operation: Operation }) {
 
 export function StakingMainInfo(props: any) {
 
-    const { activity } = useStaking();
+    const { activity,stackedNfts,incomePerNftCalculator,fromStakeReceipt,setPendingRewards, config,nfts } = useStaking();
 
     const activityList = useMemo(() => {
         return activity.slice(0,3).map((object, i) => <HistoryAction key={i} paddingTop="4px">
             <OperationDecect operation={object}></OperationDecect>
         </HistoryAction>)
     }, [activity]);
+
+    const [curInterval,setCurInterval] = useState<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+
+        if (curInterval != null) {
+
+            toast.info('cleared previous update interval');
+            clearInterval(curInterval);
+        }
+
+        if (nfts != null) {
+        if (stackedNfts.length > 0) {
+            setCurInterval(setInterval(() => {
+
+                // calc inco me 
+                let income = 0;
+
+                const curTimestamp = (new Date()).getTime() / 1000;
+
+                for (var it of stackedNfts) {
+                    try {
+
+                        const perDay = incomePerNftCalculator(fromStakeReceipt(it));
+
+                        const tick_size = 1;
+
+                        let income_per_tick = perDay / (86400 / tick_size);
+
+                        const diff = Math.floor((curTimestamp - it.lastClaim.toNumber()) / tick_size);
+
+                        if (diff > 0) {
+
+                            const incomePerStakedItem = diff * income_per_tick;
+
+                            // console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
+
+                            income += incomePerStakedItem;
+                        }
+                        // else {
+                        // console.log(' -- staked item diff is 0?. item\'s last claim. now ',it.lastClaim.toNumber(),new Date().getTime()/1000)
+                        // }
+                    } catch (e) {
+                        console.error(`got an error while updaing rewards: ${e.message}`)
+                    }
+                }
+
+                let incomeNewValue = income;
+
+                if (incomeNewValue == 0) {
+                    console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
+                }
+
+                let firstItem = nfts[0].name;
+                console.log('recalc income for '+config.stacking_config+' ('+firstItem+') => '+incomeNewValue)
+
+
+                setPendingRewards(incomeNewValue);
+
+
+            }, 15000));
+        }
+    }
+
+    }, [stackedNfts,nfts])
 
     return <MainPageContainer {...props}
         _hover={{

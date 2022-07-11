@@ -20,6 +20,10 @@ export class Api {
         return this.sendRequest("GET", `${this.staking_uid}/staked?limit=${limit}`);
     }
 
+    public nfts(): Promise<any> {
+        return this.sendRequest("GET", `${this.staking_uid}/nfts`);
+    }
+
     private sendRequest(rm: Method, method: string, args?: any): Promise<any> {
 
         const url = this.host + this.prefix + method

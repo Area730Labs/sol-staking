@@ -68,7 +68,7 @@ export function StakeNftsListTab(props: NftTabContentProps) {
 
 export function StakedNftsListTab(props: NftTabContentProps) {
 
-    const { stackedNfts, dailyRewards, config, pretty, fromStakeReceipt } = useStaking();
+    const { stackedNfts, dailyRewards, config, pretty, fromStakeReceipt,nfts } = useStaking();
     const { sendTx } = useAppContext();
 
     async function unstakeSelectedItems(

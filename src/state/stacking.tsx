@@ -15,6 +15,7 @@ import { PublicKey } from "@solana/web3.js";
 import { TaxedItem } from "../types/taxeditem";
 import { Operation } from "../types/operation";
 import { Api } from "../api";
+import { info } from "console";
 
 export interface StakingContextType {
     config: Config,
@@ -28,19 +29,19 @@ export interface StakingContextType {
     nftsInWallet: Nft[],
     // updateNftsList: any
     stackedNfts: StakingReceipt[]
-    updateStakedNfts: { (items: StakingReceipt[]): void }
+    updateStakedNfts(items: StakingReceipt[]): void
 
     platform: Platform | null
     nftMultMap: RankMultiplyerMap | null
 
-    incomePerNftCalculator: { (item: Nft): number }
-    basicIncomePerNft: { (): number }
-    calculateIncomeWithTaxes: { (item: StakingReceipt): [number, number, number] }
+    incomePerNftCalculator(item: Nft): number
+    basicIncomePerNft(): number
+    calculateIncomeWithTaxes(item: StakingReceipt): [number, number, number]
 
-    getTaxedItems: { (): [TaxedItem[], number] }
+    getTaxedItems(): [TaxedItem[], number]
 
-    pretty: { (value: number): number }
-    fromStakeReceipt: { (receipt: StakingReceipt): Nft }
+    pretty(value: number): number
+    fromStakeReceipt(receipt: StakingReceipt): Nft 
 
     activity: Operation[]
 
@@ -52,21 +53,28 @@ export interface StakingContextType {
 export interface StakingProviderProps {
     children?: ReactNode,
     config: Config,
-    nfts: any[]
 }
 
-export function StakingProvider({ children, config, nfts }: StakingProviderProps) {
+const StakingContext = createContext<StakingContextType>(null);
 
-    // const [contextObject, setContextObject] = useState<string|null>(null);
+function getNftsFromCache(staking_config: PublicKey): any[] {
 
-    let context_uid = "staking_ctx_"+config.stacking_config.toBase58();
+    const cacheKey = "staking_nfts_" +staking_config.toBase58();
+    const cachedItem = localStorage.getItem(cacheKey);
 
-    if (window[context_uid] == null) {
-        window[context_uid] = createContext<StakingContextType>(null);
-        // setContextObject(context_uid)
-        console.log("setting context object for uid",context_uid);
+    if (cachedItem != null) {
+        const cachedArray = JSON.parse(cachedItem);
+        return cachedArray;
+    } else {
+        // make a request to 
+        return null;
     }
+}
 
+export function StakingProvider({ children, config }: StakingProviderProps) {
+
+    // todo make interface for that list
+    const [nfts,setNfts] = useState<any[] | null>(getNftsFromCache(config.stacking_config));
     const [platform, setPlatform] = useState<Platform | null>(getPlatformInfoFromCache(config.stacking_config));
     const [nftMultMap, setMultMap] = useState<RankMultiplyerMap | null>(null);
     const [userNfts, updateNfts] = useState<Nft[]>([]);
@@ -78,6 +86,28 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     const [staked, setStaked] = useState<PublicKey[]>(getStakedFromCache(config.stacking_config))
 
     const [api, setApi] = useState<Api>(new Api("https://cldfn.com", "/staking/", config.stacking_config.toBase58()));
+
+    useEffect(() => {
+        if (nfts == null) {
+
+            const cacheKey = "staking_nfts_" +config.stacking_config.toBase58();
+
+            api.nfts().then((resp) => {
+                localStorage.setItem(cacheKey,JSON.stringify(resp.data))
+                setNfts(resp);
+            });
+
+        }
+    },[nfts]);
+
+    useEffect(() => {
+        getPlatformInfo(global_config.disable_cache, solanaConnection, config.stacking_config).then((platform) => {
+            setPlatform(platform);
+        }).catch((e) => {
+            console.error(e)
+            toast.error('error while fetching staking config: ' + e.message)
+        })
+    }, []);
 
     // const compressed = nfts.map((it, idx) => {
     //     return [
@@ -106,9 +136,6 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
             }
         }
 
-        let firstNft = nfts[0].address;
-        console.error("unable to find an nft by pubkey : . number of nfts here ", pk.toBase58(), nfts.length, firstNft);
-
         return null;
     }
 
@@ -119,15 +146,15 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         let nft_item = getNft(receiptMint);
 
         if (nft_item == null) {
-            throw Error(`unable to get nft from stake receipt for mint : ${receiptMint}`);
+
+            let firstItem = nfts[0].name;
+            throw Error(`unable to get nft from stake receipt for mint : ${receiptMint} first of ${firstItem}`);
         }
 
         return nft_item;
     }
 
     // for background tasks
-    const [curInterval, setCurInterval] = useState(null);
-
     const { solanaConnection, wallet } = useAppContext();
 
     function pretty(value: number): number {
@@ -223,75 +250,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
     useEffect(() => {
 
-        getPlatformInfo(global_config.disable_cache, solanaConnection, config.stacking_config).then((platform) => {
-            setPlatform(platform);
-        }).catch((e) => {
-            console.error(e)
-            toast.error('error while fetching staking config: ' + e.message)
-        })
-
-    }, []);
-
-    useEffect(() => {
-
-        if (curInterval != null) {
-
-            toast.info('cleared previous update interval');
-
-            clearInterval(curInterval);
-        }
-
-        if (stackedNfts.length > 0) {
-            setCurInterval(setInterval(() => {
-
-                // calc inco me 
-                let income = 0;
-
-                const curTimestamp = (new Date()).getTime() / 1000;
-
-                for (var it of stackedNfts) {
-                    try {
-
-                        const perDay = incomePerNftCalculator(fromStakeReceipt(it));
-
-                        const tick_size = 1;
-
-                        let income_per_tick = perDay / (86400 / tick_size);
-
-                        const diff = Math.floor((curTimestamp - it.lastClaim.toNumber()) / tick_size);
-
-                        if (diff > 0) {
-
-                            const incomePerStakedItem = diff * income_per_tick;
-
-                            // console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
-
-                            income += incomePerStakedItem;
-                        }
-                        // else {
-                        // console.log(' -- staked item diff is 0?. item\'s last claim. now ',it.lastClaim.toNumber(),new Date().getTime()/1000)
-                        // }
-                    } catch (e) {
-                        console.error(`got an error while updaing rewards: ${e.message}`)
-                    }
-                }
-
-                let incomeNewValue = income;
-
-                if (incomeNewValue == 0) {
-                    console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
-                }
-
-                setPendingRewards(incomeNewValue);
-
-
-            }, 15000));
-        }
-    }, [stackedNfts,nfts])
-
-    useEffect(() => {
-
-        if (platform != null && wallet != null && nftMultMap != null && stackedNfts.length > 0) {
+        if (platform != null && wallet != null && nftMultMap != null && stackedNfts.length > 0 && nfts != null) {
 
             // calc inco me 
             let income = 0;
@@ -323,7 +282,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                         income += incomePerStakedItem;
                     }
                 } catch (e) {
-                    console.error(`got an error while updaing rewards: ${e.message}`)
+                    console.error(`got an error while setting income per staking rewards: ${e.message}`)
                 }
             }
 
@@ -340,7 +299,6 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
             const savedIncomeValues = incomeNewValue;
 
             getStakeOwnerForWallet(config, wallet.publicKey).then(async (stakeOwnerAddress) => {
-
                 // connection expected to be always available 
                 return StakeOwner.fetch(solanaConnection, stakeOwnerAddress);
             }).then((stake_owner) => {
@@ -353,11 +311,11 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         // todo handle wallet disconnection
         // need to set ZERO earnings
 
-    }, [stackedNfts, platform, wallet, nftMultMap]);
+    }, [stackedNfts, platform, wallet, nftMultMap,nfts]);
 
     useEffect(() => {
 
-        if (platform != null) {
+        if (platform != null && nfts != null) {
 
             getOrConstruct<PublicKey[]>(global_config.disable_cache, platform_staked_cache, async () => {
 
@@ -437,7 +395,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
             });
 
         }
-    }, [platform]);
+    }, [platform,nfts]);
 
 
     // initialization
@@ -518,25 +476,21 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     }, [
         pendingRewards, userNfts, stackedNfts,
         nftMultMap,
-        activity
+        activity,
+        nfts
     ]);
 
-    let context = window[context_uid];
 
-    if (context != null) {
     return (
-        <context.Provider value={memoedValue}>
-            {children}
-        </context.Provider>
+        <StakingContext.Provider value={memoedValue}>
+            {nfts != null ? children : null}
+        </StakingContext.Provider>
     )
-    } else {
-        <>{children}</>
-    }
 }
 
-export function useStaking(uid: string) : StakingContextType {
+export function useStaking() : StakingContextType {
 
-    const staking = useContext(window["staking_ctx_"+uid]) as StakingContextType
+    const staking = useContext(StakingContext) as StakingContextType
 
     if (staking == null) {
         console.warn(

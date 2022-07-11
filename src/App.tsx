@@ -47,8 +47,8 @@ export function App() {
             </Box>
           </Grid>
           <Box>
-            <Staking config={fromJson(global_config.env.prod)} nfts={nfts} />
-            <Staking config={fromJson(global_config.env.prod_1)} nfts={nfts_babies} />
+            <Staking config={fromJson(global_config.env.prod)} />
+            <Staking config={fromJson(global_config.env.prod_1)} />
           </Box>
         </Box>
       </ModalProvider>
