@@ -9,17 +9,17 @@ import { getPlatformInfo, getPlatformInfoFromCache, getStakedFromCache, getStaki
 import global_config from '../config.json'
 import { Config } from "../types/config";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
-import { getNftsInWalletCached, getStakedNftsCached, getStakeOwnerForWallet } from "./user";
 import { getOrConstruct } from "../types/cacheitem";
 import { PublicKey } from "@solana/web3.js";
 import { TaxedItem } from "../types/taxeditem";
 import { Operation } from "../types/operation";
 import { Api } from "../api";
 import { info } from "console";
+import { others } from "@chakra-ui/react";
 
 export interface StakingContextType {
     config: Config,
-    nfts: any[]
+    nfts: NftBag | null
 
     pendingRewards: number
     setPendingRewards: any
@@ -55,50 +55,91 @@ export interface StakingContextType {
 export interface StakingProviderProps {
     children?: ReactNode,
     config: Config,
+    alias: string
 }
 
 const StakingContext = createContext<StakingContextType>(null);
 
-function getNftsFromCache(staking_config: PublicKey): any[] {
+function getNftsFromCache(staking_config: PublicKey): NftBag | null {
 
     const cacheKey = "staking_nfts_" +staking_config.toBase58();
     const cachedItem = localStorage.getItem(cacheKey);
 
     if (cachedItem != null) {
-        const cachedArray = JSON.parse(cachedItem);
-        return cachedArray;
+        const cachedArray = JSON.parse(cachedItem) as any[];
+        return new NftBag(cachedArray);
     } else {
         // make a request to 
         return null;
     }
 }
 
-export function StakingProvider({ children, config }: StakingProviderProps) {
+export class NftBag {
+    
+    public items : {[index:string]:any};
+    public order: string[]
+
+    constructor(items : any[]) {
+
+        this.items = {};
+        this.order = [];
+
+        for (const it of items) {
+            this.items[it.address] = it;
+            this.order.push(it.address)
+        }
+    }
+
+    contains(mint: PublicKey) : boolean {
+        return this.get(mint) != undefined;
+    }
+
+    length(): number {
+        return this.order.length;
+    }
+
+    get(mint: PublicKey): any | null {
+
+        let it = this.items[mint.toBase58()];
+        
+        if (it != null) {
+            return {
+                image: it.image,
+                address: new PublicKey(it.address),
+                name: it.name,
+                props: it.props
+            } as Nft
+        } else {
+            return null;
+        }
+    }
+}
+
+
+export function StakingProvider({ children, config, alias }: StakingProviderProps) {
 
     // todo make interface for that list
-    const [nfts,setNfts] = useState<any[] | null>(getNftsFromCache(config.stacking_config));
+    const [nfts,setNfts] = useState<NftBag | null>(getNftsFromCache(config.stacking_config));
     const [platform, setPlatform] = useState<Platform | null>(getPlatformInfoFromCache(config.stacking_config));
     const [nftMultMap, setMultMap] = useState<RankMultiplyerMap | null>(null);
     const [userNfts, updateNfts] = useState<Nft[]>([]);
     const [stackedNfts, updateStakedNfts] = useState<StakingReceipt[]>([] as StakingReceipt[]);
     const [pendingRewards, setPendingRewards] = useState<number>(0);
     const [dailyRewards, setDailyrewards] = useState(0);
-    const [activity, setActivity] = useState<Operation[]>(getStakingActivityFromCache(config.stacking_config))
 
+    const [activity, setActivity] = useState<Operation[]>(getStakingActivityFromCache(config.stacking_config))
     const [staked, setStaked] = useState<PublicKey[]>(getStakedFromCache(config.stacking_config))
 
     const [api, setApi] = useState<Api>(new Api("https://cldfn.com", "/staking/", config.stacking_config.toBase58()));
 
     useEffect(() => {
         if (nfts == null) {
-
             const cacheKey = "staking_nfts_" +config.stacking_config.toBase58();
 
             api.nfts().then((resp) => {
                 localStorage.setItem(cacheKey,JSON.stringify(resp.data))
-                setNfts(resp);
+                setNfts(new NftBag(resp.data));
             });
-
         }
     },[nfts]);
 
@@ -124,7 +165,7 @@ export function StakingProvider({ children, config }: StakingProviderProps) {
     // console.log('compressed size', JSON.stringify(compressed).length)
 
     // for background tasks
-    const { solanaConnection, wallet } = useAppContext();
+    const { solanaConnection, wallet, allStakedReceipts, allNonStakedNfts } = useAppContext();
 
     function pretty(value: number): number {
         return Math.round(((value / config.reward_token_decimals) + Number.EPSILON) * 100) / 100
@@ -141,8 +182,6 @@ export function StakingProvider({ children, config }: StakingProviderProps) {
                 }).then((rawitems) => {
                     let result = [];
 
-                    console.log('got raw staked items ...  ', rawitems)
-
                     for (var it of rawitems) {
                         result.push(new PublicKey(it.mint))
                     }
@@ -150,9 +189,6 @@ export function StakingProvider({ children, config }: StakingProviderProps) {
                     return result;
                 })
             }, 360, config.stacking_config.toBase58()).then(items => {
-
-                console.log('setting staked items to ... ', items)
-
                 setStaked(items);
             });
 
@@ -180,16 +216,19 @@ export function StakingProvider({ children, config }: StakingProviderProps) {
                 setActivity(items);
             });
 
-
             // @todo add changes counter to staking config account
             // and use it for caching 
+            if (platform.multiplyRule.steps > 0) {
             getOrConstruct<RankMultiplyerMap>(global_config.disable_cache, "rank_multiplyer", async () => {
 
                 let result: RankMultiplyerMap = {};
 
                 const rule = platform.multiplyRule;
 
-                for (var it of nfts) {
+                for (var it_key in nfts.items) {
+
+                    const it = nfts.items[it_key];
+
                     const matched = matchRule(rule, it.props.rank)
                     if (matched != null) {
 
@@ -210,6 +249,7 @@ export function StakingProvider({ children, config }: StakingProviderProps) {
             }, 86400 * 30).then((map) => {
                 setMultMap(map);
             });
+        }
 
         }
     }, [platform,nfts]);
@@ -217,41 +257,43 @@ export function StakingProvider({ children, config }: StakingProviderProps) {
     // initialization
     useEffect(() => {
         if (wallet != null && wallet.connected) {
-
             // probably just use useMemo
-            getStakedNftsCached(config, solanaConnection, wallet.publicKey).then((stakedNfts) => {
+
+            {
+                let stakedNfts = [];
+
+                for (const it of allStakedReceipts) {
+                    if (nfts.contains(it.mint)) {
+                        stakedNfts.push(it);
+                    }
+                }
+
                 updateStakedNfts(stakedNfts);
-            });
+            }
 
-            getNftsInWalletCached({ nfts } as StakingContextType, wallet.publicKey as PublicKey, solanaConnection).then(items => {
-                console.warn('found items for staking', items);
-                updateNfts(items);
-            })
+            {
+                let nonStakedNfts = [];
+                for (const it of allNonStakedNfts) {
 
+                    const nft_data = nfts.contains(it);
+                    if (nft_data != null) {
+                        nonStakedNfts.push(nft_data);
+                    }
+                }
+
+                updateNfts(nonStakedNfts);
+
+            }
         } else {
             updateStakedNfts([]);
             updateNfts([]);
         }
-    }, [wallet]);
+    }, [wallet, allStakedReceipts]);
 
     const memoedValue = useMemo(() => {
 
-        function getNft(pk: PublicKey): Nft | null {
-
-            let pk_str = pk.toBase58();
-    
-            for (var it of nfts) {
-                if (it.address === pk_str) {
-                    return {
-                        image: it.image,
-                        address: new PublicKey(it.address),
-                        name: it.name,
-                        props: it.props
-                    } as Nft
-                }
-            }
-    
-            return null;
+        function getNft(pk: PublicKey): Nft | null {    
+            return nfts.get(pk);
         }    
 
         function fromStakeReceipt(receipt: StakingReceipt): Nft {

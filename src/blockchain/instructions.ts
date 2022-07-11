@@ -34,12 +34,10 @@ import { StakingContextType } from "../state/stacking";
 export function getMerkleTree(staking: StakingContextType): MerkleTree {
 
     const leaves = buildLeaves(
-        staking.nfts.map((e, i) => ({
-            address: new PublicKey(e.address),
-            props: e.props,
-            name: e.name,
-            image: e.image
-        } as Nft))
+        staking.nfts.order.map((e, i) => {
+            let item = staking.nfts.items[e];
+            return item;
+        })
     );
 
     const tree = new MerkleTree(leaves);
@@ -79,8 +77,8 @@ export function createStakeNftIx(config: StakingContextType, mint: PublicKey, ow
 
     const tree = getMerkleTree(config);
 
-    const indexStaked = config.nfts.findIndex(
-        (e) => e.address === mint.toBase58()
+    const indexStaked = config.nfts.order.findIndex(
+        (e) => e === mint.toBase58()
     );
 
     const nftToStake = config.nfts[indexStaked];

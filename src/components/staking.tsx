@@ -22,7 +22,7 @@ export function StakingInfo() {
     return <VStack alignItems="flex-start">
         <Text fontWeight="bold">{config.label}</Text>
         <MainImage  imgsrc={config.main_image}/>
-        <StakePlatformStats  platform={platform} nfts_length={nfts.length} />
+        <StakePlatformStats  platform={platform} nfts_length={nfts.length()} />
     </VStack>
 }
 
@@ -35,7 +35,7 @@ export function Staking(props: StakingProviderProps) {
     return <Box onClick={() => {
         expand(true);
     }}>
-        <StakingProvider config={props.config}>
+        <StakingProvider alias={props.alias} config={props.config}>
             <StakingMainInfo marginTop="10" p="3" />
             <Fadeable isVisible={expanded}>
                 <NftSelectorTabs />

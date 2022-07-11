@@ -7,10 +7,14 @@ import { TxHandler } from "../blockchain/handler";
 import { CurrentTx, getCurrentTx, storeCurrentTx } from "./currenttx"
 import { getLanguageFromCache, Lang } from "../components/langselector";
 import global_config from '../config.json'
-import { getAllNfts } from "../blockchain/nfts";
+import { getAllNfts, getStakedNfts } from "../blockchain/nfts";
 import { getMinimumBalanceForRentExemptAccount } from "@solana/spl-token";
 import * as phantom from "@solana/wallet-adapter-phantom";
 import { WalletReadyState } from "@solana/wallet-adapter-base";
+import { StakingReceipt, StakingReceiptJSON } from "../blockchain/idl/accounts/StakingReceipt";
+import { getOrConstruct } from "../types/cacheitem";
+import { get_cached_nfts_of_wallet } from "./user";
+import Nft from "../types/Nft";
 
 export type RankMultiplyerMap = { [key: string]: number }
 export type NftsSelectorTab = "stake" | "unstake"
@@ -35,6 +39,11 @@ export interface AppContextType {
 
     lang: Lang,
     setLang: { (value: Lang) }
+
+    allStakedReceipts: StakingReceipt[]
+    setStakedReceipts(value: StakingReceipt[])
+
+    allNonStakedNfts: PublicKey[]
 }
 
 export interface SolanaRpc {
@@ -85,7 +94,6 @@ interface QueuedRpcRequest {
     reject: any
 }
 
-
 const AppContext = createContext<AppContextType>({} as AppContextType);
 
 function sleep(ms) {
@@ -104,7 +112,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     const [curtx, setCurtx] = useState<CurrentTx | null>(null);
     const [userUpdatesCounter, setUserUpdatesCounter] = useState(0);
 
-    const [nfts, setNFts] = useState([]);
+    const [allStakedReceipts, setStakedReceipts] = useState<StakingReceipt[]>([]);
+    const [allNonStakedNfts, setNFts] = useState<PublicKey[]>([]);
 
     const [rpcQueue, setRpcQueue] = useState<QueuedRpcRequest[]>([]);
     const [queueProcessorStarted, setStarted] = useState(false);
@@ -119,10 +128,10 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         });
     }, [solanaNode]);
 
-    // @todo move into app state init
     useEffect(() => {
 
         if (connectedWallet == null) {
+
             let phantomWallet = new phantom.PhantomWalletAdapter();
 
             phantomWallet.on("readyStateChange", (newState) => {
@@ -151,6 +160,42 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                 // toast.warn('wallet installed or loadable')
                 phantomWallet.connect()
             }
+
+            // globally staked nfts on platform
+            setStakedReceipts([]);
+
+            // globally nfts in wallet
+            setNFts([]);
+
+        } else {
+
+            get_cached_nfts_of_wallet(global_config.disable_cache, connectedWallet.publicKey, rpc_wrapper).then(response => {
+                setNFts(response);
+            });
+
+            // app's cache for staked items
+            getOrConstruct<StakingReceipt[]>(global_config.disable_cache, "staked_by", () => {
+                return getStakedNfts(new PublicKey(global_config.staking_program_id), rpc_wrapper, connectedWallet.publicKey).then((response) => {
+                    return [];
+                });
+            }, global_config.caching.staked_nfts, connectedWallet.publicKey.toBase58()).then((staked) => {
+
+                var result = [];
+
+                for (var it of staked) {
+
+                    let properObject = it;
+                    if (properObject.constructor.name !== "StackingReceipt") {
+                        properObject = StakingReceipt.fromJSON((it as any) as StakingReceiptJSON);
+                    }
+
+                    result.push(properObject);
+                }
+
+                return result;
+            }).then(items => {
+                setStakedReceipts(items);
+            });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connectedWallet]);
@@ -377,16 +422,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     // initialization
     useEffect(() => {
         if (connectedWallet != null && connectedWallet.connected) {
-
             setCurtx(getCurrentTx(connectedWallet));
-
-            let all_nfts_cache = getAllNfts(rpc_wrapper, connectedWallet.publicKey);
-
-            console.log('all nfts cached', all_nfts_cache);
-
-
         } else {
-
             setCurTxWrapper(null);
         }
     }, [connectedWallet, userUpdatesCounter]);
@@ -437,8 +474,12 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
             // lang 
             lang,
-            setLang
+            setLang,
 
+            allStakedReceipts,
+            setStakedReceipts,
+
+            allNonStakedNfts,
         } as AppContextType;
 
         return curCtx

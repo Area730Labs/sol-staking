@@ -47,8 +47,8 @@ export function App() {
             </Box>
           </Grid>
           <Box>
-            <Staking config={fromJson(global_config.env.prod)} />
-            <Staking config={fromJson(global_config.env.prod_1)} />
+            <Staking alias="gen1" config={fromJson(global_config.env.prod)} />
+            <Staking alias="babies" config={fromJson(global_config.env.prod_1)} />
           </Box>
         </Box>
       </ModalProvider>

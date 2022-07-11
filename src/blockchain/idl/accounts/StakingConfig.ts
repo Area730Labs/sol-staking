@@ -148,8 +148,6 @@ export class StakingConfig {
   ): Promise<StakingConfig | null> {
     const info = await c.getAccountInfo(address)
 
-    console.log('got StakingConfig@fetch: ',info)
-
     if (info === null) {
       return null
     }
