@@ -258,17 +258,19 @@ export function StakingProvider({ children, config, alias }: StakingProviderProp
     useEffect(() => {
         if (wallet != null && wallet.connected) {
             // probably just use useMemo
+            console.log(`trying to calc staked nfts for whole app: ${allStakedReceipts.length}, ${allNonStakedNfts.length}`)
 
             {
                 let stakedNfts = [];
 
                 for (const it of allStakedReceipts) {
+
                     if (nfts.contains(it.mint)) {
                         stakedNfts.push(it);
                     }
                 }
 
-                console.warn(`setting staked nfts in staking ${alias}: ${stakedNfts.length}/${allStakedReceipts.length}`)
+                // console.warn(`setting staked nfts in staking ${alias}: ${stakedNfts.length}/${allStakedReceipts.length}`)
 
                 updateStakedNfts(stakedNfts);
             }
@@ -277,7 +279,7 @@ export function StakingProvider({ children, config, alias }: StakingProviderProp
                 let nonStakedNfts = [];
                 for (const it of allNonStakedNfts) {
 
-                    const nft_data = nfts.contains(it);
+                    const nft_data = nfts.get(it);
                     if (nft_data != null) {
                         nonStakedNfts.push(nft_data);
                     }
@@ -290,7 +292,7 @@ export function StakingProvider({ children, config, alias }: StakingProviderProp
             updateStakedNfts([]);
             updateNfts([]);
         }
-    }, [wallet, allStakedReceipts]);
+    }, [wallet, allStakedReceipts,allNonStakedNfts]);
 
     const memoedValue = useMemo(() => {
 

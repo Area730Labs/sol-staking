@@ -59,5 +59,6 @@
      "data_commitment": "confirmed",
      "small_staked_nfts_list_size": 4,
      "cluster_url": "https://api.mainnet-beta.solana.com",
-     "staking_program_id" : "stkqdwwENqh935UFNAbgJY2deqWcRxDEEzR68GBgo68"
+     "staking_program_id" : "stkqdwwENqh935UFNAbgJY2deqWcRxDEEzR68GBgo68",
+     "rewards_update_interval_ms": 15000
 }

@@ -18,6 +18,7 @@ export interface Config {
     reward_token_name: string
     reward_token_decimals: number
     rewards_mint: PublicKey
+    rewards_update_interval_ms : number
 
     main_image: string
     label: string
@@ -42,7 +43,8 @@ export function fromJson(object: any): Config {
         rewards_mint: new PublicKey(object.rewards_mint),
 
         main_image: object.main_image,
-        label : object.label
+        label : object.label,
+        rewards_update_interval_ms : object.rewards_update_interval_ms
     }
 }
 

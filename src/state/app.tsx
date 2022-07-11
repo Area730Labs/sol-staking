@@ -170,8 +170,12 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
         } else {
 
+            console.log("app: calc staked + non staked nfts");
+
             get_cached_nfts_of_wallet(global_config.disable_cache, connectedWallet.publicKey, rpc_wrapper).then(response => {
                 setNFts(response);
+            }).catch(e => {
+                console.warn("unable to get non staked nfts: "+e.message);
             });
 
             // app's cache for staked items
