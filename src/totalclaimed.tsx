@@ -39,7 +39,7 @@ export default function TotalClaimed() {
         }
     }, [platform,config]);
 
-    return <Text fontSize="xl" fontWeight="bold" color="white" textAlign="center" fontFamily="helvetica">
+    return <Box fontSize="xl" fontWeight="bold" color="white" textAlign="center" fontFamily="helvetica">
         {claimedValue > 0?<Box borderRadius={appTheme.borderRadiusXl} backgroundColor={appTheme.stressColor2} color="black"><Countup number={claimedValue} float={true} /></Box>:0} {config.reward_token_name}
-    </Text>
+    </Box>
 }

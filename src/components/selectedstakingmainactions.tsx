@@ -24,6 +24,9 @@ import Moment from "react-moment";
 import config from "../config.json";
 import appTheme from "../state/theme"
 import { toast } from "react-toastify";
+import { useAppContext } from "../state/app";
+import { getStakeOwnerForWallet } from "../state/user";
+import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 
 function HistoryActionNftLink(props: { nft: NftType }) {
     return <Box>
@@ -87,7 +90,7 @@ export interface HistoryOperationProps {
 
 function HistoryOperation(props: HistoryOperationProps) {
 
-    const { getNft, nfts} = useStaking();
+    const { getNft, nfts } = useStaking();
     let childContent = props.children;
 
     if (childContent == null) {
@@ -167,15 +170,18 @@ export function OperationDecect({ operation: op }: { operation: Operation }) {
 
 export function StakingMainInfo(props: any) {
 
-    const { activity,stackedNfts,incomePerNftCalculator,fromStakeReceipt,setPendingRewards, config,nfts } = useStaking();
+    const { 
+        setPendingRewards,setDailyRewards,
+        platform, nftMultMap, activity, stackedNfts, incomePerNftCalculator, fromStakeReceipt, config, nfts} = useStaking();
+    const { wallet, solanaConnection} = useAppContext();
 
     const activityList = useMemo(() => {
-        return activity.slice(0,3).map((object, i) => <HistoryAction key={i} paddingTop="4px">
+        return activity.slice(0, 3).map((object, i) => <HistoryAction key={i} paddingTop="4px">
             <OperationDecect operation={object}></OperationDecect>
         </HistoryAction>)
     }, [activity]);
 
-    const [curInterval,setCurInterval] = useState<NodeJS.Timeout | null>(null);
+    const [curInterval, setCurInterval] = useState<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
 
@@ -186,59 +192,123 @@ export function StakingMainInfo(props: any) {
         }
 
         if (nfts != null) {
-        if (stackedNfts.length > 0) {
-            setCurInterval(setInterval(() => {
+            if (stackedNfts.length > 0) {
 
-                // calc inco me 
-                let income = 0;
 
-                const curTimestamp = (new Date()).getTime() / 1000;
 
-                for (var it of stackedNfts) {
-                    try {
+                setCurInterval(setInterval(() => {
 
-                        const perDay = incomePerNftCalculator(fromStakeReceipt(it));
+                    // calc inco me 
+                    let income = 0;
 
-                        const tick_size = 1;
+                    const curTimestamp = (new Date()).getTime() / 1000;
 
-                        let income_per_tick = perDay / (86400 / tick_size);
+                    for (var it of stackedNfts) {
+                        try {
 
-                        const diff = Math.floor((curTimestamp - it.lastClaim.toNumber()) / tick_size);
+                            const perDay = incomePerNftCalculator(fromStakeReceipt(it));
 
-                        if (diff > 0) {
+                            const tick_size = 1;
 
-                            const incomePerStakedItem = diff * income_per_tick;
+                            let income_per_tick = perDay / (86400 / tick_size);
 
-                            // console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
+                            const diff = Math.floor((curTimestamp - it.lastClaim.toNumber()) / tick_size);
 
-                            income += incomePerStakedItem;
+                            if (diff > 0) {
+
+                                const incomePerStakedItem = diff * income_per_tick;
+
+                                // console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
+
+                                income += incomePerStakedItem;
+                            }
+                            // else {
+                            // console.log(' -- staked item diff is 0?. item\'s last claim. now ',it.lastClaim.toNumber(),new Date().getTime()/1000)
+                            // }
+                        } catch (e) {
+                            console.error(`got an error while updaing rewards: ${e.message}`)
                         }
-                        // else {
-                        // console.log(' -- staked item diff is 0?. item\'s last claim. now ',it.lastClaim.toNumber(),new Date().getTime()/1000)
-                        // }
-                    } catch (e) {
-                        console.error(`got an error while updaing rewards: ${e.message}`)
                     }
-                }
 
-                let incomeNewValue = income;
+                    let incomeNewValue = income;
 
-                if (incomeNewValue == 0) {
-                    console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
-                }
+                    if (incomeNewValue == 0) {
+                        console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
+                    }
 
-                let firstItem = nfts[0].name;
-                console.log('recalc income for '+config.stacking_config+' ('+firstItem+') => '+incomeNewValue)
-
-
-                setPendingRewards(incomeNewValue);
+                    let firstItem = nfts[0].name;
+                    console.log('recalc income for ' + config.stacking_config + ' (' + firstItem + ') => ' + incomeNewValue)
 
 
-            }, 15000));
+                    setPendingRewards(incomeNewValue);
+
+
+                }, 15000));
+            }
         }
-    }
 
-    }, [stackedNfts,nfts])
+    }, [stackedNfts, nfts])
+
+    useEffect(() => {
+        // move away from state 
+        if (platform != null && wallet != null && nftMultMap != null && stackedNfts.length > 0 && nfts != null) {
+
+            // calc inco me 
+            let income = 0;
+
+            const curTimestamp = (new Date()).getTime() / 1000;
+
+            let dailyRewardsValue = 0;
+
+            for (var it of stackedNfts) {
+
+                try {
+                    let item_from_stake_receipt = fromStakeReceipt(it);
+
+                    const perDay = incomePerNftCalculator(item_from_stake_receipt);
+
+                    let income_per_minute = perDay / (24 * 60);
+
+                    dailyRewardsValue += perDay;
+
+                    const diff = (curTimestamp - it.lastClaim.toNumber()) / 60;
+                    if (diff > 0) {
+
+                        const incomePerStakedItem = diff * income_per_minute;
+
+                        console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals, nfts[0].name)
+
+                        income += incomePerStakedItem;
+                    }
+                } catch (e) {
+                    console.error(`got an error while setting income per staking rewards: ${e.message}`)
+                }
+            }
+
+            setDailyRewards(dailyRewardsValue);
+
+            let incomeNewValue = income;
+
+            if (incomeNewValue == 0) {
+                console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
+            }
+
+            setPendingRewards(incomeNewValue);
+
+            const savedIncomeValues = incomeNewValue;
+
+            getStakeOwnerForWallet(config, wallet.publicKey).then(async (stakeOwnerAddress) => {
+                // connection expected to be always available 
+                return StakeOwner.fetch(solanaConnection, stakeOwnerAddress);
+            }).then((stake_owner) => {
+                if (stake_owner != null) {
+                    const totalRewards = savedIncomeValues + stake_owner.balance.toNumber();
+                    setPendingRewards(totalRewards);
+                }
+            });
+        }
+    }, [platform,wallet,nftMultMap]);
+
 
     return <MainPageContainer {...props}
         _hover={{
@@ -296,8 +366,8 @@ export function StakingMainInfo(props: any) {
                     >
                         Claim pending
                     </Box> */}
-                    <StakeButton borderRadius={appTheme.borderRadiusXl}/>
-                    <ClaimPendingRewardsButton borderRadius={appTheme.borderRadiusXl}/>
+                    <StakeButton borderRadius={appTheme.borderRadiusXl} />
+                    <ClaimPendingRewardsButton borderRadius={appTheme.borderRadiusXl} />
                     <PendingRewards />
                     <DevButtons />
 
