@@ -194,7 +194,7 @@ export function StakingMainInfo(props: any) {
         if (nfts != null) {
             if (stackedNfts.length > 0) {
 
-
+                console.warn('set income update interval')
 
                 setCurInterval(setInterval(() => {
 
@@ -244,6 +244,8 @@ export function StakingMainInfo(props: any) {
 
 
                 }, 15000));
+            } else {
+                console.log('no staked nfts ...')
             }
         }
 

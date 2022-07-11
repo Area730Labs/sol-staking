@@ -268,6 +268,8 @@ export function StakingProvider({ children, config, alias }: StakingProviderProp
                     }
                 }
 
+                console.warn(`setting staked nfts in staking ${alias}: ${stakedNfts.length}/${allStakedReceipts.length}`)
+
                 updateStakedNfts(stakedNfts);
             }
 

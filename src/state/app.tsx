@@ -112,6 +112,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     const [curtx, setCurtx] = useState<CurrentTx | null>(null);
     const [userUpdatesCounter, setUserUpdatesCounter] = useState(0);
 
+    const [nfstChanges,setNftsChanges] = useState(0);
     const [allStakedReceipts, setStakedReceipts] = useState<StakingReceipt[]>([]);
     const [allNonStakedNfts, setNFts] = useState<PublicKey[]>([]);
 
@@ -175,9 +176,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
             // app's cache for staked items
             getOrConstruct<StakingReceipt[]>(global_config.disable_cache, "staked_by", () => {
-                return getStakedNfts(new PublicKey(global_config.staking_program_id), rpc_wrapper, connectedWallet.publicKey).then((response) => {
-                    return [];
-                });
+                return getStakedNfts(new PublicKey(global_config.staking_program_id), rpc_wrapper, connectedWallet.publicKey);
             }, global_config.caching.staked_nfts, connectedWallet.publicKey.toBase58()).then((staked) => {
 
                 var result = [];
@@ -195,6 +194,10 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                 return result;
             }).then(items => {
                 setStakedReceipts(items);
+                console.log(`global staked receipts length : ${items.length}`)
+                setNftsChanges(nfstChanges+1);
+            }).catch(e => {
+                console.error('unable to set global staking receipts holder : '+e.message)
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -488,7 +491,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         nftsTab, nftsTabClickCounter,
         rpc_wrapper, connectedWallet,
         curtx, userUpdatesCounter,
-        lang,
+        lang, 
+        nfstChanges
     ]);
 
     return (
