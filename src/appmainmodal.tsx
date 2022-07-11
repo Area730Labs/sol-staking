@@ -20,7 +20,7 @@ function UnstakeTaxModal() {
 
   const { setModalVisible, setTaxModal } = useModal();
   const ctx = useAppContext();
-  const { stackedNfts, calculateIncomeWithTaxes, platform, pendingRewards, pretty, config, fromStakeReceipt } = useStaking();
+  const { stackedNfts, calculateIncomeWithTaxes, platform, pendingRewards, pretty, config, fromStakeReceipt } = useStaking("");
 
   function closeTaxModal() {
     setModalVisible(false)

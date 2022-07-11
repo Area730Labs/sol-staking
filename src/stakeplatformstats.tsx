@@ -4,6 +4,7 @@ import HistoryAction from "./components/historyaction";
 import { Stat } from "./components/stat";
 import { prettyNumber } from "./data/uitls"
 import { useStaking } from "./state/stacking";
+import Platform from "./types/paltform";
 
 export interface PlatformStats {
     totalStacked: number,
@@ -11,14 +12,19 @@ export interface PlatformStats {
     percentStaked: number,
 }
 
-export default function StakePlatformStats() {
+export interface StakePlatformProps {
+    platform: Platform,
+    nfts_length: number
+}
 
-    const { platform, nfts } = useStaking();
+export default function StakePlatformStats(props : StakePlatformProps) {
+
+    const { platform, nfts_length } = props;
 
     const [info, setInfo] = useState<PlatformStats>({
         totalStacked: 0,
         percentStaked: 0,
-        itemsAvailable: nfts.length,
+        itemsAvailable: nfts_length,
     });
 
     useEffect(() => {
@@ -26,7 +32,7 @@ export default function StakePlatformStats() {
 
             let infoNew = {
                 totalStacked: platform.totalStaked,
-                itemsAvailable: nfts.length,
+                itemsAvailable: nfts_length,
             } as PlatformStats;
 
             infoNew.percentStaked = (infoNew.totalStacked / infoNew.itemsAvailable) * 100;

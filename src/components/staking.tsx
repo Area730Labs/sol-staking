@@ -6,7 +6,7 @@ import MainImage from "./mainimage";
 
 import { StakingMainInfo } from "./selectedstakingmainactions";
 import { NftSelectorTabs } from "./nftstab";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Fadeable from "./fadeable";
 
 export function StakingInfo() {
@@ -15,7 +15,7 @@ export function StakingInfo() {
 
     return <VStack alignItems="flex-start">
         <Text fontWeight="bold">{config.label}</Text>
-        <MainImage />
+        <MainImage  imgsrc={config.main_image}/>
         <StakePlatformStats />
     </VStack>
 }
@@ -23,7 +23,7 @@ export function StakingInfo() {
 export function Staking(props: StakingProviderProps) {
 
     const [expanded, expand] = useState(false);
-
+    
     return <Box onClick={() => {
         expand(true);
     }}>

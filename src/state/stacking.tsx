@@ -49,8 +49,6 @@ export interface StakingContextType {
 
 }
 
-const StakingContext = createContext<StakingContextType>(null);
-
 export interface StakingProviderProps {
     children?: ReactNode,
     config: Config,
@@ -58,6 +56,16 @@ export interface StakingProviderProps {
 }
 
 export function StakingProvider({ children, config, nfts }: StakingProviderProps) {
+
+    // const [contextObject, setContextObject] = useState<string|null>(null);
+
+    let context_uid = "staking_ctx_"+config.stacking_config.toBase58();
+
+    if (window[context_uid] == null) {
+        window[context_uid] = createContext<StakingContextType>(null);
+        // setContextObject(context_uid)
+        console.log("setting context object for uid",context_uid);
+    }
 
     const [platform, setPlatform] = useState<Platform | null>(getPlatformInfoFromCache(config.stacking_config));
     const [nftMultMap, setMultMap] = useState<RankMultiplyerMap | null>(null);
@@ -227,19 +235,22 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     useEffect(() => {
 
         if (curInterval != null) {
+
+            toast.info('cleared previous update interval');
+
             clearInterval(curInterval);
         }
 
         if (stackedNfts.length > 0) {
             setCurInterval(setInterval(() => {
 
-                try {
-                    // calc inco me 
-                    let income = 0;
+                // calc inco me 
+                let income = 0;
 
-                    const curTimestamp = (new Date()).getTime() / 1000;
+                const curTimestamp = (new Date()).getTime() / 1000;
 
-                    for (var it of stackedNfts) {
+                for (var it of stackedNfts) {
+                    try {
 
                         const perDay = incomePerNftCalculator(fromStakeReceipt(it));
 
@@ -260,22 +271,23 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                         // else {
                         // console.log(' -- staked item diff is 0?. item\'s last claim. now ',it.lastClaim.toNumber(),new Date().getTime()/1000)
                         // }
+                    } catch (e) {
+                        console.error(`got an error while updaing rewards: ${e.message}`)
                     }
-
-                    let incomeNewValue = income;
-
-                    if (incomeNewValue == 0) {
-                        console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
-                    }
-
-                    setPendingRewards(incomeNewValue);
-                } catch (e) {
-                    console.error(`got an error while updaing rewards: ${e.message}`)
                 }
+
+                let incomeNewValue = income;
+
+                if (incomeNewValue == 0) {
+                    console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
+                }
+
+                setPendingRewards(incomeNewValue);
+
 
             }, 15000));
         }
-    }, [stackedNfts])
+    }, [stackedNfts,nfts])
 
     useEffect(() => {
 
@@ -306,7 +318,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
                         const incomePerStakedItem = diff * income_per_minute;
 
-                        console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
+                        console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals, nfts[0].name)
 
                         income += incomePerStakedItem;
                     }
@@ -509,16 +521,22 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         activity
     ]);
 
+    let context = window[context_uid];
+
+    if (context != null) {
     return (
-        <StakingContext.Provider value={memoedValue}>
+        <context.Provider value={memoedValue}>
             {children}
-        </StakingContext.Provider>
+        </context.Provider>
     )
+    } else {
+        <>{children}</>
+    }
 }
 
-export function useStaking() {
+export function useStaking(uid: string) : StakingContextType {
 
-    const staking = useContext(StakingContext)
+    const staking = useContext(window["staking_ctx_"+uid]) as StakingContextType
 
     if (staking == null) {
         console.warn(
