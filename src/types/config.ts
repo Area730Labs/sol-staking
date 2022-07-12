@@ -44,7 +44,7 @@ export function fromJson(object: any): Config {
 
         main_image: object.main_image,
         label : object.label,
-        rewards_update_interval_ms : object.rewards_update_interval_ms
+        rewards_update_interval_ms : object.rewards_update_interval_ms,
     }
 }
 

@@ -7,14 +7,14 @@ import { TxHandler } from "../blockchain/handler";
 import { CurrentTx, getCurrentTx, storeCurrentTx } from "./currenttx"
 import { getLanguageFromCache, Lang } from "../components/langselector";
 import global_config from '../config.json'
-import { getAllNfts, getStakedNfts } from "../blockchain/nfts";
-import { getMinimumBalanceForRentExemptAccount } from "@solana/spl-token";
 import * as phantom from "@solana/wallet-adapter-phantom";
 import { WalletReadyState } from "@solana/wallet-adapter-base";
 import { StakingReceipt, StakingReceiptJSON } from "../blockchain/idl/accounts/StakingReceipt";
 import { getOrConstruct } from "../types/cacheitem";
 import { get_cached_nfts_of_wallet } from "./user";
-import Nft from "../types/Nft";
+import { createRpcWrapper, execRpcTask, QueuedRpcRequest, SolanaRpc } from "../rpc";
+import { getStakedNfts } from "../blockchain/nfts";
+import moment from "moment";
 
 export type RankMultiplyerMap = { [key: string]: number }
 export type NftsSelectorTab = "stake" | "unstake"
@@ -46,54 +46,6 @@ export interface AppContextType {
     allNonStakedNfts: PublicKey[]
 }
 
-export interface SolanaRpc {
-
-    getProgramAccounts(
-        programId: PublicKey,
-        configOrCommitment?: web3.GetProgramAccountsConfig | web3.Commitment,
-    ): Promise<
-        Array<{
-            pubkey: PublicKey;
-            account: web3.AccountInfo<Buffer>;
-        }>
-    >;
-
-    getAccountInfo(
-        publicKey: PublicKey,
-        commitment?: web3.Commitment,
-    ): Promise<web3.AccountInfo<Buffer> | null>;
-
-    getParsedTokenAccountsByOwner(
-        ownerAddress: PublicKey,
-        filter: web3.TokenAccountsFilter,
-        commitment?: web3.Commitment,
-    ): Promise<
-        web3.RpcResponseAndContext<
-            Array<{
-                pubkey: PublicKey;
-                account: web3.AccountInfo<web3.ParsedAccountData>;
-            }>
-        >
-    >;
-
-    getMinimumBalanceForRentExemptAccount(): Promise<number>,
-
-}
-
-enum QueuedRpcRequestType {
-    get_token_min_rent,
-    get_parsed_token_accs,
-    get_account_info,
-    get_program_accs,
-}
-
-interface QueuedRpcRequest {
-    type: QueuedRpcRequestType,
-    args: any[],
-    resolve: any,
-    reject: any
-}
-
 const AppContext = createContext<AppContextType>({} as AppContextType);
 
 function sleep(ms) {
@@ -117,9 +69,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     const [allNonStakedNfts, setNFts] = useState<PublicKey[]>([]);
 
     const [rpcQueue, setRpcQueue] = useState<QueuedRpcRequest[]>([]);
+    const [lastRpcRequest,setLastRpcRequestTime] = useState<number>(0);
     const [queueProcessorStarted, setStarted] = useState(false);
-
-    const [rpcQueueChanges, incRpcChanges] = useState(0);
 
     const web3Handler = useMemo(() => {
         return new web3.Connection(solanaNode, {
@@ -208,75 +159,12 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     }, [connectedWallet]);
 
     const rpc_wrapper: SolanaRpc = useMemo(() => {
-
-        if (web3Handler != null) {
-            return {
-
-                getAccountInfo(publicKey, commitment?) {
-                    return this.generate_result_promise(QueuedRpcRequestType.get_account_info, [
-                        publicKey,
-                        commitment
-                    ]);
-                },
-                getProgramAccounts(
-                    programId: PublicKey,
-                    configOrCommitment?: web3.GetProgramAccountsConfig | web3.Commitment,
-                ): Promise<
-                    Array<{
-                        pubkey: PublicKey;
-                        account: web3.AccountInfo<Buffer>;
-                    }>
-                > {
-                    return this.generate_result_promise(QueuedRpcRequestType.get_program_accs, [
-                        programId,
-                        configOrCommitment
-                    ]);
-                },
-                getParsedTokenAccountsByOwner(
-                    ownerAddress: PublicKey,
-                    filter: web3.TokenAccountsFilter,
-                    commitment?: web3.Commitment,
-                ): Promise<
-                    web3.RpcResponseAndContext<
-                        Array<{
-                            pubkey: PublicKey;
-                            account: web3.AccountInfo<web3.ParsedAccountData>;
-                        }>
-                    >
-                > {
-                    return this.generate_result_promise(QueuedRpcRequestType.get_parsed_token_accs, [
-                        ownerAddress,
-                        filter,
-                        commitment
-                    ]);
-                },
-                getMinimumBalanceForRentExemptAccount(): Promise<number> {
-                    return this.generate_result_promise(QueuedRpcRequestType.get_token_min_rent, [
-
-                    ]);
-                },
-                generate_result_promise(typ: QueuedRpcRequestType, args_value: any[]): Promise<any> {
-
-                    return new Promise<any>((resolve, reject) => {
-                        rpcQueue.push({
-                            type: typ,
-                            args: args_value,
-                            resolve: resolve,
-                            reject: reject,
-                        });
-
-                        setRpcQueue(rpcQueue);
-                        incRpcChanges(rpcQueueChanges + 1);
-                    });
-                }
-
-
-            } as SolanaRpc;
-        } else {
-            return {} as SolanaRpc;
-        }
-
-    }, [web3Handler, rpcQueueChanges])
+        return createRpcWrapper({
+            rpcQueue,
+            setRpcQueue,
+            setLastRpcRequestTime
+        });
+    }, [lastRpcRequest])
 
     // rate limitied :) solana rpc request processor
     useEffect(() => {
@@ -289,56 +177,22 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                     let task = rpcQueue.shift();
 
                     if (task != null) {
-
                         setRpcQueue(rpcQueue);
-
-                        switch (task.type) {
-                            case QueuedRpcRequestType.get_account_info: {
-
-                                web3Handler.getAccountInfo(task.args[0], task.args[1])
-                                    .then((result) => {
-                                        task.resolve(result);
-                                    }).catch((reason) => {
-                                        task.reject(reason);
-                                    });
-
-                            } break;
-
-                            case QueuedRpcRequestType.get_parsed_token_accs: {
-
-                                web3Handler.getParsedTokenAccountsByOwner(task.args[0], task.args[1], task.args[2])
-                                    .then((result) => {
-                                        task.resolve(result);
-                                    }).catch((reason) => {
-                                        task.reject(reason);
-                                    });
-                            } break;
-                            case QueuedRpcRequestType.get_program_accs: {
-
-                                web3Handler.getProgramAccounts(task.args[0], task.args[1])
-                                    .then((result) => {
-                                        task.resolve(result);
-                                    }).catch((reason) => {
-                                        task.reject(reason);
-                                    });
-                            } break;
-                            case QueuedRpcRequestType.get_token_min_rent: {
-                                getMinimumBalanceForRentExemptAccount(web3Handler, task.args[0])
-                                    .then((result) => {
-                                        task.resolve(result);
-                                    }).catch((reason) => {
-                                        task.reject(reason);
-                                    });
-
-                            } break;
-                        }
-
+                        execRpcTask(web3Handler,task);
                     }
-                    await sleep(2000);
+
+
+                    if (rpcQueue.length > 0 ) {
+                        await sleep(global_config.rpc_request_interval);
+                    } else {
+                        break;
+                    }
                 }
+
+                setStarted(false);
             })();
-        }
-    }, [web3Handler]);
+        } 
+    }, [web3Handler, lastRpcRequest]);
 
 
     function changeNftsTab(openedTab: NftsSelectorTab) {

@@ -1,11 +1,10 @@
-import { Connection, PublicKey } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import { StakingConfig } from "../blockchain/idl/accounts/StakingConfig";
 import CacheItem, { constructCacheKey, getOrConstruct } from "../types/cacheitem";
 import Platform from "../types/paltform";
 import config from "../config.json"
-import { toast } from "react-toastify";
 import { Operation } from "../types/operation";
-import { SolanaRpc } from "./app";
+import { SolanaRpc } from "../rpc";
 
 const cache_key_prefix: string = "platform_config";
 const platform_activity_cache: string = "staking_activity";

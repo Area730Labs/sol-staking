@@ -4,7 +4,7 @@ import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript
 import {InitializeStakingBumpsFields,InitializeStakingBumpsJSON,InitializeStakingBumps} from "../types/InitializeStakingBumps" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
 import {RuleFields,RuleJSON,Rule} from "../types/Rule"
-import { SolanaRpc } from "../../../state/app"
+import { SolanaRpc } from "../../../rpc"
 
 
 export interface StakingConfigFields {

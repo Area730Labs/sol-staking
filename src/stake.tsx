@@ -1,6 +1,6 @@
 import { Connection, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { toast } from "react-toastify";
-import { SolanaRpc, useAppContext } from "./state/app"
+import { useAppContext } from "./state/app"
 import Nft from "./types/Nft";
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { Box, GridItem } from "@chakra-ui/layout";
@@ -14,6 +14,7 @@ import NftSelectorGrid from "./components/nftselectorgrid";
 import React, { ReactNode } from "react";
 import global_config from "./config.json"
 import { useStaking } from "./state/stacking";
+import { SolanaRpc } from "./rpc";
 
 export interface NftsSelectorProps {
     items: Nft[]

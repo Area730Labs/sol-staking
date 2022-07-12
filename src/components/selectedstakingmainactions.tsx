@@ -233,25 +233,18 @@ export function StakingMainInfo(props: any) {
     useEffect(() => {
 
         if (curInterval != null) {
-
-            toast.info('cleared previous update interval');
             clearInterval(curInterval);
         }
 
         if (nfts != null) {
             if (stackedNfts.length > 0) {
 
-                console.log(`staked nfts count : ${config.stacking_config.toBase58()}: ${stackedNfts.length}`)
-
-                console.warn(`set income update interval. nfts len = ${nfts.length()}`)
-
                 calcIncome(staking);
 
                 setCurInterval(setInterval(() => {
                     calcIncome(staking);
                 }, config.rewards_update_interval_ms));
-            } else {
-                console.log('no staked nfts ...')
+
             }
         }
 

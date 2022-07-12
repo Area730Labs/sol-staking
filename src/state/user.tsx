@@ -1,15 +1,11 @@
-import { WalletAdapter } from "@solana/wallet-adapter-base";
-import { Connection, PublicKey } from "@solana/web3.js";
-import { StakingReceipt, StakingReceiptJSON } from "../blockchain/idl/accounts/StakingReceipt";
-import { getAllNfts, getStakedNfts } from "../blockchain/nfts";
+import { PublicKey } from "@solana/web3.js";
+import { getAllNfts } from "../blockchain/nfts";
 import { constructCacheKey, getOrConstruct } from "../types/cacheitem";
-import Nft from "../types/Nft";
 import { calcAddressWithTwoSeeds } from "../blockchain/instructions";
 
 import { Config } from "../types/config"
 import global_config from "../config.json"
-import { StakingContextType } from "./stacking";
-import { SolanaRpc } from "./app";
+import { SolanaRpc } from "../rpc";
 
 export function cleanCacheUponStake(wallet: PublicKey) {
 
@@ -26,7 +22,6 @@ export function cleanCacheUponStake(wallet: PublicKey) {
     }
 
 }
-
 
 export function getStakeOwnerForWallet(config: Config, wallet: PublicKey): Promise<PublicKey> {
 

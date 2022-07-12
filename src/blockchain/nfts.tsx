@@ -1,7 +1,7 @@
 import * as solana from '@solana/web3.js'
 import * as spl from '@solana/spl-token'
 import { StakingReceipt } from './idl/accounts/StakingReceipt';
-import { SolanaRpc } from '../state/app';
+import { SolanaRpc } from '../rpc';
 
 export async function getStakedNfts(stakingProgramId: solana.PublicKey, connection: SolanaRpc, owner: solana.PublicKey): Promise<StakingReceipt[]> {
 
