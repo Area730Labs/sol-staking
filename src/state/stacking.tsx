@@ -246,7 +246,7 @@ export function StakingProvider({ children, config, alias }: StakingProviderProp
                 }
 
                 return result;
-            }, 86400 * 30).then((map) => {
+            }, 86400 * 30,config.stacking_config.toBase58()).then((map) => {
                 setMultMap(map);
             });
         }

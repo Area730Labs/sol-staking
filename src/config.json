@@ -31,8 +31,8 @@
                "label": "Dope Apes"
           },
           "prod_1": {
-               "stacking_config_alias": "5ckMb8o4uaeG6RMYR2QpadPRtLUG3yUCV26apAWZTn5B",
-               "rewards_token_account": "Ce8XSXKQ9mkgAq3Ta5M7w8tgaJy3vYBjXjcq4R9avN7v",
+               "stacking_config_alias": "HRwDtjp5zVsEMpkjzkKfYQkgTC5vX6FRC6dyWTk6gcmC",
+               "rewards_token_account": "8kYF9PCeivjy95hoqxr2ngSQSdVx3GjxBajy7vL1VYqJ",
                "stacking_config": "9TFvLfZxRbb3G4YuECtApzjHnGZCjB5PUJ3BF4QfNEi4",
                "reward_image": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/DPuGqV7jq9PEbcRU7bWzuaJx5bGiaVj4cNWhWjTdWAKi/logo.png",
                "reward_token_name": "DOPE",

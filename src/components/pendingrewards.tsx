@@ -8,7 +8,7 @@ import { createAssociatedTokenAccountInstruction } from "@solana/spl-token";
 import { getStakeOwnerForWallet } from "../state/user";
 import { Label } from "./label";
 import { Button } from "./button";
-import { Box } from "@chakra-ui/layout";
+import { Box,Text } from "@chakra-ui/layout";
 import Countup from "./countup";
 import appTheme from "../state/theme"
 
@@ -18,6 +18,8 @@ export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, sta
     const { stackedNfts, config } = stakingctx;
 
     let ixs = [];
+
+    console.log('pending rewards for staking ... ',config.stacking_config.toBase58(),config.stacking_config_alias);
 
     // check if stake owner is created before
     const stakeOwnerAddress = await getStakeOwnerForWallet(config, wallet.publicKey);
@@ -50,6 +52,7 @@ export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, sta
 
         }
     }).then(() => {
+
         ixs.push(createClaimStakeOwnerIx(config, wallet.publicKey, stakeOwnerAddress, rewardsTokenMint));
 
         sendTx(ixs, 'claim').catch((e) => {
@@ -63,12 +66,12 @@ export function ClaimPendingRewardsButton(props: any) {
 
     const ctx = useAppContext();
     const staking = useStaking();
-    const { setModalVisible, setTaxModal } = useModal();
+    const { setModalVisible, setTaxModal,setModalContent } = useModal();
 
     async function claimPendingRewardsHandler() {
-
         if (ctx.wallet == null || ctx.wallet.publicKey == null) {
-            toast.info('No wallet connected. Use Stake button for now');
+            setModalContent(<Text><Label>Connect your wallet first</Label></Text>)
+            setModalVisible(true);
         } else {
             const [taxed, totalTax] = staking.getTaxedItems();
 

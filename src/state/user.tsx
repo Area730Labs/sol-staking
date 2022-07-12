@@ -35,7 +35,7 @@ export function getStakeOwnerForWallet(config: Config, wallet: PublicKey): Promi
         )
 
         return Promise.resolve(stakeOwnerAddress);
-    }, 86400 * 365, wallet.toBase58()).then((val) => {
+    }, 86400 * 365, wallet.toBase58(), config.stacking_config.toBase58()).then((val) => {
         if (typeof val == "string") {
             return new PublicKey(val);
         } else {

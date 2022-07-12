@@ -300,6 +300,9 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         if (global_config.debug_simulate_tx) {
             toast.warn("simulation of tx enabled. look into console for more info")
             txhandler.simulate(ixs, signers);
+
+            return Promise.reject(new Error("simulation enabled, look into console"));
+
         } else {
             return txhandler.sendTransaction(ixs, signers).then((signature) => {
 
