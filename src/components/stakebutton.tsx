@@ -4,11 +4,14 @@ import { useModal } from "../state/modal";
 import { WalletConnectButton } from "./walletconnect";
 import { Button } from "./button";
 import { Label } from "./label";
+import { NftSelectorTabs } from "./nftstab";
+import { useStaking } from "../state/stacking";
 
 export default function StakeButton(props: any) {
 
     const { wallet, setNftsTab } = useAppContext();
     const { setModalContent, setModalVisible } = useModal();
+    const staking_context = useStaking();
 
     function stakeHandler() {
 
@@ -22,6 +25,15 @@ export default function StakeButton(props: any) {
             </Box>)
 
             setModalVisible(true);
+        } else {
+
+            setModalContent(<Box>
+                <NftSelectorTabs staking={staking_context} />
+            </Box>)
+
+            setModalVisible(true);
+
+          
         }
     }
 

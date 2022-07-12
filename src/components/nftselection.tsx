@@ -6,18 +6,19 @@ import { CheckIcon } from "@chakra-ui/icons";
 import { Image } from "@chakra-ui/image";
 import { useAppContext } from "../state/app";
 import config from "../config.json";
-import { useStaking } from "../state/stacking";
+import { StakingContextType, useStaking } from "../state/stacking";
 
 export interface NftSelectionProps {
   item: Nft
   borderSize?: number
   onSelect?: { (pubkey: Nft, state: boolean): boolean }
+  staking : StakingContextType
 }
 
 export function NftSelection(props: NftSelectionProps | any) {
 
   const ctx = useAppContext();
-  const staking = useStaking();
+  const staking = props.staking
 
   const [selected, setSelected] = useState<boolean>(false);
   const [mult, setMult] = useState(0);

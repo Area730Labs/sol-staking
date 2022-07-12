@@ -13,7 +13,7 @@ import { Button } from "./components/button";
 import NftSelectorGrid from "./components/nftselectorgrid";
 import React, { ReactNode } from "react";
 import global_config from "./config.json"
-import { useStaking } from "./state/stacking";
+import { StakingContextType, useStaking } from "./state/stacking";
 import { SolanaRpc } from "./rpc";
 
 export interface NftsSelectorProps {
@@ -30,6 +30,7 @@ export interface NftsSelectorProps {
             selectedItems: { [key: string]: boolean }
         ): Promise<any>
     },
+    staking: StakingContextType
 
 }
 
@@ -103,7 +104,8 @@ export default function NftsSelector(props: NftsSelectorProps) {
                 maxH='280px'
                 borderRadius={appTheme.borderRadius}
                 transition={appTheme.transition}
-                backgroundColor={"whiteAlpha.100"}></GridItem>)
+                backgroundColor={"whiteAlpha.100"}>
+                </GridItem>)
         }
     }
 
@@ -111,6 +113,7 @@ export default function NftsSelector(props: NftsSelectorProps) {
         <NftSelectorGrid>
             {items && items.map((it, idx) => {
                 return <NftSelection
+                    staking={props.staking}
                     key={idx}
                     item={it}
                     position="relative"

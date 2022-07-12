@@ -6,7 +6,7 @@ import global_config from "./config.json"
 
 export default function EmptyRow() {
 
-    const maxPerRow = global_config.max_nfts_per_row;
+    const maxPerRow = global_config.selector_max_nft_per_row;
     const nftsPlaceholders = [];
 
     // @todo use nft layout 

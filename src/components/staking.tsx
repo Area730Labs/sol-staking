@@ -28,18 +28,13 @@ export function StakingInfo() {
 
 export function Staking(props: StakingProviderProps) {
 
-    const [expanded, expand] = useState(false);
+    // const [expanded, expand] = useState(false);
 
-    console.log('staking redraw');
+    // console.log('staking redraw');
 
-    return <Box onClick={() => {
-        expand(true);
-    }}>
+    return <Box>
         <StakingProvider alias={props.alias} config={props.config}>
             <StakingMainInfo marginTop="10" p="3" />
-            <Fadeable isVisible={expanded}>
-                <NftSelectorTabs />
-            </Fadeable>
         </StakingProvider>
     </Box>
 }

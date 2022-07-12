@@ -1,10 +1,5 @@
-import { useDisclosure } from "@chakra-ui/hooks";
 import { Box, Flex } from "@chakra-ui/layout";
-import { propNames, SystemStyleObject } from "@chakra-ui/styled-system";
-import { ChakraProps } from "@chakra-ui/system";
-import { SlideFade } from "@chakra-ui/transition";
 import { useEffect, useMemo, useState } from "react";
-import { Button } from "./button";
 import appTheme from "../state/theme"
 
 interface ModalStyles {
@@ -93,8 +88,9 @@ export default function Modal(props: ModalStyles & any ) {
                     // width="40vw"
                     borderRadius={appTheme.borderRadius}
                     p="8"
-                    // height={["90%","400px","600px"]}
-                    backgroundColor="white"
+                    height={["90%","500px"]}
+                    // backgroundColor="white"
+                    backgroundColor={appTheme.themeColorAlpha(0.95)}
                     color="black"
                     zIndex="101"
                     transition="all .2s ease"
