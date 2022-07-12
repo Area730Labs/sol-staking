@@ -6,16 +6,18 @@ import { Button } from "./button";
 import { Label } from "./label";
 import { NftSelectorTabs } from "./nftstab";
 import { useStaking } from "../state/stacking";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 export default function StakeButton(props: any) {
 
     const { wallet, setNftsTab } = useAppContext();
     const { setModalContent,modalVisible, modalContentId,showLoginModal,showModalContentId } = useModal();
     const staking_context = useStaking();
-    const {stackedNfts,nftsInWallet} = staking_context;
+    const {stackedNfts,nftsInWallet,config} = staking_context;
 
-    const content_id = "wallet_nfts";
+    const content_id = useMemo(() => {
+        return "wallet_nfts" + config.stacking_config.toBase58();
+    },[config.stacking_config]);
 
     useEffect(() => {
         if (modalVisible && modalContentId == content_id) {

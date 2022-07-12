@@ -348,48 +348,10 @@ export function StakingMainInfo(props: any) {
             <GridItem>
                 <InfoColumn minW="240px" alignItems="flex-start">
                     <Text fontSize={["xl", "xl", "sm"]} fontWeight="bold"><Label>Actions</Label></Text>
-                    {/* <Box
-                        minH="64px"
-                        minW="280px"
-                        borderRadius={appTheme.borderRadius}
-                        backgroundColor="whiteAlpha.200"
-                        textAlign="center"
-                        verticalAlign="center"
-                        display="flex"
-                    >
-                        <Label >Stake</Label>
-                    </Box>
-                    <Box
-                        minH="64px"
-                        minW="280px"
-                        borderRadius={appTheme.borderRadius}
-                        backgroundColor="whiteAlpha.200"
-                        textAlign="center"
-                    >
-                        Claim pending
-                    </Box> */}
                     <StakeButton borderRadius={appTheme.borderRadiusXl} />
                     <ClaimPendingRewardsButton borderRadius={appTheme.borderRadiusXl} />
                     <PendingRewards />
                     {/* <DevButtons /> */}
-
-                    {/* 
-                    <Text fontSize="sm" fontWeight="bold"><Label>Activity feed</Label></Text>
-                    <HistoryAction textAlign="left">
-                        <Text >
-                            <Label>Total Claimed</Label>
-                        </Text>
-                        <Text fontSize="xl">{23833.93}</Text>
-                    </HistoryAction>
-                    <HistoryAction>
-                        <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> staked
-                    </HistoryAction>
-                    <HistoryAction>
-                        <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> withdrawed
-                    </HistoryAction> */}
-                    {/* <HistoryAction>
-    <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> claimed
-</HistoryAction> */}
                 </InfoColumn>
             </GridItem>
         </Grid>

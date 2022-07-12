@@ -121,8 +121,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
         } else {
 
-            console.log("app: calc staked + non staked nfts");
-
             get_cached_nfts_of_wallet(global_config.disable_cache, connectedWallet.publicKey, rpc_wrapper).then(response => {
                 setNFts(response);
             }).catch(e => {
@@ -149,7 +147,6 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                 return result;
             }).then(items => {
                 setStakedReceipts(items);
-                console.log(`global staked receipts length : ${items.length}`)
                 setNftsChanges(nfstChanges+1);
             }).catch(e => {
                 console.error('unable to set global staking receipts holder : '+e.message)

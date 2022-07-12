@@ -36,8 +36,6 @@ export default function Modal(props: ModalStyles & any ) {
 
     useEffect(() => {
 
-        console.log(`visible effect ${visible}`)
-
         if (visible) {
             setAvisible(true);
             setTimeout(function () {
