@@ -1,6 +1,6 @@
 import { Button as CButton, ButtonProps } from "@chakra-ui/button";
 import { useStyleConfig } from "@chakra-ui/system";
-
+import appTheme from "../state/theme"
 
 // darker blue: backgroundColor: "rgb(64,78,237)"
 
@@ -15,6 +15,7 @@ interface ButtonStyle {
     boxShadow: string
     bRadius: number
     fontWeight: string
+    border: string
 }
 
 export function Button(props: ButtonProps | SbuttonArgs | any) {
@@ -27,13 +28,6 @@ export function Button(props: ButtonProps | SbuttonArgs | any) {
     let textColor = "black";
     let hcolor = "blue";
     let hbg = "whitesmoke";
-
-    if (props.typ == "black") {
-        bgc = "black";
-        textColor = "white";
-        hbg = "rgb(35 39 42)"
-        hcolor = "whitesmoke";
-    }
 
     const curSize: string = props.size ?? "default";
 
@@ -72,6 +66,16 @@ export function Button(props: ButtonProps | SbuttonArgs | any) {
         sStyle = default_style;
     }
 
+    if (props.typ == "black") {
+        bgc = "black";
+        textColor = "white";
+        hbg = "rgb(35 39 42)"
+        hcolor = "whitesmoke";
+
+        sStyle.border = "1px solid "+appTheme.stressColor2
+    }
+
+
     return <CButton
         textAlign="center"
         px={sStyle.px}
@@ -79,6 +83,7 @@ export function Button(props: ButtonProps | SbuttonArgs | any) {
         cursor="pointer"
         fontWeight={sStyle.fontWeight}
         borderRadius={sStyle.bRadius}
+        border={sStyle.border}
         color={textColor}
         fontSize={sStyle.fontSize}
         fontFamily="sans-serif"
