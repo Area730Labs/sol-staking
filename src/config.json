@@ -51,7 +51,7 @@
           "platform": 15,
           "wallet_nfts": 60
      },
-     "disable_cache": true,
+     "disable_cache": false,
      "debug_simulate_tx": false,
      "max_items_per_stake": 3,
      "max_items_per_unstake": 5,
