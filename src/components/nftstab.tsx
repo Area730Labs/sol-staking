@@ -1,11 +1,10 @@
-import { Flex, Text, Box, HStack } from "@chakra-ui/layout";
+import { Flex, Text, Box } from "@chakra-ui/layout";
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import React from "react";
 import { toast } from "react-toastify";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 import { createClaimIx, createStakeNftIx, createStakeOwnerIx, createUnstakeNftIx } from "../blockchain/instructions";
-import EmptyRow from "../emptyrow";
 import NftsSelector from "../stake";
 import { useAppContext } from "../state/app";
 import { getStakeOwnerForWallet } from "../state/user";
@@ -14,9 +13,8 @@ import config from "../config.json"
 import MainPageContainer from "./mainpagecontainer";
 import { Button } from "./button";
 import { Label } from "./label";
-import { StakingContextType, useStaking } from "../state/stacking";
+import { StakingContextType } from "../state/stacking";
 import { SolanaRpc } from "../rpc";
-import Nft from "../types/Nft";
 
 export interface NftsTabProps {
     heading: JSX.Element
@@ -105,12 +103,8 @@ export function StakedNftsListTab(props: NftTabContentProps) {
     }
 
     const items = stackedNfts.map((it, idx) => {
-        console.log(' --- staked nft : ',it.mint.toBase58());
         return fromStakeReceipt(it);
     });
-
-    console.log('staked nfts :',nfts.length())
-
 
     return <NftsTab emptyLabel={<Label>no NFT's to unstake</Label>} heading={<><Label>YOUR STAKED NFT'S</Label>. Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="black" backgroundColor={appTheme.stressColor2}>{pretty(dailyRewards)}  {config.reward_token_name}</Box> per day</>}>
         {items.length > 0 ? <NftsSelector  staking={props.staking} maxChunk={props.maxSelection} items={items} actionHandler={unstakeSelectedItems} actionLabel={<Label>Unstake selected</Label>} /> : null}

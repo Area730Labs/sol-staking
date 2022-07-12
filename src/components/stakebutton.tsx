@@ -6,12 +6,25 @@ import { Button } from "./button";
 import { Label } from "./label";
 import { NftSelectorTabs } from "./nftstab";
 import { useStaking } from "../state/stacking";
+import { useEffect } from "react";
 
 export default function StakeButton(props: any) {
 
     const { wallet, setNftsTab } = useAppContext();
-    const { setModalContent, setModalVisible } = useModal();
+    const { setModalContent, setModalVisible,modalVisible } = useModal();
     const staking_context = useStaking();
+    const {stackedNfts,nftsInWallet} = staking_context;
+
+    useEffect(() => {
+        if (modalVisible) {
+
+            console.log('updating modal content ... ')
+
+            setModalContent(<Box>
+                <NftSelectorTabs staking={staking_context} />
+            </Box>)
+        }
+    },[modalVisible,stackedNfts,nftsInWallet]);
 
     function stakeHandler() {
 
@@ -26,14 +39,7 @@ export default function StakeButton(props: any) {
 
             setModalVisible(true);
         } else {
-
-            setModalContent(<Box>
-                <NftSelectorTabs staking={staking_context} />
-            </Box>)
-
             setModalVisible(true);
-
-          
         }
     }
 

@@ -88,7 +88,7 @@ export default function Modal(props: ModalStyles & any ) {
                     // width="40vw"
                     borderRadius={appTheme.borderRadius}
                     p="8"
-                    height={["90%","500px"]}
+                    height="100%"
                     // backgroundColor="white"
                     backgroundColor={appTheme.themeColorAlpha(0.95)}
                     color="black"
@@ -102,12 +102,13 @@ export default function Modal(props: ModalStyles & any ) {
                     right={0}
                     left={0}
                     bottom={0}
+                    overflow="auto"
                 >
                     {props.children}
                 </Box></Flex>
         </Box>;
 
-    }, [styles, actualVisible]);
+    }, [styles, actualVisible,props.children]);
 
 
     return result;

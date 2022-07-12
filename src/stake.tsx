@@ -121,10 +121,31 @@ export default function NftsSelector(props: NftsSelectorProps) {
                 >
                 </NftSelection>
             })}
+            {items && items.map((it, idx) => {
+                return <NftSelection
+                    staking={props.staking}
+                    key={idx}
+                    item={it}
+                    position="relative"
+                    onSelect={selectionHandler}
+                >
+                </NftSelection>
+            })}
+            {items && items.map((it, idx) => {
+                return <NftSelection
+                    staking={props.staking}
+                    key={idx}
+                    item={it}
+                    position="relative"
+                    onSelect={selectionHandler}
+                >
+                </NftSelection>
+            })}
             {nftsPlaceholders.map((it, idx) => {
                 return it;
             })}
         </NftSelectorGrid>
+        <Box position="static">
         <Fadeable
             isVisible={selectedItemsPopupVisible}
             fadesize={7}
@@ -156,5 +177,6 @@ export default function NftsSelector(props: NftsSelectorProps) {
             </Button>
             {/* <Button>Cancel</Button> */}
         </Fadeable>
+        </Box>
     </Box>
 }
