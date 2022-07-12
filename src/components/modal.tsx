@@ -1,5 +1,6 @@
 import { Box, Flex } from "@chakra-ui/layout";
 import { useEffect, useMemo, useState } from "react";
+import { useModal } from "../state/modal";
 import appTheme from "../state/theme"
 
 interface ModalStyles {
@@ -21,6 +22,10 @@ export default function Modal(props: ModalStyles & any ) {
 
     const [actualVisible, setAvisible] = useState(false);
     const [firstInit, setFirstInit] = useState<boolean>(true);
+
+    const {modalStyles} = useModal();
+
+    const bgColorValue = (modalStyles.backgroundColor ?? appTheme.themeColorAlpha(0.95)) as string;
 
     const [styles, setStyles] = useState<ModalStyles>({
         opacity: 0,
@@ -89,8 +94,7 @@ export default function Modal(props: ModalStyles & any ) {
                     borderRadius={appTheme.borderRadius}
                     p="8"
                     height="100%"
-                    // backgroundColor="white"
-                    backgroundColor={appTheme.themeColorAlpha(0.95)}
+                    backgroundColor={bgColorValue}
                     color="black"
                     zIndex="101"
                     transition="all .2s ease"

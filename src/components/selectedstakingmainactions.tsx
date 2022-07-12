@@ -313,8 +313,9 @@ export function StakingMainInfo(props: any) {
 
     return <MainPageContainer {...props}
         _hover={{
-            backgroundColor: "whiteAlpha.100"
+            backgroundColor: "whiteAlpha.200"
         }}
+        backgroundColor="whiteAlpha.100"
         transition={appTheme.transition}
         borderRadius={appTheme.borderRadiusXl}
     >

@@ -1,4 +1,4 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box, CSSObject, Text } from "@chakra-ui/react";
 import { createContext, ReactNode, useContext, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { WalletConnectButton } from "../components/walletconnect";
@@ -15,6 +15,10 @@ export interface ModalContextType {
 
     showLoginModal()
     showModalContentId(contentId: string)
+
+    // styles
+    modalStyles: CSSObject,
+    setModalStyles(CSSObject)
 }
 
 const ModalContext = createContext<ModalContextType>({} as ModalContextType);
@@ -26,7 +30,7 @@ export function ModalProvider({ children }: { children: ReactNode; }) {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalContent, setModalContent] = useState<JSX.Element | null>(null);
     const [modalContentId, setModalContentId] = useState<string>("");
-
+    const [modalStyles,setModalStyles] = useState<CSSObject>({});
 
     function showModalContentId(contentName: string) {
         setModalContentId(contentName);
@@ -51,7 +55,11 @@ export function ModalProvider({ children }: { children: ReactNode; }) {
             modalContentId,
             setModalContentId,
             showLoginModal,
-            showModalContentId
+            showModalContentId,
+
+            // styles
+            modalStyles,
+            setModalStyles
         } as ModalContextType;
 
         return value;

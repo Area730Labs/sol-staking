@@ -17,7 +17,7 @@ import { UnstakeTaxModal } from "./unstaketax";
 export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, stakingctx: StakingContextType) {
 
     const { wallet, solanaConnection, sendTx } = appctx;
-    const { stackedNfts, config } = stakingctx;
+    const { stackedNfts, config,setPendingRewards } = stakingctx;
 
     let ixs = [];
 
@@ -59,8 +59,9 @@ export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, sta
 
         sendTx(ixs, 'claim').catch((e) => {
             toast.error(`Unable to claim: ${e.message}`)
+        }).then(() => {
+            setPendingRewards(0);
         })
-
     });
 }
 
