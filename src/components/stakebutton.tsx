@@ -11,35 +11,28 @@ import { useEffect } from "react";
 export default function StakeButton(props: any) {
 
     const { wallet, setNftsTab } = useAppContext();
-    const { setModalContent, setModalVisible,modalVisible } = useModal();
+    const { setModalContent,modalVisible, modalContentId,showLoginModal,showModalContentId } = useModal();
     const staking_context = useStaking();
     const {stackedNfts,nftsInWallet} = staking_context;
 
+    const content_id = "wallet_nfts";
+
     useEffect(() => {
-        if (modalVisible) {
-
-            console.log('updating modal content ... ')
-
+        if (modalVisible && modalContentId == content_id) {
             setModalContent(<Box>
                 <NftSelectorTabs staking={staking_context} />
             </Box>)
         }
-    },[modalVisible,stackedNfts,nftsInWallet]);
+    },[modalVisible,stackedNfts,nftsInWallet,modalContentId]);
 
     function stakeHandler() {
 
         setNftsTab("stake");
 
         if (wallet == null) {
-            
-            setModalContent(<Box>
-                <Text fontSize="xl">Connect your wallet first</Text>
-                <WalletConnectButton />
-            </Box>)
-
-            setModalVisible(true);
+            showLoginModal();
         } else {
-            setModalVisible(true);
+            showModalContentId(content_id);
         }
     }
 

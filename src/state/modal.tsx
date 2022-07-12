@@ -1,5 +1,7 @@
+import { Box, Text } from "@chakra-ui/react";
 import { createContext, ReactNode, useContext, useMemo, useState } from "react";
 import { toast } from "react-toastify";
+import { WalletConnectButton } from "../components/walletconnect";
 
 export interface ModalContextType {
     // modal state
@@ -8,20 +10,36 @@ export interface ModalContextType {
     modalContent: JSX.Element | null
     setModalContent: any
 
-    // tax modal
-    taxModal: boolean
-    setTaxModal: any
+    modalContentId: string
+    setModalContentId(string)
+
+    showLoginModal()
+    showModalContentId(contentId: string)
 }
 
 const ModalContext = createContext<ModalContextType>({} as ModalContextType);
+
+const login_modal_content_id = "login_modal";
 
 export function ModalProvider({ children }: { children: ReactNode; }) {
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalContent, setModalContent] = useState<JSX.Element | null>(null);
+    const [modalContentId, setModalContentId] = useState<string>("");
 
-    // ? 
-    const [taxModal, setTaxModal] = useState(false);
+
+    function showModalContentId(contentName: string) {
+        setModalContentId(contentName);
+        setModalVisible(true);
+    }
+
+    function showLoginModal() {
+        setModalContent(<Box>
+            <Text fontSize="xl">Connect your wallet first</Text>
+            <WalletConnectButton />
+        </Box>)
+        showModalContentId(login_modal_content_id);
+    }
 
     const ctx = useMemo(() => {
 
@@ -30,12 +48,14 @@ export function ModalProvider({ children }: { children: ReactNode; }) {
             setModalVisible,
             modalContent,
             setModalContent,
-            taxModal,
-            setTaxModal,
+            modalContentId,
+            setModalContentId,
+            showLoginModal,
+            showModalContentId
         } as ModalContextType;
 
         return value;
-    }, [modalVisible, modalContent, taxModal]);
+    }, [modalVisible, modalContent]);
 
     return <ModalContext.Provider value={ctx}>
         {children}

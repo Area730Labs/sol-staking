@@ -11,6 +11,8 @@ import { Button } from "./button";
 import { Box,Text } from "@chakra-ui/layout";
 import Countup from "./countup";
 import appTheme from "../state/theme"
+import { useEffect } from "react";
+import { UnstakeTaxModal } from "./unstaketax";
 
 export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, stakingctx: StakingContextType) {
 
@@ -66,18 +68,29 @@ export function ClaimPendingRewardsButton(props: any) {
 
     const ctx = useAppContext();
     const staking = useStaking();
-    const { setModalVisible, setTaxModal,setModalContent } = useModal();
+    const { setModalVisible,setModalContent,setModalContentId,modalContentId,modalVisible,showLoginModal } = useModal();
+
+    const content_id = "unstake_tax";
+
+    const {stackedNfts} = staking;
+
+    useEffect(() => {
+
+        if (modalVisible && modalContentId == content_id) {
+            setModalContent(<UnstakeTaxModal staking={staking}/>)
+        }
+
+    },[modalVisible, modalContentId,stackedNfts])
 
     async function claimPendingRewardsHandler() {
         if (ctx.wallet == null || ctx.wallet.publicKey == null) {
-            setModalContent(<Text><Label>Connect your wallet first</Label></Text>)
-            setModalVisible(true);
+            showLoginModal();
         } else {
             const [taxed, totalTax] = staking.getTaxedItems();
 
             if (totalTax > 0) {
-                setTaxModal(true);
                 setModalVisible(true);
+                setModalContentId(content_id);
             } else {
                 claimPendingrewardsHandlerImpl(ctx, staking);
             }
