@@ -36,7 +36,6 @@ export interface NftsSelectorProps {
 export default function NftsSelector(props: NftsSelectorProps) {
 
     const { wallet, solanaConnection } = useAppContext();
-    const { config } = useStaking();
 
     const [selectedItems, setSelectedItems] = React.useState<{ [key: string]: boolean }>({});
     const [selectedItemsCount, setSelectedItemsCount] = React.useState(0);
@@ -127,7 +126,6 @@ export default function NftsSelector(props: NftsSelectorProps) {
             isVisible={selectedItemsPopupVisible}
             fadesize={7}
 
-            position="fixed" bottom="20px"
             left="0"
             right="0"
 

@@ -35,7 +35,7 @@ export function getMerkleTree(staking: StakingContextType): MerkleTree {
 
     const leaves = buildLeaves(
         staking.nfts.order.map((e, i) => {
-            let item = staking.nfts.items[e];
+            let item = staking.nfts.get(new PublicKey(e));
             return item;
         })
     );
@@ -81,7 +81,7 @@ export function createStakeNftIx(config: StakingContextType, mint: PublicKey, ow
         (e) => e === mint.toBase58()
     );
 
-    const nftToStake = config.nfts[indexStaked];
+    const nftToStake = config.nfts.get(mint);
 
     if (indexStaked == -1) {
         toast.warn(`This is not whitelisted nft : ${mint.toBase58()}`)

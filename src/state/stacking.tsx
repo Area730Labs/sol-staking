@@ -98,7 +98,7 @@ export class NftBag {
         return this.order.length;
     }
 
-    get(mint: PublicKey): any | null {
+    get(mint: PublicKey): Nft | null {
 
         let it = this.items[mint.toBase58()];
         

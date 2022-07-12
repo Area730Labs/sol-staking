@@ -43,7 +43,7 @@ export function App() {
               <LangSelector />
             </Box>
           </Grid>
-          <Box>
+          <Box paddingBottom="200px">
             <Staking alias="gen1" config={fromJson(global_config.env.prod)} />
             <Staking alias="babies" config={fromJson(global_config.env.prod_1)} />
           </Box>
