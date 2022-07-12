@@ -154,26 +154,6 @@ export default function NftsSelector(props: NftsSelectorProps) {
                 >
                 </NftSelection>
             })}
-            {items && items.map((it, idx) => {
-                return <NftSelection
-                    staking={props.staking}
-                    key={idx}
-                    item={it}
-                    position="relative"
-                    onSelect={selectionHandler}
-                >
-                </NftSelection>
-            })}
-            {items && items.map((it, idx) => {
-                return <NftSelection
-                    staking={props.staking}
-                    key={idx}
-                    item={it}
-                    position="relative"
-                    onSelect={selectionHandler}
-                >
-                </NftSelection>
-            })}
             {nftsPlaceholders.map((it, idx) => {
                 return it;
             })}
