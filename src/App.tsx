@@ -15,6 +15,7 @@ import { fromJson } from "./types/config"
 import LangSelector from "./components/langselector"
 import global_config from "./config.json"
 import AppMainModal from "./appmainmodal"
+import bg from "./data/bg.jpeg"
 
 import appTheme from "./state/theme"
 
@@ -37,10 +38,16 @@ export function App() {
     <AppProvider>
       <ModalProvider>
         <AppMainModal />
-        <Box backgroundColor={appTheme.themeColor}>
+        <Box 
+        // backgroundColor={appTheme.themeColor}
+        backgroundImage={bg}
+        backgroundPosition="center"
+        // backgroundRepeat="repeat-y"
+        // background-clip="padding-box"
+        >
           <Grid p={3} pb="0">
             <Box justifySelf="flex-end" fontSize="sm">
-              <LangSelector />
+              {/* <LangSelector /> */}
             </Box>
           </Grid>
           <Box paddingBottom="200px">
