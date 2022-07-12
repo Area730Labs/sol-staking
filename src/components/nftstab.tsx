@@ -99,6 +99,8 @@ export function StakedNftsListTab(props: NftTabContentProps) {
     const { stackedNfts, dailyRewards, config, pretty, fromStakeReceipt, nfts } = props.staking;
     const { sendTx } = useAppContext();
 
+    const {staking} = props;
+
     async function unstakeSelectedItems(
         wallet: WalletAdapter,
         solanaConnection: SolanaRpc,
@@ -150,7 +152,7 @@ export function StakedNftsListTab(props: NftTabContentProps) {
     const nftSelectorContent = useMemo(() => {
         if (items.length > 0) {
             return <NftsSelector
-                staking={props.staking}
+                staking={staking}
                 maxChunk={props.maxSelection}
                 items={items}
                 actionHandler={unstakeSelectedItems}
@@ -159,8 +161,7 @@ export function StakedNftsListTab(props: NftTabContentProps) {
         } else {
             return null;
         }
-    }, [items]);
-
+    }, [items,staking]);
 
     return <NftsTab emptyLabel={<Label>no NFT's to unstake</Label>} heading={headingBlock}>
         {nftSelectorContent}
