@@ -49,8 +49,6 @@ export function ModalProvider({ children }: { children: ReactNode; }) {
             })
         }
 
-        console.log(" --- setting modal content id ",contentName);
-
         setModalContentId(contentName);
         setModalVisible(true);
     }
