@@ -1,7 +1,7 @@
 import { Flex, Text, Box } from "@chakra-ui/layout";
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
-import React from "react";
+import React, { useMemo } from "react";
 import { toast } from "react-toastify";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 import { createClaimIx, createStakeNftIx, createStakeOwnerIx, createUnstakeNftIx } from "../blockchain/instructions";
@@ -36,13 +36,13 @@ export function NftsTab(props: NftsTabProps) {
 
 interface NftTabContentProps {
     maxSelection: number,
-    staking : StakingContextType
+    staking: StakingContextType
 }
 
 export function StakeNftsListTab(props: NftTabContentProps) {
 
-    const { sendTx, setNftsTab } = useAppContext();
-    const {staking}  = props;
+    const { sendTx, setNftsTab, nftsTab } = useAppContext();
+    const { staking } = props;
     const items = staking.nftsInWallet;
 
     function stakeSelectedItems(
@@ -62,14 +62,41 @@ export function StakeNftsListTab(props: NftTabContentProps) {
         });
     }
 
-    return <NftsTab emptyLabel={<Label>no NFT's to stake</Label>} heading={<><Label>NFT'S IN YOUR WALLET</Label>. <Box alignSelf="flex-end" display="inline-block" paddingLeft="4">go to<Button marginLeft="2" typ="black" size="sm" onClick={() => setNftsTab("unstake")}><Label>Staked</Label></Button></Box></>}>
-        {items.length > 0 ? <NftsSelector staking={staking} maxChunk={props.maxSelection} items={items} actionHandler={stakeSelectedItems} actionLabel={<Label>Stake selected</Label>} /> : null}
+    const headingBlock = useMemo(() => {
+        return <>
+            <Label>NFT'S IN YOUR WALLET</Label>.
+            <Box
+                alignSelf="flex-end"
+                display="inline-block"
+                paddingLeft="4">go to<Button marginLeft="2" typ="black" size="sm" onClick={() => setNftsTab("unstake")}><Label>Staked</Label>
+                </Button>
+            </Box>
+        </>;
+    }, [nftsTab]);
+
+
+    const nftSelectorContent = useMemo(() => {
+        if (items.length > 0) {
+            return <NftsSelector
+                staking={staking}
+                maxChunk={props.maxSelection}
+                items={items}
+                actionHandler={stakeSelectedItems}
+                actionLabel={<Label>Stake selected</Label>}
+            />
+        } else {
+            return null;
+        }
+    }, [items]);
+
+    return <NftsTab emptyLabel={<Label>no NFT's to stake</Label>} heading={headingBlock}>
+        {nftSelectorContent}
     </NftsTab>
 }
 
 export function StakedNftsListTab(props: NftTabContentProps) {
 
-    const { stackedNfts, dailyRewards, config, pretty, fromStakeReceipt,nfts } = props.staking;
+    const { stackedNfts, dailyRewards, config, pretty, fromStakeReceipt, nfts } = props.staking;
     const { sendTx } = useAppContext();
 
     async function unstakeSelectedItems(
@@ -102,12 +129,41 @@ export function StakedNftsListTab(props: NftTabContentProps) {
         });
     }
 
-    const items = stackedNfts.map((it, idx) => {
-        return fromStakeReceipt(it);
-    });
+    const items = useMemo(() =>  {
+        return stackedNfts.map((it, idx) => {
+            return fromStakeReceipt(it);
+        })
+    },[stackedNfts]);
 
-    return <NftsTab emptyLabel={<Label>no NFT's to unstake</Label>} heading={<><Label>YOUR STAKED NFT'S</Label>. Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="black" backgroundColor={appTheme.stressColor2}>{pretty(dailyRewards)}  {config.reward_token_name}</Box> per day</>}>
-        {items.length > 0 ? <NftsSelector  staking={props.staking} maxChunk={props.maxSelection} items={items} actionHandler={unstakeSelectedItems} actionLabel={<Label>Unstake selected</Label>} /> : null}
+
+    const headingBlock = <>
+        <Label>YOUR STAKED NFT'S</Label>. Earning 
+            <Box 
+                display="inline-block" 
+                p="1.5" 
+                borderRadius="17px" 
+                color="black" 
+                backgroundColor={appTheme.stressColor2}>{pretty(dailyRewards)}  {config.reward_token_name}
+            </Box> per day
+    </>
+
+    const nftSelectorContent = useMemo(() => {
+        if (items.length > 0) {
+            return <NftsSelector
+                staking={props.staking}
+                maxChunk={props.maxSelection}
+                items={items}
+                actionHandler={unstakeSelectedItems}
+                actionLabel={<Label>Unstake selected</Label>}
+            />
+        } else {
+            return null;
+        }
+    }, [items]);
+
+
+    return <NftsTab emptyLabel={<Label>no NFT's to unstake</Label>} heading={headingBlock}>
+        {nftSelectorContent}
     </NftsTab>
 }
 

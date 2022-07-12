@@ -65,19 +65,21 @@ export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, sta
     });
 }
 
+export const unstake_modal_content_id = "unstake_tax";
+
 export function ClaimPendingRewardsButton(props: any) {
 
     const ctx = useAppContext();
     const staking = useStaking();
-    const { setModalVisible,setModalContent,setModalContentId,modalContentId,modalVisible,showLoginModal } = useModal();
+    const { setModalContent,modalContentId,modalVisible,showLoginModal,showModalContentId } = useModal();
 
-    const content_id = "unstake_tax";
+
 
     const {stackedNfts} = staking;
 
     useEffect(() => {
 
-        if (modalVisible && modalContentId == content_id) {
+        if (modalVisible && modalContentId == unstake_modal_content_id) {
             setModalContent(<UnstakeTaxModal staking={staking}/>)
         }
 
@@ -90,8 +92,7 @@ export function ClaimPendingRewardsButton(props: any) {
             const [taxed, totalTax] = staking.getTaxedItems();
 
             if (totalTax > 0) {
-                setModalVisible(true);
-                setModalContentId(content_id);
+                showModalContentId(unstake_modal_content_id);
             } else {
                 claimPendingrewardsHandlerImpl(ctx, staking);
             }

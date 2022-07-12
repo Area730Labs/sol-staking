@@ -109,7 +109,40 @@ export default function NftsSelector(props: NftsSelectorProps) {
         }
     }
 
-    return <Box position="relative">
+    return <Box >
+                <Fadeable
+            isVisible={selectedItemsPopupVisible}
+            fadesize={7}
+
+            left="0"
+            right="0"
+
+            margin="0 auto"
+            position="fixed"
+            top="20px"
+
+            width={["100%", "350px", "500px"]}
+            zIndex="20"
+            backgroundColor="whiteAlpha.900"
+            alignSelf="stretch"
+            color="black"
+            p="4"
+            borderRadius={appTheme.borderRadius}>
+
+            <Button typ="black" onClick={performActionWithSelectedItems}>{action_label} <Box
+                display="inline"
+                right="-15px"
+                top="-15px"
+                p="1"
+                px="2.5"
+                width="8"
+                backgroundColor={appTheme.stressColor}
+                borderRadius="50%"
+            >{selectedItemsCount}</Box>
+
+            </Button>
+            {/* <Button>Cancel</Button> */}
+        </Fadeable>
         <NftSelectorGrid>
             {items && items.map((it, idx) => {
                 return <NftSelection
@@ -145,38 +178,5 @@ export default function NftsSelector(props: NftsSelectorProps) {
                 return it;
             })}
         </NftSelectorGrid>
-        <Box position="static">
-        <Fadeable
-            isVisible={selectedItemsPopupVisible}
-            fadesize={7}
-
-            left="0"
-            right="0"
-
-            margin="0 auto"
-
-            width={["100%", "350px", "500px"]}
-            zIndex="20"
-            backgroundColor="whiteAlpha.900"
-            alignSelf="stretch"
-            color="black"
-            p="4"
-            borderRadius={appTheme.borderRadius}>
-
-            <Button typ="black" onClick={performActionWithSelectedItems}>{action_label} <Box
-                display="inline"
-                right="-15px"
-                top="-15px"
-                p="1"
-                px="2.5"
-                width="8"
-                backgroundColor={appTheme.stressColor}
-                borderRadius="50%"
-            >{selectedItemsCount}</Box>
-
-            </Button>
-            {/* <Button>Cancel</Button> */}
-        </Fadeable>
-        </Box>
     </Box>
 }
