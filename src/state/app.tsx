@@ -168,26 +168,51 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         if (!queueProcessorStarted) {
             setStarted(true);
 
-            (async () => {
-                for (; ;) {
+            let promiseResolved = false;
+            const queueuPromise = new Promise((resolve, reject) => {
+                (async () => {
 
-                    let task = rpcQueue.shift();
-
-                    if (task != null) {
-                        setRpcQueue(rpcQueue);
-                        execRpcTask(web3Handler,task);
+                    for (; ;) {
+    
+                        let task = rpcQueue.shift();
+    
+                        if (task != null) {
+                            setRpcQueue(rpcQueue);
+                            execRpcTask(web3Handler,task);
+                        }
+    
+    
+                        if (rpcQueue.length > 0 ) {
+                            await sleep(global_config.rpc_request_interval);
+                        } else {
+                            break;
+                        }
                     }
+    
+                    resolve(true);
+                    promiseResolved = true;
+                    setStarted(false);
+                })();
+            });
 
-
-                    if (rpcQueue.length > 0 ) {
-                        await sleep(global_config.rpc_request_interval);
-                    } else {
-                        break;
-                    }
+            setTimeout(function() {
+                if (!promiseResolved) {
+                    toast.promise(queueuPromise, {
+                        pending: 'loading',
+                        success: {
+                            icon: Icons.success,
+                            render() {
+                                return "done"
+                            }
+                        },
+                        error: 'unable to load data. refresh page and try again',
+                    }, {
+                        theme: "dark",
+                        hideProgressBar: false,
+                    } as ToastOptions);
                 }
+            },800);
 
-                setStarted(false);
-            })();
         } 
     }, [web3Handler, lastRpcRequest]);
 
