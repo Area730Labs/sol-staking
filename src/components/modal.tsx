@@ -14,7 +14,6 @@ export interface ModalProps {
     setVisible : any
 }
 
-
 export default function Modal(props: ModalStyles & any ) {
 
     const visible = props.isVisible 
@@ -25,7 +24,7 @@ export default function Modal(props: ModalStyles & any ) {
 
     const {modalStyles} = useModal();
 
-    const bgColorValue = (modalStyles.backgroundColor ?? appTheme.themeColorAlpha(0.95)) as string;
+    const bgColorValue = (modalStyles.backgroundColor ?? appTheme.themeColor) as string;
 
     const [styles, setStyles] = useState<ModalStyles>({
         opacity: 0,

@@ -11,7 +11,7 @@ import { Button } from "./button";
 import { Box,Text } from "@chakra-ui/layout";
 import Countup from "./countup";
 import appTheme from "../state/theme"
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { UnstakeTaxModal } from "./unstaketax";
 
 export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, stakingctx: StakingContextType) {
@@ -65,25 +65,24 @@ export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, sta
     });
 }
 
-export const unstake_modal_content_id = "unstake_tax";
-
 export function ClaimPendingRewardsButton(props: any) {
 
     const ctx = useAppContext();
     const staking = useStaking();
     const { setModalContent,modalContentId,modalVisible,showLoginModal,showModalContentId } = useModal();
 
+    const {stackedNfts,config} = staking;
 
-
-    const {stackedNfts} = staking;
+    const unstake_modal_content_id =  useMemo(() => {
+        return "unstake_tax" + config.stacking_config.toBase58();
+    },[config.stacking_config]);
 
     useEffect(() => {
-
         if (modalVisible && modalContentId == unstake_modal_content_id) {
+            console.log('update staking modal : ',config.stacking_config.toBase58())
             setModalContent(<UnstakeTaxModal staking={staking}/>)
         }
-
-    },[modalVisible, modalContentId,stackedNfts])
+    },[modalVisible, modalContentId,stackedNfts,unstake_modal_content_id])
 
     async function claimPendingRewardsHandler() {
         if (ctx.wallet == null || ctx.wallet.publicKey == null) {

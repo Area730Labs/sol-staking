@@ -1,7 +1,6 @@
 import { Box, CSSObject, Text } from "@chakra-ui/react";
 import { createContext, ReactNode, useContext, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import { unstake_modal_content_id } from "../components/pendingrewards";
 import { WalletConnectButton } from "../components/walletconnect";
 import appTheme from "../state/theme"
 
@@ -37,15 +36,20 @@ export function ModalProvider({ children }: { children: ReactNode; }) {
     function showModalContentId(contentName: string) {
 
         // hardcod fix
-        if (contentName == unstake_modal_content_id) {
+
+        const prefix = "unstake_tax";
+        
+        if (contentName.indexOf(prefix) == 0) {
             setModalStyles({
                 backgroundColor:"white"
             });
         } else {
             setModalStyles({
-                backgroundColor:appTheme.themeColorAlpha(0.95)
+                backgroundColor:appTheme.themeColor
             })
         }
+
+        console.log(" --- setting modal content id ",contentName);
 
         setModalContentId(contentName);
         setModalVisible(true);
