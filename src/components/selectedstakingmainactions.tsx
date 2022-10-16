@@ -1,4 +1,4 @@
-import { Box, Container, HStack, Text, VStack, Grid, GridItem, Flex } from "@chakra-ui/layout";
+import { Box, Container, HStack, Text, VStack, Grid, GridItem, Flex, Spacer } from "@chakra-ui/layout";
 import DailyRewardValue from "../dailyrewardvalue";
 import { DevButtons } from "../dev";
 import TotalClaimed from "../totalclaimed";
@@ -97,29 +97,27 @@ function HistoryOperation(props: HistoryOperationProps) {
         }
     }
 
-    return <Grid
+    return <Flex
         position="relative"
-        templateColumns='repeat(5, 1fr)'
-        justifyContent="stretch"
-        placeItems="center stretch"
     >
-        <GridItem colSpan={3} justifySelf="start">
-            <Grid templateRows="repeat(2,1fr)" gap={2}>
-                <Box justifySelf={"start"}>
-                    <Text display="inline" fontWeight="bold"><Label>{props.label}</Label></Text>
-                    <Text display="inline" color="#c7c7c7"> {props.time ? <Moment fromNow date={props.time} /> : null}</Text>
+        <Flex>
+            <Flex gap={2} flexDirection='column' alignItems='flex-start'>
+                <Box>
+                    <Text display="inline" fontWeight="bold" fontSize='18px'><Label>{props.label}</Label></Text>
+                    <Text display="inline" color="black" fontSize='14px'> {props.time ? <Moment fromNow date={props.time} /> : null}</Text>
                 </Box>
                 <Address addr={props.performer} shortLength={8} />
-            </Grid>
-        </GridItem>
-        <GridItem justifySelf="start">
+            </Flex>
+        </Flex>
+        <Spacer/>
+        <Box >
             {props.middleContent}
-        </GridItem>
-        <GridItem justifySelf="end" >
+        </Box>
+        <Box>
             {childContent}
-        </GridItem>
+        </Box>
 
-    </Grid>
+    </Flex>
 }
 
 export function ClaimOperation({ operation: object }: { operation: Operation }) {
@@ -130,6 +128,7 @@ export function ClaimOperation({ operation: object }: { operation: Operation }) 
         position="absolute"
         top="10px"
         opacity={0.9}
+        zIndex='5'
         backgroundColor={appTheme.stressColor2} fontWeight="bold" color="black" p="6px" borderRadius={appTheme.borderRadiusXl}>
         <Text textAlign="left" fontSize={"md"}>+ {pretty(object.value)}</Text>
     </Box>
@@ -141,13 +140,18 @@ export function ClaimOperation({ operation: object }: { operation: Operation }) 
             borderRadius="50%"
         >
             <Box
-                backgroundImage={"url(" + config.reward_image + ")"}
+                
                 backgroundSize="100%"
                 backgroundPosition="center"
                 borderRadius="50%"
-                height="50px"
-                width="50px"
-            ></Box>
+                border='2px solid black'
+                height="70px"
+                width="70px"
+            >
+                <Box height="47px"
+                marginTop='10px' marginLeft='8px'
+                width="47px" backgroundSize='contain' backgroundImage={process.env.PUBLIC_URL + '/logo512.png'}></Box>
+            </Box>
         </Box>
     </HistoryOperation>
 }
