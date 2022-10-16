@@ -45,7 +45,6 @@ export default function NftsSelector(props: NftsSelectorProps) {
     const max_selection = props.maxChunk;
 
     function selectionHandler(item: Nft, state: boolean): boolean {
-
         if (state && selectedItemsCount == max_selection) {
 
             toast.warn(props.maxSelectedMsg ?? "max item selected, deselect first")
@@ -122,37 +121,5 @@ export default function NftsSelector(props: NftsSelectorProps) {
                 return it;
             })}
         </NftSelectorGrid>
-        <Fadeable
-            isVisible={selectedItemsPopupVisible}
-            fadesize={7}
-
-            position="fixed" bottom="20px"
-            left="0"
-            right="0"
-
-            margin="0 auto"
-
-            width={["100%", "350px", "500px"]}
-            zIndex="20"
-            backgroundColor="whiteAlpha.900"
-            alignSelf="stretch"
-            color="black"
-            p="4"
-            borderRadius={appTheme.borderRadius}>
-
-            <Button typ="black" onClick={performActionWithSelectedItems}>{action_label} <Box
-                display="inline"
-                right="-15px"
-                top="-15px"
-                p="1"
-                px="2.5"
-                width="8"
-                backgroundColor={appTheme.stressColor}
-                borderRadius="50%"
-            >{selectedItemsCount}</Box>
-
-            </Button>
-            {/* <Button>Cancel</Button> */}
-        </Fadeable>
     </Box>
 }

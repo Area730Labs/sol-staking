@@ -88,7 +88,7 @@ export function Staking(props: StakingProviderProps) {
                 <NftSelectorTabs />
             </Fadeable>
 
-            <Footer></Footer>
+            <Footer/>
         </StakingProvider>
     </Box>
 }

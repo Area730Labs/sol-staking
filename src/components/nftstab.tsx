@@ -15,6 +15,7 @@ import MainPageContainer from "./mainpagecontainer";
 import { Button } from "./button";
 import { Label } from "./label";
 import { useStaking } from "../state/stacking";
+import Nft from "../types/Nft";
 
 export interface NftsTabProps {
     heading: JSX.Element
@@ -42,7 +43,42 @@ export function StakeNftsListTab(props: NftTabContentProps) {
 
     const { sendTx, setNftsTab } = useAppContext();
     const staking = useStaking();
-    const { nftsInWallet, config } = staking;
+    const { config } = staking;
+
+
+    const nftsInWallet: Nft[] = [
+        {
+            address: new PublicKey("7xkNyQH8xyfKeDnWuSjFvuFAQA22odY9JCsmJfY9oUbN"),
+            name: "Solmads OG Pass #209",
+            image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/6kNSZRefRxGsCUgccL-eE8gIj-hLcitQpLlh19vI3eo",
+        },
+        {
+            address: new PublicKey("5gf8U7nWGoTb9s9VrEUoTsMgCVYXjZn3UykMjzSGLTUq"),
+            name: "Solmads OG Pass #111",
+            image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/gRHy0kzQkzlZf-GS7EauOG13vZ8d9VT9vNU9J_ABuvo"
+        },
+        {
+            address: new PublicKey("AEoTin5HbEekwFhvHcHAqGaeuLz2PS562jFZsPM1Gvjc"),
+            "name": "Solmads OG Pass #1",
+            image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/vzdQhvB_aHW4x3rLAeoOxUsMytTzXXpcIrfCwscXjCI"
+        },
+        {
+            address: new PublicKey("7xkNyQH8xyfKeDnWuSjFvuFAQA22odY9JCsmJfY9oUbN"),
+            name: "Solmads OG Pass #209",
+            image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/6kNSZRefRxGsCUgccL-eE8gIj-hLcitQpLlh19vI3eo",
+        },
+        {
+            address: new PublicKey("5gf8U7nWGoTb9s9VrEUoTsMgCVYXjZn3UykMjzSGLTUq"),
+            name: "Solmads OG Pass #111",
+            image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/gRHy0kzQkzlZf-GS7EauOG13vZ8d9VT9vNU9J_ABuvo"
+        },
+        {
+            address: new PublicKey("AEoTin5HbEekwFhvHcHAqGaeuLz2PS562jFZsPM1Gvjc"),
+            "name": "Solmads OG Pass #1",
+            image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/vzdQhvB_aHW4x3rLAeoOxUsMytTzXXpcIrfCwscXjCI"
+        }
+    ];
+
 
     function stakeSelectedItems(
         wallet: WalletAdapter,
@@ -64,7 +100,7 @@ export function StakeNftsListTab(props: NftTabContentProps) {
     const heading = (
         <Flex flexDirection='column' alignItems='self-start' gap='5px'>
             <Text fontSize='35px'>NFT'S IN YOUR WALLET</Text>
-            <Box  display="inline-block" paddingLeft="4">Go to<Button marginLeft="2" typ="black" size="sm" onClick={() => setNftsTab("unstake")}><Label>Staked</Label></Button></Box>
+            <Box display="inline-block" paddingLeft="4">Go to<Button marginLeft="2" typ="black" size="sm" onClick={() => setNftsTab("unstake")}><Label>Staked</Label></Button></Box>
         </Flex>
     );
 
@@ -116,10 +152,10 @@ export function StakedNftsListTab(props: NftTabContentProps) {
         <Flex flexDirection='column' alignItems='self-start' gap='5px'>
             <Text fontSize='35px'>YOUR STAKED NFTs</Text>
             <Box>
-            Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="white" backgroundColor='#5E301D'>{pretty(dailyRewards)}  {config.reward_token_name}</Box> per day
+                Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="white" backgroundColor='#5E301D'>{pretty(dailyRewards)}  {config.reward_token_name}</Box> per day
             </Box>
         </Flex>
-    ); 
+    );
 
     return <NftsTab emptyLabel={<Label>No NFT's to unstake</Label>} heading={heading}>
         {items.length > 0 ? <NftsSelector maxChunk={props.maxSelection} items={items} actionHandler={unstakeSelectedItems} actionLabel={<Label>Unstake selected</Label>} /> : null}
