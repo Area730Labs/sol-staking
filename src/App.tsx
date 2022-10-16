@@ -93,14 +93,25 @@ export function App() {
     <AppProvider>
       <ModalProvider>
         <AppMainModal />
-        <Box backgroundColor={appTheme.themeColor} minHeight='100vh' display='flex' flexDirection='column' justifyContent='space-between'>
+        <Box
+          position="relative"
+          // backgroundColor={appTheme.themeColor} 
+          minHeight='100vh' display='flex' flexDirection='column' justifyContent='space-between'>
+          <Box
+            height="920px"
+            width="100%"
+            position="absolute"
+            style={{ background: "linear-gradient(180.01deg, rgba(234, 204, 157, 0.61) 0.01%, rgba(234, 204, 157, 0.21) 28.86%, rgba(234, 204, 157, 0.160166) 59.07%, rgba(234, 204, 157, 0) 84.02%)" }}
+          >
+
+          </Box>
           <Flex padding='10px' paddingTop='0px' gap='10px' height='126px'>
             <Box marginTop='23px'>
-            <img src={process.env.PUBLIC_URL + '/logo512.png'} />
+              <img src={process.env.PUBLIC_URL + '/logo512.png'} />
             </Box>
-              <Spacer/>
-              <LangSelector />
-              <Button marginTop='29px' padding='0px' height='67px' width='141px' borderRadius='0.375rem' border='1px solid #717579'><Text fontSize='27px' fontWeight='bold'>Connect</Text></Button>
+            <Spacer />
+            <LangSelector />
+            <Button marginTop='29px' padding='0px' height='67px' width='141px' borderRadius='0.375rem' border='1px solid #717579'><Text fontSize='27px' fontWeight='bold'>Connect</Text></Button>
           </Flex>
 
 
@@ -109,27 +120,27 @@ export function App() {
           </Box>
 
           <Box position='fixed' bottom='0px' left='0px' as="footer" width='100%' height='170px' role="contentinfo" padding='20px 20px 15px 20px' backgroundColor='#ffffff'>
-              <Flex direction='column' width='100%' height='100%' alignItems='center'>
-                <Button width='310px' border='3px solid black' marginTop='15px'>
-                  <Flex gap='15px' alignItems='center'>
+            <Flex direction='column' width='100%' height='100%' alignItems='center'>
+              <Button width='310px' border='3px solid black' marginTop='15px'>
+                <Flex gap='15px' alignItems='center'>
                   Unstake selected <Box color='white' width='36px' height='36px' fontWeight='bold' borderRadius='18px' backgroundColor='black' lineHeight='36px'>1</Box>
-                  </Flex>
-                </Button>
-                <Spacer/>
-                <Flex direction='row' gap='25px' width='100%'>
-                  <Text color="#9A9CA1" fontSize='16px'>Copyright© 2022. All right reserved.</Text>
-                  <Text cursor='pointer' color="#9A9CA1" fontSize='16px' textDecoration='underline'>Help</Text>
-                  <Text cursor='pointer' color="#9A9CA1" fontSize='16px' textDecoration='underline'>Privacy</Text>
-                  <Text cursor='pointer' color="#9A9CA1" fontSize='16px' textDecoration='underline'>Messages</Text>
-                  
-                  <Spacer/>
-
-                  <Box cursor='pointer'><TelegramComponent/></Box>
-                  <Box cursor='pointer'><TwitterComponent/></Box>
-                  <Box cursor='pointer'><DiscordComponent/></Box>
-
                 </Flex>
+              </Button>
+              <Spacer />
+              <Flex direction='row' gap='25px' width='100%'>
+                <Text color="#9A9CA1" fontSize='16px'>Copyright© 2022. All right reserved.</Text>
+                <Text cursor='pointer' color="#9A9CA1" fontSize='16px' textDecoration='underline'>Help</Text>
+                <Text cursor='pointer' color="#9A9CA1" fontSize='16px' textDecoration='underline'>Privacy</Text>
+                <Text cursor='pointer' color="#9A9CA1" fontSize='16px' textDecoration='underline'>Messages</Text>
+
+                <Spacer />
+
+                <Box cursor='pointer'><TelegramComponent /></Box>
+                <Box cursor='pointer'><TwitterComponent /></Box>
+                <Box cursor='pointer'><DiscordComponent /></Box>
+
               </Flex>
+            </Flex>
 
           </Box>
         </Box>

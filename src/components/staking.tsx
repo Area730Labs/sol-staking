@@ -40,9 +40,9 @@ export function Staking(props: StakingProviderProps) {
     return <Box>
         <StakingProvider config={props.config} nfts={props.nfts}>
             <Flex direction='column' width='100%' justifyContent='center' alignItems='center'>
-
                 <Box position="relative">
                     <Flex zIndex="1"
+                        position="relative"
                         width={rewardsBlockWidth}
                         height={rewardsBlockHeight}
                         backgroundColor='white'
@@ -52,11 +52,11 @@ export function Staking(props: StakingProviderProps) {
                         justifyContent='center'
                         alignItems='center'
                     >
-                        <TotalClaimed fontFamily="Londrina Solid" fontWeight='bold' fontSize='90px'/>
-                        <Text  fontWeight='bold' fontFamily="Outfit" fontSize='37px' color='#8F949A'><Label>Total claimed reward</Label></Text>
+                        <TotalClaimed fontFamily="Londrina Solid" fontWeight='bold' fontSize='90px' />
+                        <Text fontWeight='bold' fontFamily="Outfit" fontSize='37px' color='#8F949A'><Label>Total claimed reward</Label></Text>
                     </Flex>
                     <Box
-                        zIndex="-1"
+                        zIndex="0"
                         position="absolute"
                         top="6px"
                         left="6px"
