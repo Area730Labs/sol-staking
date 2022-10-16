@@ -64,8 +64,8 @@ export function NftSelection(props: NftSelectionProps | any) {
   return <GridItem
     cursor="pointer"
     // ='100%'
-    w="280px"
-    h='345px'
+    w="310px"
+    h='370px'
     borderRadius='15px'
     boxShadow="xl"
     border={border}
@@ -120,15 +120,19 @@ function MultiplicationWithSuggestion(props: { value: number, children: any }) {
 
   if (props.value > 1) {
     return <Box
-      borderRadius="20px"
-      background={!isHovering ? appTheme.stressColor : appTheme.stressColor2}
-      boxShadow="dark-lg"
-      color={!isHovering ? "white" : "black"}
+      borderRadius="30px"
+      // background={!isHovering ? appTheme.stressColor : appTheme.stressColor2}
+      background='#EACC9D'
+      // boxShadow="dark-lg"
+      // color={!isHovering ? "white" : "black"}
+      color='#5E301D'
       fontWeight="bold"
       p="2"
+      minWidth='60px'
       position="absolute"
       right="-10px"
       top="-15px"
+      fontSize='22px'
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >

@@ -134,7 +134,7 @@ export function NftSelectorTabs() {
     //     setFirstShowup(false);
     // }, [nftsTabCounter]);
 
-    return <MainPageContainer paddingY="20px" paddingBottom="40" marginBottom='100px'>
+    return <MainPageContainer  paddingY="20px" paddingBottom="40" marginBottom='100px' overflow='initial' >
         <Tabs variant='solid-rounded' colorScheme='teal'>
             <TabList>
                 <Tab onClick={() => {
@@ -145,10 +145,10 @@ export function NftSelectorTabs() {
                 }}><Label>Unstake</Label></Tab>
             </TabList>
             <TabPanels marginLeft={0}>
-                <TabPanel>
+                <TabPanel padding={0}>
                     <StakeNftsListTab maxSelection={config.max_items_per_stake} />
                 </TabPanel>
-                <TabPanel>
+                <TabPanel padding={0}>
                     <StakedNftsListTab maxSelection={config.max_items_per_unstake} />
                 </TabPanel>
             </TabPanels>
