@@ -4,6 +4,7 @@ import HistoryAction from "./components/historyaction";
 import { Stat } from "./components/stat";
 import { prettyNumber } from "./data/uitls"
 import { useStaking } from "./state/stacking";
+import { Divider } from '@chakra-ui/react'
 
 export interface PlatformStats {
     totalStacked: number,
@@ -35,10 +36,12 @@ export default function StakePlatformStats() {
         }
     }, [platform]);
 
-    return <HistoryAction backgroundColor="white" color="black">
-        <HStack justify="center">
+    return <HistoryAction backgroundColor="#5E301D" color="#EACC9D" borderRadius='15px' height='90px'>
+        <HStack justify="center" height='100%'>
             <Stat value={info.itemsAvailable}>Total</Stat>
+                <Divider orientation='vertical' h='50%' borderColor='rgba(1,1,1,0,3)' />
             <Stat value={info.totalStacked}>Staked</Stat>
+                <Divider orientation='vertical'  h='50%' borderColor='rgba(1,1,1,0,3)' />
             <Stat value={prettyNumber(info.percentStaked)} units="%">Percent</Stat>
         </HStack>
     </HistoryAction>

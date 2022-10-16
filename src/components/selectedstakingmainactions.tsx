@@ -179,14 +179,18 @@ export function StakingMainInfo(props: any) {
         transition={appTheme.transition}
         borderRadius={appTheme.borderRadiusXl}
     >
-        <Grid gap={4}
+        {/* <Grid gap={4    }
             alignItems="center"
             justifyContent="center"
             templateColumns={['repeat(1, 1fr)', 'repeat(1, 1fr)', 'repeat(6, 1fr)']}
-        >
-            <GridItem colSpan={[1, 1, 3]}>
+        > */}
+        <Flex dir="row">
+            <StakingInfo />
+        </Flex>
+
+            {/* <GridItem colSpan={[1, 1, 3]}>
                 <StakingInfo />
-            </GridItem>
+            </GridItem> */}
             <GridItem>
                 <VStack textAlign="center" paddingTop="3">
                     <Text fontSize="sm" fontWeight="bold"><Label>Rewards</Label></Text>
@@ -253,7 +257,7 @@ export function StakingMainInfo(props: any) {
 </HistoryAction> */}
                 {/* </InfoColumn>
             </GridItem> */}
-        </Grid>
+        {/* </Grid> */}
     </MainPageContainer>
 
 }
