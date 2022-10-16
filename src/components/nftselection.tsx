@@ -7,6 +7,7 @@ import { Image } from "@chakra-ui/image";
 import { useAppContext } from "../state/app";
 import config from "../config.json";
 import { useStaking } from "../state/stacking";
+import { toast } from "react-toastify";
 
 export interface NftSelectionProps {
   item: Nft
@@ -20,18 +21,21 @@ export function NftSelection(props: NftSelectionProps | any) {
   const staking = useStaking();
 
   const [selected, setSelected] = useState<boolean>(false);
-  const [mult, setMult] = useState(0);
+  const [mult, setMult] = useState(2);
   const [dailyIncome, setDailyIncome] = useState(0);
 
   const nftInfo = props.item;
   const borderSize = props.borderSize ?? 4;
 
-  useEffect(() => {
-    if (staking.nftMultMap != null) {
-      setMult(staking.nftMultMap[nftInfo.address.toBase58()] / 10000)
-      setDailyIncome(staking.pretty(staking.incomePerNftCalculator(props.item)))
-    }
-  }, [staking.platform, staking.nftMultMap])
+  // useEffect(() => {
+  //   if (staking.nftMultMap != null) {
+  //     setMult(staking.nftMultMap[nftInfo.address.toBase58()] / 10000)
+  //     setDailyIncome(staking.pretty(staking.incomePerNftCalculator(props.item)))
+  //   } else {
+  //     setMult(100);
+  //     setDailyIncome(Math.random()*100)
+  //   }
+  // }, [staking.platform, staking.nftMultMap])
 
   function clickHandler() {
 
@@ -67,7 +71,7 @@ export function NftSelection(props: NftSelectionProps | any) {
     border={border}
     transition={appTheme.transition}
     _hover={{
-      boxShadow: "dark-lg",
+      boxShadow: "lg",
       border: `2.5px solid black`
     }}
     backgroundColor={"white"}//appTheme.themeColor}
