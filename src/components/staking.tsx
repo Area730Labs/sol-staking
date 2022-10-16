@@ -73,7 +73,7 @@ export function Staking(props: StakingProviderProps) {
                     ></Box>
                 </Box>
 
-                <Flex direction='row' justifyContent='center' alignItems='center' gap='15px'>
+                <Flex direction='row' justifyContent='center' alignItems='center' gap='15px' zIndex="1000">
                     <StakeButton />
                     <ClaimPendingRewardsButton />
                 </Flex>
