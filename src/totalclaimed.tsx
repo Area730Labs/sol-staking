@@ -5,12 +5,21 @@ import Countup from "./components/countup"
 import { useStaking } from "./state/stacking";
 import { Config } from "./types/config"
 import appTheme from "./state/theme"
+import { ChakraProps } from "@chakra-ui/react";
 
 function getCacheKey(config: Config) {
     return "total_claimed" + new PublicKey(config.stacking_config);
 }
 
-export default function TotalClaimed() {
+
+export interface TotalClaimedProps extends ChakraProps {
+
+}
+
+
+export default function TotalClaimed(props: any) {
+
+    const restProps = props;
 
     const { platform, config } = useStaking();
 
@@ -38,6 +47,6 @@ export default function TotalClaimed() {
             }
         }
     }, [platform,config]);
-    
-    return <Text fontWeight='bold' fontSize='50px'>{claimedValue > 0?<Countup number={claimedValue} float={true} />:0}  {config.reward_token_name}</Text>
+
+    return <Text {...restProps}>{claimedValue > 0?<Countup number={claimedValue} float={true} />:0}  {config.reward_token_name}</Text>
 }

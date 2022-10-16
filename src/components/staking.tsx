@@ -33,13 +33,40 @@ export function StakingInfo() {
 
 export function Staking(props: StakingProviderProps) {
 
+    const rewardsBlockWidth = "856px"
+    const rewardsBlockHeight = "256px"
+    const brad = "40px"
+
     return <Box>
         <StakingProvider config={props.config} nfts={props.nfts}>
             <Flex direction='column' width='100%' justifyContent='center' alignItems='center'>
-                <Flex width='600px' height='200px' backgroundColor='white' borderRadius='34px' border='4px solid black' direction='column' justifyContent='center' alignItems='center'>
-                    <TotalClaimed />
-                    <Text fontWeight='bold' fontSize='24px' color='#8F949A'><Label>Total claimed reward</Label></Text>
-                </Flex>
+
+                <Box position="relative">
+                    <Flex zIndex="1"
+                        width={rewardsBlockWidth}
+                        height={rewardsBlockHeight}
+                        backgroundColor='white'
+                        borderRadius={brad}
+                        border='6px solid black'
+                        direction='column'
+                        justifyContent='center'
+                        alignItems='center'
+                    >
+                        <TotalClaimed fontFamily="Londrina Solid" fontWeight='bold' fontSize='90px'/>
+                        <Text  fontWeight='bold' fontFamily="Outfit" fontSize='37px' color='#8F949A'><Label>Total claimed reward</Label></Text>
+                    </Flex>
+                    <Box
+                        zIndex="-1"
+                        position="absolute"
+                        top="6px"
+                        left="6px"
+                        borderRadius={brad}
+                        width={rewardsBlockWidth}
+                        height={rewardsBlockHeight}
+                        background="black"
+                        border="6px solid black"
+                    ></Box>
+                </Box>
 
                 <Flex direction='row' justifyContent='center' alignItems='center' gap='15px'>
                     <StakeButton />
