@@ -126,11 +126,15 @@ export function ClaimOperation({ operation: object }: { operation: Operation }) 
 
     const claimAmount = <Box
         position="absolute"
-        top="10px"
+        top="4px"
+        right='12px'
         opacity={0.9}
-        zIndex='5'
-        backgroundColor={appTheme.stressColor2} fontWeight="bold" color="black" p="6px" borderRadius={appTheme.borderRadiusXl}>
-        <Text textAlign="left" fontSize={"md"}>+ {pretty(object.value)}</Text>
+        zIndex='0'
+        height='68px'
+        minWidth='100px'
+        width='auto'
+        backgroundColor='#ffd085' fontWeight="bold" color="black" p="6px" borderRadius='34px' lineHeight='56px'>
+        <Text paddingLeft='15px' paddingRight='65px' textAlign="center"  color='#5E301D' fontSize='20px'>+{pretty(object.value)}</Text>
     </Box>
 
     return <HistoryOperation time={object.blockchain_time} performer={object.performer} label="claimed" middleContent={claimAmount}>
@@ -140,10 +144,13 @@ export function ClaimOperation({ operation: object }: { operation: Operation }) 
             borderRadius="50%"
         >
             <Box
+                position='relative'
+                zIndex='1'
                 backgroundSize="100%"
                 backgroundPosition="center"
                 borderRadius="50%"
                 border='2px solid black'
+                backgroundColor='white'
                 height="70px"
                 width="70px"
             >
