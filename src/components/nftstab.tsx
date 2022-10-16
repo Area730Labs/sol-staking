@@ -117,19 +117,6 @@ export function NftSelectorTabs() {
     // const scrollRef = React.useRef<HTMLInputElement>(null);
     const [firstShowup, setFirstShowup] = React.useState(true);
 
-    // React.useEffect(() => {
-
-    //     if (firstShowup != true) {
-    //         if (scrollRef.current) {
-    //             scrollRef.current.scrollIntoView({
-    //                 behavior: "smooth"
-    //             });
-    //         }
-    //     }
-
-    //     setFirstShowup(false);
-    // }, [nftsTabCounter]);
-
     return <MainPageContainer paddingY="10" paddingBottom="40">
         <Box></Box>
         {nftsTab === "stake" ?

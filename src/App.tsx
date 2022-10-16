@@ -59,7 +59,13 @@ export function App() {
           >
             <Lines></Lines>
           </Box>
-          <Flex padding='10px' paddingTop='0px' gap='10px' height='126px' position="relative" zIndex="20">
+          <Flex 
+            padding='10px' 
+            paddingTop='0px' 
+            gap='10px' 
+            height='126px' 
+            position="relative" 
+            zIndex="2001">
             <Box marginTop='23px'>
               <img src={process.env.PUBLIC_URL + '/logo512.png'} />
             </Box>
