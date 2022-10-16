@@ -24,9 +24,10 @@ export function StakingInfo() {
 
     const { config } = useStaking();
 
-    return <VStack alignItems="flex-start">
+    return <VStack alignItems="flex-start" minW='350px'>
         <Text fontWeight="bold" fontSize='30px' color='black'>{config.label}</Text>
         <MainImage />
+        <Box height='2px'/>
         <StakePlatformStats />
     </VStack>
 }

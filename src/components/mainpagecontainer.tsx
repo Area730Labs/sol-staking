@@ -6,7 +6,7 @@ export default function MainPageContainer(props: any) {
 
     return (
         <Container
-            maxW='container.lg'
+            maxW='990px'
             color='white'
             zIndex="10"
             textAlign="center"
