@@ -48,6 +48,7 @@ export interface StakingContextType {
     platform_staked: PublicKey[],
 
     stakeModalContext: NftSelectorContext
+    stakedModalContext: NftSelectorContext
 }
 
 const StakingContext = createContext<StakingContextType>(null);
@@ -73,14 +74,17 @@ export interface NftSelectorContext {
 
 export function StakingProvider({ children, config, nfts }: StakingProviderProps) {
 
-
     // selection context
-
     const [selectedItems, setSelectedItems] = useState<{ [key: string]: boolean }>({});
     const [selectedItemsCount, setSelectedItemsCount] = useState(0);
     const [selectedItemsPopupVisible, setSelectedPopupVisible] = useState(false);
 
+    // staked
+    const [sselectedItems, ssetSelectedItems] = useState<{ [key: string]: boolean }>({});
+    const [sselectedItemsCount, ssetSelectedItemsCount] = useState(0);
+    const [sselectedItemsPopupVisible, ssetSelectedPopupVisible] = useState(false);
 
+    const [tab, setTab] = useState<string>("staking");
     const [platform, setPlatform] = useState<Platform | null>(getPlatformInfoFromCache(config.stacking_config));
     const [nftMultMap, setMultMap] = useState<RankMultiplyerMap | null>(null);
     const [userNfts, updateNfts] = useState<Nft[]>([]);
@@ -479,7 +483,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         return [result, totalTax];
     }
 
-    const stakeModalContext: NftSelectorContext = useMemo( () => {
+    const stakeModalContext: NftSelectorContext = useMemo(() => {
         const result: NftSelectorContext = {
             selectedItems: selectedItems,
             setSelectedItems: setSelectedItems,
@@ -490,13 +494,30 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         };
 
         return result;
-    },[selectedItems,selectedItemsCount,selectedItemsPopupVisible]);
+    }, [selectedItems, selectedItemsCount, selectedItemsPopupVisible]);
+
+
+
+    const stakedModalContext: NftSelectorContext = useMemo(() => {
+        const result: NftSelectorContext = {
+            selectedItems: sselectedItems,
+            setSelectedItems: ssetSelectedItems,
+            selectedItemsCount: sselectedItemsCount,
+            setSelectedItemsCount: ssetSelectedItemsCount,
+            selectedItemsPopupVisible: sselectedItemsPopupVisible,
+            setSelectedPopupVisible: ssetSelectedPopupVisible
+        };
+
+        return result;
+    }, [sselectedItems, sselectedItemsCount, sselectedItemsPopupVisible]);
+
 
     const memoedValue = useMemo(() => {
 
         const result: StakingContextType = {
 
             stakeModalContext: stakeModalContext,
+            stakedModalContext,
 
             // user wallet nfts
             nftsInWallet: userNfts,
@@ -532,7 +553,9 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         pendingRewards, userNfts, stackedNfts,
         nftMultMap,
         activity,
-        stakeModalContext
+        // modals contexts
+        stakeModalContext, stakedModalContext,
+        tab
     ]);
 
     return (

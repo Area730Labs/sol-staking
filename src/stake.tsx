@@ -13,13 +13,15 @@ import { Button } from "./components/button";
 import NftSelectorGrid from "./components/nftselectorgrid";
 import React, { ReactNode } from "react";
 import global_config from "./config.json"
-import { useStaking } from "./state/stacking";
+import { NftSelectorContext, useStaking } from "./state/stacking";
 
 export interface NftsSelectorProps {
     items: Nft[]
 
     maxChunk: number
     maxSelectedMsg?: string
+
+    modalState: NftSelectorContext
 
     actionLabel: ReactNode
     actionHandler: {
@@ -35,7 +37,9 @@ export interface NftsSelectorProps {
 export default function NftsSelector(props: NftsSelectorProps) {
 
     const { wallet, solanaConnection } = useAppContext();
-    const { config, stakeModalContext: {selectedItems, selectedItemsCount, selectedItemsPopupVisible, setSelectedItemsCount, setSelectedItems, setSelectedPopupVisible} } = useStaking();
+    const { config } = useStaking();
+
+    const { selectedItems, selectedItemsCount, selectedItemsPopupVisible, setSelectedItemsCount, setSelectedItems, setSelectedPopupVisible } = props.modalState;
 
     const action_label = props.actionLabel ?? ""
     const max_selection = props.maxChunk;
@@ -64,17 +68,8 @@ export default function NftsSelector(props: NftsSelectorProps) {
         }
     }
 
-    function performActionWithSelectedItems() {
-        props.actionHandler(wallet, solanaConnection, selectedItems).then((signature) => {
-            // cleanup selection
-            setSelectedItemsCount(0);
-            setSelectedItems({});
-        })
-    }
-
     React.useEffect(() => {
         if (selectedItemsCount > 0) {
-            toast.info('show visible')
             setSelectedPopupVisible(true)
         } else {
             setSelectedPopupVisible(false);

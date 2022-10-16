@@ -44,7 +44,6 @@ export function Staking(props: StakingProviderProps) {
     const rFontSize = "55px"
     const rLabelSize = "23px"
 
-
     return <Box>
         <StakingProvider config={props.config} nfts={props.nfts}>
             <Flex direction='column' width='100%' justifyContent='center' alignItems='center'>
@@ -83,11 +82,7 @@ export function Staking(props: StakingProviderProps) {
             </Flex>
 
             <StakingMainInfo marginTop="10" p="3" zIndex="2000"/>
-
-            <Fadeable isVisible={true}>
-                <NftSelectorTabs />
-            </Fadeable>
-
+            <NftSelectorTabs />
             <Footer/>
         </StakingProvider>
     </Box>

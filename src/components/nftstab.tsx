@@ -44,7 +44,7 @@ export function StakeNftsListTab(props: NftTabContentProps) {
 
     const { sendTx, setNftsTab } = useAppContext();
     const staking = useStaking();
-    const { config } = staking;
+    const { config, stakeModalContext } = staking;
 
 
     const nftsInWallet: Nft[] = [
@@ -106,13 +106,13 @@ export function StakeNftsListTab(props: NftTabContentProps) {
     );
 
     return <NftsTab emptyLabel={<Label>No NFT's to stake</Label>} heading={heading}>
-        {nftsInWallet.length > 0 ? <NftsSelector maxChunk={props.maxSelection} items={nftsInWallet} actionHandler={stakeSelectedItems} actionLabel={<Label>Stake selected</Label>} /> : null}
+        {nftsInWallet.length > 0 ? <NftsSelector modalState={stakeModalContext} maxChunk={props.maxSelection} items={nftsInWallet} actionHandler={stakeSelectedItems} actionLabel={<Label>Stake selected</Label>} /> : null}
     </NftsTab>
 }
 
 export function StakedNftsListTab(props: NftTabContentProps) {
 
-    const { stackedNfts, dailyRewards, config, pretty, fromStakeReceipt } = useStaking();
+    const { stackedNfts, dailyRewards, config, pretty, fromStakeReceipt, stakedModalContext: modalContext } = useStaking();
     const { sendTx } = useAppContext();
 
     async function unstakeSelectedItems(
@@ -159,7 +159,7 @@ export function StakedNftsListTab(props: NftTabContentProps) {
     );
 
     return <NftsTab emptyLabel={<Label>No NFT's to unstake</Label>} heading={heading}>
-        {items.length > 0 ? <NftsSelector maxChunk={props.maxSelection} items={items} actionHandler={unstakeSelectedItems} actionLabel={<Label>Unstake selected</Label>} /> : null}
+        {items.length > 0 ? <NftsSelector modalState={modalContext} maxChunk={props.maxSelection} items={items} actionHandler={unstakeSelectedItems} actionLabel={<Label>Unstake selected</Label>} /> : null}
     </NftsTab>
 }
 
@@ -186,8 +186,8 @@ export function NftSelectorTabs() {
     return <MainPageContainer paddingY="20px" paddingBottom="40" marginBottom='200px'>
         <Tabs variant='solid-rounded' colorScheme='teal'>
             <TabList>
-                <Tab>Stake</Tab>
-                <Tab>Unstake</Tab>
+                <Tab><Label>Stake</Label></Tab>
+                <Tab><Label>Unstake</Label></Tab>
             </TabList>
             <TabPanels marginLeft={0}>
                 <TabPanel>
