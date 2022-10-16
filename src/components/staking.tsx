@@ -23,7 +23,7 @@ export function StakingInfo() {
     const { config } = useStaking();
 
     return <VStack alignItems="flex-start">
-        <Text fontWeight="bold">{config.label}</Text>
+        <Text fontWeight="bold" fontSize='30px' color='black'>{config.label}</Text>
         <MainImage />
         <StakePlatformStats />
     </VStack>
@@ -50,7 +50,7 @@ export function Staking(props: StakingProviderProps) {
             <Fadeable isVisible={true}>
                 <NftSelectorTabs />
             </Fadeable>
-            
+
         </StakingProvider>
     </Box>
 }

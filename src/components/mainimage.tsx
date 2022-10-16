@@ -6,5 +6,5 @@ export default function MainImage() {
 
     const { config } = useStaking();
 
-    return <Image src={config.main_image} borderRadius={appTheme.borderRadius} width="250px" boxShadow="dark" />
+    return <Image src={config.main_image} borderRadius='15px' width="350px" boxShadow="dark"  />
 }
