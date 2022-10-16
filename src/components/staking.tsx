@@ -19,6 +19,9 @@ import { useState } from "react";
 import Fadeable from "./fadeable";
 import TotalClaimed from "../totalclaimed";
 import { Label } from "./label";
+import { Button } from "./button";
+import { DiscordComponent, TelegramComponent, TwitterComponent } from "./icons";
+import { Footer } from "./footer";
 
 export function StakingInfo() {
 
@@ -27,7 +30,7 @@ export function StakingInfo() {
     return <VStack alignItems="flex-start" minW='350px'>
         <Text fontWeight="bold" fontSize='30px' color='black'>{config.label}</Text>
         <MainImage />
-        <Box height='2px'/>
+        <Box height='2px' />
         <StakePlatformStats />
     </VStack>
 }
@@ -79,12 +82,14 @@ export function Staking(props: StakingProviderProps) {
                 </Flex>
             </Flex>
 
-            <StakingMainInfo marginTop="10" p="3" />
+            <StakingMainInfo marginTop="10" p="3" zIndex="2000"/>
 
             <Fadeable isVisible={true}>
                 <NftSelectorTabs />
             </Fadeable>
 
+            {/* footer */}
+            <Footer></Footer>
         </StakingProvider>
     </Box>
 }

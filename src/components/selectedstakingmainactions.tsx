@@ -58,7 +58,7 @@ function AllStakedNfts() {
         placeItems="center"
         gap="3"
         marginTop='7px'
-        >
+    >
         {platform_staked.slice(0, global_config.max_nfts_per_row - 1).map((object, i) =>
             <StakedSmallNft key={i} item={getNft(object)} />
         )}
@@ -109,7 +109,7 @@ function HistoryOperation(props: HistoryOperationProps) {
                 <Address addr={props.performer} shortLength={8} />
             </Flex>
         </Flex>
-        <Spacer/>
+        <Spacer />
         <Box >
             {props.middleContent}
         </Box>
@@ -140,7 +140,6 @@ export function ClaimOperation({ operation: object }: { operation: Operation }) 
             borderRadius="50%"
         >
             <Box
-                
                 backgroundSize="100%"
                 backgroundPosition="center"
                 borderRadius="50%"
@@ -149,8 +148,8 @@ export function ClaimOperation({ operation: object }: { operation: Operation }) 
                 width="70px"
             >
                 <Box height="47px"
-                marginTop='10px' marginLeft='8px'
-                width="47px" backgroundSize='contain' backgroundImage={process.env.PUBLIC_URL + '/logo512.png'}></Box>
+                    marginTop='10px' marginLeft='8px'
+                    width="47px" backgroundSize='contain' backgroundImage={process.env.PUBLIC_URL + '/logo512.png'}></Box>
             </Box>
         </Box>
     </HistoryOperation>
@@ -174,14 +173,14 @@ export function StakingMainInfo(props: any) {
     const { activity } = useStaking();
 
     const activityList = useMemo(() => {
-        return activity.slice(0,3).map((object, i) => <HistoryAction key={i} 
-        // paddingTop="4px" 
-        borderRadius='10px' 
-        padding='15px'
-        backgroundColor='white'
-        border='1px solid black'
-        height='100px'
-        color='black'
+        return activity.slice(0, 3).map((object, i) => <HistoryAction key={i}
+            // paddingTop="4px" 
+            borderRadius='10px'
+            padding='15px'
+            backgroundColor='white'
+            border='1px solid black'
+            height='100px'
+            color='black'
         >
             <OperationDecect operation={object}></OperationDecect>
         </HistoryAction>)
@@ -192,79 +191,15 @@ export function StakingMainInfo(props: any) {
         borderRadius={appTheme.borderRadiusXl}
     >
         <Flex dir="row" gap={10}>
-            <StakingInfo  />
+            <StakingInfo />
 
             <Flex flexDir="column" width='100%' alignItems='flex-start' marginTop='20px'>
                 <Text fontSize='18px' color='black' fontWeight="bold"><Label>All staked</Label></Text>
-                    <AllStakedNfts />
-                    <Text marginTop='15px' paddingBottom='7px' fontSize='18px' color='black' fontWeight="bold"><Label>Activity feed</Label></Text>
-                    {activityList}
+                <AllStakedNfts />
+                <Text marginTop='15px' paddingBottom='7px' fontSize='18px' color='black' fontWeight="bold"><Label>Activity feed</Label></Text>
+                {activityList}
             </Flex>
         </Flex>
-
-            {/* <GridItem colSpan={[1, 1, 3]}>
-                <StakingInfo />
-            </GridItem> */}
-            {/* <GridItem>
-                <VStack textAlign="center" paddingTop="3">
-                    <Text fontSize="sm" fontWeight="bold"><Label>Rewards</Label></Text>
-                    <RewardImage />
-                    <DailyRewardValue />
-                </VStack>
-            </GridItem> */}
-            {/* <GridItem>
-                <InfoColumn>
-                   
-                </InfoColumn>
-            </GridItem> */}
-            {/* <GridItem>
-                <InfoColumn minW="240px" alignItems="flex-start"> */}
-                    {/* <Text fontSize={["xl", "xl", "sm"]} fontWeight="bold"><Label>Actions</Label></Text> */}
-                    {/* <Box
-                        minH="64px"
-                        minW="280px"
-                        borderRadius={appTheme.borderRadius}
-                        backgroundColor="whiteAlpha.200"
-                        textAlign="center"
-                        verticalAlign="center"
-                        display="flex"
-                    >
-                        <Label >Stake</Label>
-                    </Box>
-                    <Box
-                        minH="64px"
-                        minW="280px"
-                        borderRadius={appTheme.borderRadius}
-                        backgroundColor="whiteAlpha.200"
-                        textAlign="center"
-                    >
-                        Claim pending
-                    </Box> */}
-                    {/* <StakeButton borderRadius={appTheme.borderRadiusXl}/>
-                    <ClaimPendingRewardsButton borderRadius={appTheme.borderRadiusXl}/> */}
-                    {/* <PendingRewards />
-                    <DevButtons /> */}
-
-                    {/* 
-                    <Text fontSize="sm" fontWeight="bold"><Label>Activity feed</Label></Text>
-                    <HistoryAction textAlign="left">
-                        <Text >
-                            <Label>Total Claimed</Label>
-                        </Text>
-                        <Text fontSize="xl">{23833.93}</Text>
-                    </HistoryAction>
-                    <HistoryAction>
-                        <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> staked
-                    </HistoryAction>
-                    <HistoryAction>
-                        <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> withdrawed
-                    </HistoryAction> */}
-                    {/* <HistoryAction>
-    <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> claimed
-</HistoryAction> */}
-                {/* </InfoColumn>
-            </GridItem> */}
-        {/* </Grid> */}
     </MainPageContainer>
 
 }

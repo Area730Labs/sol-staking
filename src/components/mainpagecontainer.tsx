@@ -8,7 +8,7 @@ export default function MainPageContainer(props: any) {
         <Container
             maxW='990px'
             color='white'
-            zIndex="10"
+            zIndex="2000"
             textAlign="center"
             overflowY="hidden"
             {...rest}>{children}
