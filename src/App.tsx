@@ -27,6 +27,8 @@ import nfts from "./data/nfts.json"
 
 import { Staking } from "./components/staking";
 import { Button } from "./components/button";
+import { useMemo } from "react";
+import useWindowDimensions from "./components/windowsize";
 
 
 
@@ -76,6 +78,63 @@ const TelegramComponent = (props) => (
 )
 
 
+export function Line(props: { top: number }) {
+  return <Box position="absolute" height="0" width="100vw" border="1px solid #FFFFFF" top={props.top + "px"}></Box>
+}
+
+export function VerticalLine(props: { left: number, top: number }) {
+  return <Box position="absolute" top={props.top+"px"} height="70vh" width="0" border="1px solid #FFFFFF" left={props.left + "px"}></Box>
+}
+
+
+export function Lines() {
+
+  const boxSizeWidth = 110;
+  const linesCountH = 4;
+
+  const {width } = useWindowDimensions();
+
+
+  const result = useMemo(() => {
+
+    let subresult = [];
+
+    for (let i = 0; i < linesCountH; i++) {
+      const hOffset = boxSizeWidth * i;
+      subresult.push(<Line top={hOffset}></Line>)
+    }
+
+    return subresult;
+
+  }, [])
+
+
+  const verticalLines = useMemo(() => {
+
+    let subresult = [];
+    const vLines = width/boxSizeWidth; 
+
+    for (let i = 0; i < vLines ; i ++ ) {
+      const hOffset = boxSizeWidth * i;
+
+      let topOffset = boxSizeWidth;
+
+      if (i == 1) {
+        topOffset = 0;
+      }
+
+      subresult.push(<VerticalLine left={hOffset} top={topOffset}/>)
+    }
+
+    return subresult;
+
+  },[width]);
+
+
+  return <>{result} {verticalLines}</>
+
+}
+
 export function App() {
 
   return <ChakraProvider theme={theme}>
@@ -97,15 +156,18 @@ export function App() {
           position="relative"
           // backgroundColor={appTheme.themeColor} 
           minHeight='100vh' display='flex' flexDirection='column' justifyContent='space-between'>
+
+          {/* top gradient */}
           <Box
-            height="920px"
+            height="70vh"
             width="100%"
             position="absolute"
+            z-zIndex="-10"
             style={{ background: "linear-gradient(180.01deg, rgba(234, 204, 157, 0.61) 0.01%, rgba(234, 204, 157, 0.21) 28.86%, rgba(234, 204, 157, 0.160166) 59.07%, rgba(234, 204, 157, 0) 84.02%)" }}
           >
-
+            <Lines></Lines>
           </Box>
-          <Flex padding='10px' paddingTop='0px' gap='10px' height='126px'>
+          <Flex padding='10px' paddingTop='0px' gap='10px' height='126px' position="relative" zIndex="20">
             <Box marginTop='23px'>
               <img src={process.env.PUBLIC_URL + '/logo512.png'} />
             </Box>
@@ -113,7 +175,6 @@ export function App() {
             <LangSelector />
             <Button marginTop='29px' padding='0px' height='67px' width='141px' borderRadius='0.375rem' border='1px solid #717579'><Text fontSize='27px' fontWeight='bold'>Connect</Text></Button>
           </Flex>
-
 
           <Box>
             <Staking config={fromJson(global_config.env.prod)} nfts={nfts} />
