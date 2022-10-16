@@ -96,7 +96,7 @@ export function NftSelection(props: NftSelectionProps | any) {
       textAlign="left"
     >
       <Box overflowY="hidden" borderRadius={appTheme.borderRadius} minH={["100px", "150px", "200px"]} minW={["100px", "150px", "200px"]} backgroundColor={appTheme.themeColorAlpha(0.1)}>
-        <Image margin="0 auto" maxH={["100px", "150px", "200px"]} maxW={["100px", "150px", "200px"]} src={nftInfo.image} borderRadius={appTheme.borderRadius} />
+        <Image margin="0 auto" maxH={["100px", "150px", "200px"]} maxW={["100px", "150px", "200px"]} src={nftInfo.image ?? ""} borderRadius={appTheme.borderRadius} />
       </Box>
       <Text width="100%" marginTop="2" color="black" marginBottom="2">{nftInfo.name}</Text>
     </Box>

@@ -109,13 +109,21 @@ export default function NftsSelector(props: NftsSelectorProps) {
     return <Box position="relative">
         <NftSelectorGrid>
             {items && items.map((it, idx) => {
-                return <NftSelection
-                    key={idx}
-                    item={it}
-                    position="relative"
-                    onSelect={selectionHandler}
-                >
-                </NftSelection>
+
+                // todo: check why its possible
+
+                if (it != null) {
+                    return <NftSelection
+                        key={idx}
+                        item={it}
+                        position="relative"
+                        onSelect={selectionHandler}
+                    >
+                    </NftSelection>
+                } else {
+                    console.log("got an empty element in selector grid: ", it, "idx", idx)
+                    return null;
+                }
             })}
             {nftsPlaceholders.map((it, idx) => {
                 return it;
