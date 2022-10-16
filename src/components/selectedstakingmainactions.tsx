@@ -99,6 +99,7 @@ function HistoryOperation(props: HistoryOperationProps) {
 
     return <Flex
         position="relative"
+        marginTop='-4px'
     >
         <Flex>
             <Flex gap={2} flexDirection='column' alignItems='flex-start'>
@@ -188,6 +189,7 @@ export function StakingMainInfo(props: any) {
             border='1px solid black'
             height='100px'
             color='black'
+
         >
             <OperationDecect operation={object}></OperationDecect>
         </HistoryAction>)

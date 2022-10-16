@@ -23,7 +23,7 @@ export interface NftsTabProps {
 }
 
 export function NftsTab(props: NftsTabProps) {
-    return <>
+    return <Box color='black'>
         <Flex>
             <Text fontWeight="bold" marginBottom="4">{props.heading}</Text>
         </Flex>
@@ -31,7 +31,7 @@ export function NftsTab(props: NftsTabProps) {
             <EmptyRow />
             <Text fontSize="4xl" position="absolute" top="calc(40%)" left="0" right="0" >{props.emptyLabel}</Text>
         </Box>}
-    </>
+    </Box>
 }
 
 interface NftTabContentProps {
@@ -61,7 +61,14 @@ export function StakeNftsListTab(props: NftTabContentProps) {
         });
     }
 
-    return <NftsTab emptyLabel={<Label>no NFT's to stake</Label>} heading={<><Label>NFT'S IN YOUR WALLET</Label>. <Box alignSelf="flex-end" display="inline-block" paddingLeft="4">go to<Button marginLeft="2" typ="black" size="sm" onClick={() => setNftsTab("unstake")}><Label>Staked</Label></Button></Box></>}>
+    const heading = (
+        <Flex flexDirection='column' alignItems='self-start' gap='5px'>
+            <Text fontSize='35px'>NFT'S IN YOUR WALLET</Text>
+            <Box  display="inline-block" paddingLeft="4">Go to<Button marginLeft="2" typ="black" size="sm" onClick={() => setNftsTab("unstake")}><Label>Staked</Label></Button></Box>
+        </Flex>
+    );
+
+    return <NftsTab emptyLabel={<Label>no NFT's to stake</Label>} heading={heading}>
         {nftsInWallet.length > 0 ? <NftsSelector maxChunk={props.maxSelection} items={nftsInWallet} actionHandler={stakeSelectedItems} actionLabel={<Label>Stake selected</Label>} /> : null}
     </NftsTab>
 }
@@ -105,7 +112,16 @@ export function StakedNftsListTab(props: NftTabContentProps) {
         return fromStakeReceipt(it);
     });
 
-    return <NftsTab emptyLabel={<Label>no NFT's to unstake</Label>} heading={<><Label>YOUR STAKED NFT'S</Label>. Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="black" backgroundColor={appTheme.stressColor2}>{pretty(dailyRewards)}  {config.reward_token_name}</Box> per day</>}>
+    const heading = (
+        <Flex flexDirection='column' alignItems='self-start' gap='5px'>
+            <Text fontSize='35px'>YOUR STAKED NFTs</Text>
+            <Box>
+            Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="white" backgroundColor='#5E301D'>{pretty(dailyRewards)}  {config.reward_token_name}</Box> per day
+            </Box>
+        </Flex>
+    ); 
+
+    return <NftsTab emptyLabel={<Label>No NFT's to unstake</Label>} heading={heading}>
         {items.length > 0 ? <NftsSelector maxChunk={props.maxSelection} items={items} actionHandler={unstakeSelectedItems} actionLabel={<Label>Unstake selected</Label>} /> : null}
     </NftsTab>
 }
@@ -117,7 +133,20 @@ export function NftSelectorTabs() {
     // const scrollRef = React.useRef<HTMLInputElement>(null);
     const [firstShowup, setFirstShowup] = React.useState(true);
 
-    return <MainPageContainer paddingY="10" paddingBottom="40">
+    // React.useEffect(() => {
+
+    //     if (firstShowup != true) {
+    //         if (scrollRef.current) {
+    //             scrollRef.current.scrollIntoView({
+    //                 behavior: "smooth"
+    //             });
+    //         }
+    //     }
+
+    //     setFirstShowup(false);
+    // }, [nftsTabCounter]);
+
+    return <MainPageContainer paddingY="20px" paddingBottom="40">
         <Box></Box>
         {nftsTab === "stake" ?
             <StakeNftsListTab maxSelection={config.max_items_per_stake} /> :
