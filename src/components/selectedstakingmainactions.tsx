@@ -171,8 +171,9 @@ export function StakingMainInfo(props: any) {
 
     const activityList = useMemo(() => {
         return activity.slice(0,3).map((object, i) => <HistoryAction key={i} 
-        paddingTop="4px" 
+        // paddingTop="4px" 
         borderRadius='10px' 
+        padding='15px'
         backgroundColor='white'
         border='1px solid black'
         height='100px'
