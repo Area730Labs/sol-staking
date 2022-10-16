@@ -4,7 +4,7 @@ import { DiscordComponent, TelegramComponent, TwitterComponent } from "./icons";
 import { Label } from "./label";
 
 export function Footer() {
-    return <Box boxShadow="0px -18px 24px rgba(0, 0, 0, 0.05)" fontFamily="Outfit" position='fixed' bottom='0px' left='0px' as="footer" width='100%' height='170px' role="contentinfo" padding='20px 20px 15px 20px' backgroundColor='#ffffff'>
+    return <Box zIndex="3000" boxShadow="0px -18px 24px rgba(0, 0, 0, 0.05)" fontFamily="Outfit" position='fixed' bottom='0px' left='0px' as="footer" width='100%' height='170px' role="contentinfo" padding='20px 20px 15px 20px' backgroundColor='#ffffff'>
         <Flex direction='column' width='100%' height='100%' alignItems='center'>
             <Button width='310px' border='3px solid black' marginTop='15px'>
                 <Flex gap='15px' alignItems='center'>
