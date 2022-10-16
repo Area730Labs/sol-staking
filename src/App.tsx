@@ -180,7 +180,7 @@ export function App() {
             <Staking config={fromJson(global_config.env.prod)} nfts={nfts} />
           </Box>
 
-          <Box position='fixed' bottom='0px' left='0px' as="footer" width='100%' height='170px' role="contentinfo" padding='20px 20px 15px 20px' backgroundColor='#ffffff'>
+          <Box boxShadow="0px -18px 24px rgba(0, 0, 0, 0.05)" position='fixed' bottom='0px' left='0px' as="footer" width='100%' height='170px' role="contentinfo" padding='20px 20px 15px 20px' backgroundColor='#ffffff'>
             <Flex direction='column' width='100%' height='100%' alignItems='center'>
               <Button width='310px' border='3px solid black' marginTop='15px'>
                 <Flex gap='15px' alignItems='center'>
