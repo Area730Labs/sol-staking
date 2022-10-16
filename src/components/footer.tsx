@@ -83,16 +83,12 @@ export function Footer() {
         padding='20px 20px 15px 20px'
         backgroundColor='#ffffff'
     >
-        <Box>Tab: {nftsTab}</Box>
-        <Flex direction='column' width='100%' height='100%' alignItems='center'>
+        {/* <Box>Tab: {nftsTab}</Box> */}
+        <Flex direction='column' width='100%' height='100%' alignItems='center' gap='10px'>
             {nftsTab == "stake" ?
-                <Fadeable
-                    isVisible={stakeModalContext.selectedItemsPopupVisible}
-                    fadesize={7}
-                    margin="0 auto"
-                    backgroundColor="whiteAlpha.900"
-                >
-                    <Button
+                <>
+                    {stakeModalContext.selectedItemsPopupVisible && (
+                        <Button
                         width='310px'
                         border='3px solid black'
                         marginTop='15px'
@@ -102,24 +98,23 @@ export function Footer() {
                             <Label>Stake selected</Label> <Box color='white' width='36px' height='36px' fontWeight='bold' borderRadius='18px' backgroundColor='black' lineHeight='36px'>{stakeModalContext.selectedItemsCount}</Box>
                         </Flex>
                     </Button>
-                </Fadeable> :
-                <Fadeable
-                    isVisible={stakedModalContext.selectedItemsPopupVisible}
-                    fadesize={7}
-                    margin="0 auto"
-                    backgroundColor="whiteAlpha.900"
-                >
+                    )}
+                    
+                </> :
+                <>
+                {stakedModalContext.selectedItemsPopupVisible && (
                     <Button
-                        width='310px'
-                        border='3px solid black'
-                        marginTop='15px'
-                        onClick={unstakeCbHandler}
+                    width='310px'
+                    border='3px solid black'
+                    marginTop='15px'
+                    onClick={unstakeCbHandler}
                     >
-                        <Flex gap='15px' alignItems='center'>
-                            <Label>Unstake selected</Label> <Box color='white' width='36px' height='36px' fontWeight='bold' borderRadius='18px' backgroundColor='black' lineHeight='36px'>{stakedModalContext.selectedItemsCount}</Box>
-                        </Flex>
+                    <Flex gap='15px' alignItems='center'>
+                        <Label>Unstake selected</Label> <Box color='white' width='36px' height='36px' fontWeight='bold' borderRadius='18px' backgroundColor='black' lineHeight='36px'>{stakedModalContext.selectedItemsCount}</Box>
+                    </Flex>
                     </Button>
-                </Fadeable>
+                )} 
+                </>
             }
             <Spacer />
             <Flex direction='row' gap='25px' width='100%'>
