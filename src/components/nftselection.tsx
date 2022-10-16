@@ -51,24 +51,24 @@ export function NftSelection(props: NftSelectionProps | any) {
 
   const border = React.useMemo(() => {
     if (!selected) {
-      return `${borderSize}px solid white`
+      return `2.5px solid white`
     } else {
-      return `${borderSize}px solid ${appTheme.selectedBorderColor}`
+      return `2.5px solid ${appTheme.selectedBorderColor}`
     }
   }, [selected]);
 
   return <GridItem
     cursor="pointer"
     // ='100%'
-    w="100%"
-    maxH='280px'
-    borderRadius={appTheme.borderRadius}
+    w="290px"
+    h='345px'
+    borderRadius='15px'
     boxShadow="xl"
     border={border}
     transition={appTheme.transition}
     _hover={{
       boxShadow: "dark-lg",
-      border: `${borderSize}px solid black`
+      border: `2.5px solid black`
     }}
     backgroundColor={"white"}//appTheme.themeColor}
     onClick={clickHandler}
@@ -77,28 +77,31 @@ export function NftSelection(props: NftSelectionProps | any) {
     {selected ? <Box
       color="black"
       borderRadius="50%"
-      border={`${borderSize}px solid black`}
-      borderColor={appTheme.themeColor}
+      border={`2.5px solid black`}
+      borderColor='black'
       backgroundColor="white"
       display="inline-block"
       position="absolute"
-      left="15px"
-      top="15px"
+      left="5px"
+      top="5px"
       p="2"
       px="3"
     >
       <CheckIcon />
     </Box> : null}
 
-    <Box p="2.5"
+    <Box p="3"
       paddingBottom="4"
       overflow="hidden"
       textAlign="left"
+      fontFamily='Outfit'
     >
-      <Box overflowY="hidden" borderRadius={appTheme.borderRadius} minH={["100px", "150px", "200px"]} minW={["100px", "150px", "200px"]} backgroundColor={appTheme.themeColorAlpha(0.1)}>
-        <Image margin="0 auto" maxH={["100px", "150px", "200px"]} maxW={["100px", "150px", "200px"]} src={nftInfo.image ?? ""} borderRadius={appTheme.borderRadius} />
+      <Box overflowY="hidden" borderRadius='15px'  backgroundColor={appTheme.themeColorAlpha(0.1)}>
+        <Image margin="0 auto" width='100%' src={nftInfo.image ?? ""} borderRadius='15px' />
       </Box>
-      <Text width="100%" marginTop="2" color="black" marginBottom="2">{nftInfo.name}</Text>
+      <Text width="100%" marginTop="2" fontSize='20px'  color="black" >{nftInfo.name}</Text>
+      <Text width="100%"  fontSize='17px' color="black" marginBottom="2" marginTop='-4px'>SolMad</Text>
+
     </Box>
     <MultiplicationWithSuggestion value={mult}>
       ~{dailyIncome} {staking.config.reward_token_name}
