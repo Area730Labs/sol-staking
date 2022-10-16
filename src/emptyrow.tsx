@@ -10,17 +10,17 @@ export default function EmptyRow() {
     const nftsPlaceholders = [];
 
     // @todo use nft layout 
-    for (var i = 0; i < maxPerRow; i++) {
-        nftsPlaceholders.push(<GridItem
-            key={i}
-            cursor="pointer"
-            w="100%"
-            maxH='280px'
-            minH='230px'
-            borderRadius={appTheme.borderRadius}
-            transition={appTheme.transition}
-            backgroundColor={"whiteAlpha.100"}></GridItem>)
-    }
+    // for (var i = 0; i < maxPerRow; i++) {
+    //     nftsPlaceholders.push(<GridItem
+    //         key={i}
+    //         cursor="pointer"
+    //         w="100%"
+    //         maxH='280px'
+    //         minH='230px'
+    //         borderRadius={appTheme.borderRadius}
+    //         transition={appTheme.transition}
+    //         backgroundColor={"whiteAlpha.100"}></GridItem>)
+    // }
 
     return <NftSelectorGrid>{nftsPlaceholders}</NftSelectorGrid>
 

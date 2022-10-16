@@ -1,6 +1,6 @@
 
 const themeColor = function colorAlpha(a: number) {
-    return `rgba(88,101,242,${a})`
+    return `#EACC9D`
 }
 
 const styles = {

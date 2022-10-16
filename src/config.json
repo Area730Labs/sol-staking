@@ -58,5 +58,5 @@
      "max_nfts_per_row": 5,
      "data_commitment": "confirmed",
      "small_staked_nfts_list_size": 4,
-     "cluster_url": "https://api.mainnet-beta.solana.com"
+     "cluster_url": "https://neat-late-smoke.solana-mainnet.discover.quiknode.pro/70dcb8fe91241dbf8f52de83590377ec5b3f4a71"
 }

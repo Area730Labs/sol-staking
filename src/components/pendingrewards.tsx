@@ -11,6 +11,7 @@ import { Button } from "./button";
 import { Box } from "@chakra-ui/layout";
 import Countup from "./countup";
 import appTheme from "../state/theme"
+import { Flex } from "@chakra-ui/layout";
 
 export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, stakingctx: StakingContextType) {
 
@@ -81,7 +82,11 @@ export function ClaimPendingRewardsButton(props: any) {
         }
     }
 
-    return (<Button typ="black" onClick={claimPendingRewardsHandler} {...props}><Label>Claim</Label></Button>)
+    return (<Button border='2px solid black'  width='240px' paddingLeft='20px' paddingRight='20px' backgroundColor='black' color='white' marginTop='15px' onClick={claimPendingRewardsHandler} {...props}>
+        <Flex gap='15px' justifyContent='center' alignItems='center'>
+                  Claim rewards <Box color='black' width='28px' height='28px' fontWeight='bold' borderRadius='14px' backgroundColor='white' lineHeight='28px'>I</Box>
+                  </Flex>
+    </Button>)
 }
 
 

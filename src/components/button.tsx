@@ -87,9 +87,9 @@ export function Button(props: ButtonProps | SbuttonArgs | any) {
         transition='all 0.2s 0.1s ease'
         __css={styles} {...rest}
         _hover={{
-            color: hcolor,
-            backgroundColor: hbg,
-            boxShadow: sStyle.boxShadow
+            // color: hcolor,
+            // backgroundColor: hbg,
+            // boxShadow: sStyle.boxShadow
         }}
     >
         {props.children}

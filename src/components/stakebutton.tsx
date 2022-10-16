@@ -64,5 +64,5 @@ export default function StakeButton(props: any) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [wallet]);
 
-    return <Button onClick={() => { stakeHandler() }} {...props}><Label>Stake</Label></Button>
+    return <Button border='2px solid black' width='140px' paddingLeft='20px' paddingRight='20px' backgroundColor='white' color='black' marginTop='15px' onClick={() => { stakeHandler() }} {...props}><Label>Stake</Label></Button>
 }

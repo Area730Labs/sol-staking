@@ -114,24 +114,24 @@ export function NftSelectorTabs() {
 
     const { nftsTab, nftsTabCounter } = useAppContext();
 
-    const scrollRef = React.useRef<HTMLInputElement>(null);
+    // const scrollRef = React.useRef<HTMLInputElement>(null);
     const [firstShowup, setFirstShowup] = React.useState(true);
 
-    React.useEffect(() => {
+    // React.useEffect(() => {
 
-        if (firstShowup != true) {
-            if (scrollRef.current) {
-                scrollRef.current.scrollIntoView({
-                    behavior: "smooth"
-                });
-            }
-        }
+    //     if (firstShowup != true) {
+    //         if (scrollRef.current) {
+    //             scrollRef.current.scrollIntoView({
+    //                 behavior: "smooth"
+    //             });
+    //         }
+    //     }
 
-        setFirstShowup(false);
-    }, [nftsTabCounter]);
+    //     setFirstShowup(false);
+    // }, [nftsTabCounter]);
 
     return <MainPageContainer paddingY="10" paddingBottom="40">
-        <Box ref={scrollRef}></Box>
+        <Box></Box>
         {nftsTab === "stake" ?
             <StakeNftsListTab maxSelection={config.max_items_per_stake} /> :
             <StakedNftsListTab maxSelection={config.max_items_per_unstake} />

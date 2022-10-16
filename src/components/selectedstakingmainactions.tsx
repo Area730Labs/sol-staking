@@ -175,14 +175,13 @@ export function StakingMainInfo(props: any) {
     }, [activity]);
 
     return <MainPageContainer {...props}
-        _hover={{
-            backgroundColor: "whiteAlpha.100"
-        }}
+       
         transition={appTheme.transition}
         borderRadius={appTheme.borderRadiusXl}
     >
         <Grid gap={4}
-            alignItems="flex-start"
+            alignItems="center"
+            justifyContent="center"
             templateColumns={['repeat(1, 1fr)', 'repeat(1, 1fr)', 'repeat(6, 1fr)']}
         >
             <GridItem colSpan={[1, 1, 3]}>
@@ -207,9 +206,9 @@ export function StakingMainInfo(props: any) {
                     {activityList}
                 </InfoColumn>
             </GridItem>
-            <GridItem>
-                <InfoColumn minW="240px" alignItems="flex-start">
-                    <Text fontSize={["xl", "xl", "sm"]} fontWeight="bold"><Label>Actions</Label></Text>
+            {/* <GridItem>
+                <InfoColumn minW="240px" alignItems="flex-start"> */}
+                    {/* <Text fontSize={["xl", "xl", "sm"]} fontWeight="bold"><Label>Actions</Label></Text> */}
                     {/* <Box
                         minH="64px"
                         minW="280px"
@@ -230,10 +229,10 @@ export function StakingMainInfo(props: any) {
                     >
                         Claim pending
                     </Box> */}
-                    <StakeButton borderRadius={appTheme.borderRadiusXl}/>
-                    <ClaimPendingRewardsButton borderRadius={appTheme.borderRadiusXl}/>
-                    <PendingRewards />
-                    <DevButtons />
+                    {/* <StakeButton borderRadius={appTheme.borderRadiusXl}/>
+                    <ClaimPendingRewardsButton borderRadius={appTheme.borderRadiusXl}/> */}
+                    {/* <PendingRewards />
+                    <DevButtons /> */}
 
                     {/* 
                     <Text fontSize="sm" fontWeight="bold"><Label>Activity feed</Label></Text>
@@ -252,8 +251,8 @@ export function StakingMainInfo(props: any) {
                     {/* <HistoryAction>
     <Address addr="skyxstP4JfVoAuuGUkPC6M25hoQiafcZ8dUvsoBNmuY" /> claimed
 </HistoryAction> */}
-                </InfoColumn>
-            </GridItem>
+                {/* </InfoColumn>
+            </GridItem> */}
         </Grid>
     </MainPageContainer>
 
