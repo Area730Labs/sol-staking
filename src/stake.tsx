@@ -23,25 +23,22 @@ export interface NftsSelectorProps {
 
     modalState: NftSelectorContext
 
-    actionLabel: ReactNode
-    actionHandler: {
-        (
-            wallet: WalletAdapter,
-            solanaConnection: SolanaRpc,
-            selectedItems: { [key: string]: boolean }
-        ): Promise<any>
-    },
+    // actionLabel: ReactNode
+    // actionHandler: {
+    //     (
+    //         wallet: WalletAdapter,
+    //         solanaConnection: SolanaRpc,
+    //         selectedItems: { [key: string]: boolean }
+    //     ): Promise<any>
+    // },
 
 }
 
 export default function NftsSelector(props: NftsSelectorProps) {
 
-    const { wallet, solanaConnection } = useAppContext();
-    const { config } = useStaking();
 
-    const { selectedItems, selectedItemsCount, selectedItemsPopupVisible, setSelectedItemsCount, setSelectedItems, setSelectedPopupVisible } = props.modalState;
+    const { selectedItems, selectedItemsCount, setSelectedItemsCount, setSelectedItems, setSelectedPopupVisible } = props.modalState;
 
-    const action_label = props.actionLabel ?? ""
     const max_selection = props.maxChunk;
 
     function selectionHandler(item: Nft, state: boolean): boolean {

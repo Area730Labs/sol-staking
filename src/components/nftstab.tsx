@@ -80,24 +80,6 @@ export function StakeNftsListTab(props: NftTabContentProps) {
         }
     ];
 
-
-    function stakeSelectedItems(
-        wallet: WalletAdapter,
-        solanaConnection: SolanaRpc,
-        selectedItems: { [key: string]: boolean }
-    ): Promise<any> {
-
-        let instructions = [] as TransactionInstruction[];
-
-        for (var it in selectedItems) {
-            instructions.push(createStakeNftIx(staking, new PublicKey(it), wallet as WalletAdapter));
-        }
-
-        return sendTx(instructions, 'stake').catch((e) => {
-            toast.error(`Unable to stake: ${e.message}`)
-        });
-    }
-
     const heading = (
         <Flex flexDirection='column' alignItems='flex-start' gap='5px'>
             <Text fontSize='35px'>NFT'S IN YOUR WALLET</Text>
@@ -106,44 +88,13 @@ export function StakeNftsListTab(props: NftTabContentProps) {
     );
 
     return <NftsTab emptyLabel={<Label>No NFT's to stake</Label>} heading={heading}>
-        {nftsInWallet.length > 0 ? <NftsSelector modalState={stakeModalContext} maxChunk={props.maxSelection} items={nftsInWallet} actionHandler={stakeSelectedItems} actionLabel={<Label>Stake selected</Label>} /> : null}
+        {nftsInWallet.length > 0 ? <NftsSelector modalState={stakeModalContext} maxChunk={props.maxSelection} items={nftsInWallet} /> : null}
     </NftsTab>
 }
 
 export function StakedNftsListTab(props: NftTabContentProps) {
 
     const { stackedNfts, dailyRewards, config, pretty, fromStakeReceipt, stakedModalContext: modalContext } = useStaking();
-    const { sendTx } = useAppContext();
-
-    async function unstakeSelectedItems(
-        wallet: WalletAdapter,
-        solanaConnection: SolanaRpc,
-        selectedItems: { [key: string]: boolean }
-    ): Promise<any> {
-
-        let instructions = [] as TransactionInstruction[];
-
-        const stakeOwnerAddress = await getStakeOwnerForWallet(config, wallet.publicKey);
-
-        return StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeOwnerInfo: StakeOwner) => {
-
-            if (stakeOwnerInfo == null) {
-                instructions.push(createStakeOwnerIx(config, wallet.publicKey, stakeOwnerAddress));
-            }
-
-            for (var it in selectedItems) {
-
-                const mint = new PublicKey(it);
-
-                instructions.push(createClaimIx(config, mint, wallet.publicKey, stakeOwnerAddress))
-                instructions.push(createUnstakeNftIx(config, mint, wallet.publicKey));
-            }
-
-            return sendTx(instructions, 'unstake').catch((e) => {
-                toast.error(`Unable to unstake: ${e.message}`)
-            });
-        });
-    }
 
     const items = stackedNfts.map((it, idx) => {
         return fromStakeReceipt(it);
@@ -159,16 +110,16 @@ export function StakedNftsListTab(props: NftTabContentProps) {
     );
 
     return <NftsTab emptyLabel={<Label>No NFT's to unstake</Label>} heading={heading}>
-        {items.length > 0 ? <NftsSelector modalState={modalContext} maxChunk={props.maxSelection} items={items} actionHandler={unstakeSelectedItems} actionLabel={<Label>Unstake selected</Label>} /> : null}
+        {items.length > 0 ? <NftsSelector modalState={modalContext} maxChunk={props.maxSelection} items={items} /> : null}
     </NftsTab>
 }
 
 export function NftSelectorTabs() {
 
-    const { nftsTab, nftsTabCounter } = useAppContext();
+    const { setNftsTab } = useAppContext();
 
     // const scrollRef = React.useRef<HTMLInputElement>(null);
-    const [firstShowup, setFirstShowup] = React.useState(true);
+    // const [firstShowup, setFirstShowup] = React.useState(true);
 
     // React.useEffect(() => {
 
@@ -186,8 +137,12 @@ export function NftSelectorTabs() {
     return <MainPageContainer paddingY="20px" paddingBottom="40" marginBottom='100px'>
         <Tabs variant='solid-rounded' colorScheme='teal'>
             <TabList>
-                <Tab><Label>Stake</Label></Tab>
-                <Tab><Label>Unstake</Label></Tab>
+                <Tab onClick={() => {
+                    setNftsTab("stake");
+                }}><Label>Stake</Label></Tab>
+                <Tab onClick={() => {
+                    setNftsTab("unstake")
+                }}><Label>Unstake</Label></Tab>
             </TabList>
             <TabPanels marginLeft={0}>
                 <TabPanel>
