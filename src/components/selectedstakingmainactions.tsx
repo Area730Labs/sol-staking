@@ -26,7 +26,7 @@ import appTheme from "../state/theme"
 
 function HistoryActionNftLink(props: { nft: NftType }) {
     return <Box>
-        <Image cursor="pointer" src={props.nft.image} borderRadius={appTheme.borderRadius} width="46px" />
+        <Image cursor="pointer" src={props.nft.image} borderRadius={appTheme.borderRadius} width="76px" />
     </Box>
 }
 
@@ -86,7 +86,6 @@ export interface HistoryOperationProps {
 }
 
 function HistoryOperation(props: HistoryOperationProps) {
-
     const { getNft } = useStaking();
     let childContent = props.children;
 
