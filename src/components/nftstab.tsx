@@ -191,14 +191,14 @@ export function NftSelectorTabs() {
             </TabList>
             <TabPanels marginLeft={0}>
                 <TabPanel>
-                <StakeNftsListTab maxSelection={config.max_items_per_stake} />
+                    <StakeNftsListTab maxSelection={config.max_items_per_stake} />
                 </TabPanel>
                 <TabPanel>
-                <StakedNftsListTab maxSelection={config.max_items_per_unstake} />
+                    <StakedNftsListTab maxSelection={config.max_items_per_unstake} />
                 </TabPanel>
             </TabPanels>
         </Tabs>
-        
+
         {/* {nftsTab === "stake" ?
             <StakeNftsListTab maxSelection={config.max_items_per_stake} /> :
             <StakedNftsListTab maxSelection={config.max_items_per_unstake} />

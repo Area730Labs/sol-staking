@@ -45,8 +45,9 @@ export interface StakingContextType {
     activity: Operation[]
 
     getNft(key: PublicKey): Nft | null
-    platform_staked: PublicKey[]
+    platform_staked: PublicKey[],
 
+    stakeModalContext: NftSelectorContext
 }
 
 const StakingContext = createContext<StakingContextType>(null);
@@ -57,7 +58,28 @@ export interface StakingProviderProps {
     nfts: any[]
 }
 
+export type StringBoolMap = { [key: string]: boolean }
+export interface NftSelectorContext {
+    selectedItems: StringBoolMap
+    setSelectedItems(val: StringBoolMap): void
+
+    selectedItemsCount: number
+    setSelectedItemsCount(val: number): void
+
+    selectedItemsPopupVisible: boolean
+    setSelectedPopupVisible(val: boolean)
+}
+
+
 export function StakingProvider({ children, config, nfts }: StakingProviderProps) {
+
+
+    // selection context
+
+    const [selectedItems, setSelectedItems] = useState<{ [key: string]: boolean }>({});
+    const [selectedItemsCount, setSelectedItemsCount] = useState(0);
+    const [selectedItemsPopupVisible, setSelectedPopupVisible] = useState(false);
+
 
     const [platform, setPlatform] = useState<Platform | null>(getPlatformInfoFromCache(config.stacking_config));
     const [nftMultMap, setMultMap] = useState<RankMultiplyerMap | null>(null);
@@ -457,8 +479,25 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         return [result, totalTax];
     }
 
+    const stakeModalContext: NftSelectorContext = useMemo( () => {
+        const result: NftSelectorContext = {
+            selectedItems: selectedItems,
+            setSelectedItems: setSelectedItems,
+            selectedItemsCount: selectedItemsCount,
+            setSelectedItemsCount: setSelectedItemsCount,
+            selectedItemsPopupVisible: selectedItemsPopupVisible,
+            setSelectedPopupVisible: setSelectedPopupVisible
+        };
+
+        return result;
+    },[selectedItems,selectedItemsCount,selectedItemsPopupVisible]);
+
     const memoedValue = useMemo(() => {
-        const result = {
+
+        const result: StakingContextType = {
+
+            stakeModalContext: stakeModalContext,
+
             // user wallet nfts
             nftsInWallet: userNfts,
             stackedNfts,
@@ -492,7 +531,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     }, [
         pendingRewards, userNfts, stackedNfts,
         nftMultMap,
-        activity
+        activity,
+        stakeModalContext
     ]);
 
     return (
