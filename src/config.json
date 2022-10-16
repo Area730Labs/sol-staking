@@ -20,7 +20,7 @@
                "rewards_token_account": "Ce8XSXKQ9mkgAq3Ta5M7w8tgaJy3vYBjXjcq4R9avN7v",
                "stacking_config": "8ELy89juk6mLawcr3F37nmFNWrffJvqsHniLFHQGUcaV",
                "reward_image": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/DPuGqV7jq9PEbcRU7bWzuaJx5bGiaVj4cNWhWjTdWAKi/logo.png",
-               "reward_token_name": "DOPE",
+               "reward_token_name": "$BEADS",
                "main_image":"https://4czjblv4exlnkapuju5tmwmv42t262b5s6sknjhdfrfjrbcotczq.arweave.net/4LKQrrwl1tUB9E07NlmV5qevaD2XpKak4yxKmIROmLM?ext=png",
                "reward_token_decimals": 1000000000,
                "program_id": "stkqdwwENqh935UFNAbgJY2deqWcRxDEEzR68GBgo68",
