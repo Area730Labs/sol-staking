@@ -35,11 +35,7 @@ export interface NftsSelectorProps {
 export default function NftsSelector(props: NftsSelectorProps) {
 
     const { wallet, solanaConnection } = useAppContext();
-    const { config } = useStaking();
-
-    const [selectedItems, setSelectedItems] = React.useState<{ [key: string]: boolean }>({});
-    const [selectedItemsCount, setSelectedItemsCount] = React.useState(0);
-    const [selectedItemsPopupVisible, setSelectedPopupVisible] = React.useState(false);
+    const { config, stakeModalContext: {selectedItems, selectedItemsCount, selectedItemsPopupVisible, setSelectedItemsCount, setSelectedItems, setSelectedPopupVisible} } = useStaking();
 
     const action_label = props.actionLabel ?? ""
     const max_selection = props.maxChunk;
@@ -78,6 +74,7 @@ export default function NftsSelector(props: NftsSelectorProps) {
 
     React.useEffect(() => {
         if (selectedItemsCount > 0) {
+            toast.info('show visible')
             setSelectedPopupVisible(true)
         } else {
             setSelectedPopupVisible(false);
