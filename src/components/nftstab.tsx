@@ -153,10 +153,5 @@ export function NftSelectorTabs() {
                 </TabPanel>
             </TabPanels>
         </Tabs>
-
-        {/* {nftsTab === "stake" ?
-            <StakeNftsListTab maxSelection={config.max_items_per_stake} /> :
-            <StakedNftsListTab maxSelection={config.max_items_per_unstake} />
-        } */}
     </MainPageContainer>
 }

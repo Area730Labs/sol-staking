@@ -28,7 +28,7 @@ export function StakingInfo() {
     const { config } = useStaking();
 
     return <VStack alignItems="flex-start" minW='350px'>
-        <Text fontWeight="bold" fontSize='30px' color='black'>{config.label}</Text>
+        <Text fontWeight="bold" fontSize='30px' color='black' fontFamily="Outfit">{config.label}</Text>
         <MainImage />
         <Box height='2px' />
         <StakePlatformStats />
@@ -75,13 +75,13 @@ export function Staking(props: StakingProviderProps) {
                     ></Box>
                 </Box>
 
-                <Flex direction='row' justifyContent='center' alignItems='center' gap='15px' zIndex="1000">
+                <Flex direction='row' justifyContent='center' alignItems='center' gap='15px' zIndex="1000" marginTop="20px">
                     <StakeButton />
                     <ClaimPendingRewardsButton />
                 </Flex>
             </Flex>
 
-            <StakingMainInfo marginTop="10" p="3" zIndex="2000"/>
+            <StakingMainInfo fontFamily="Outfit" marginTop="10" p="3" zIndex="2000"/>
             <NftSelectorTabs />
             <Footer/>
         </StakingProvider>
