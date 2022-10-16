@@ -6,8 +6,8 @@ export default function SmallNftBlock(props: any) {
     return (
       <Box color="black"
         backgroundColor="whiteAlpha.300"
-        width="64px"
-        height="64px"
+        width="76px"
+        height="76px"
         overflowY="hidden"
         borderRadius={appTheme.borderRadius}
         textAlign="center"
@@ -15,7 +15,7 @@ export default function SmallNftBlock(props: any) {
         fontSize="xs"
         fontWeight="bold"
         transition='all 0.2s  ease'
-        padding={2}
+
         _hover={{
           boxShadow: "xl"
         }}

@@ -16,6 +16,7 @@ export default function HistoryAction(props: any) {
         backgroundColor={bg}
         p={p}
         transition='all 0.4s  ease'
+        marginTop='10px'
         _hover={{
             boxShadow: "xl"
         }}

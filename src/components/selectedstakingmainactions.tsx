@@ -56,8 +56,9 @@ function AllStakedNfts() {
         // justifyContent="space-between"
         justifyItems="center"
         placeItems="center"
-        gap="2"
-    >
+        gap="3"
+        marginTop='7px'
+        >
         {platform_staked.slice(0, global_config.max_nfts_per_row - 1).map((object, i) =>
             <StakedSmallNft key={i} item={getNft(object)} />
         )}
@@ -67,7 +68,7 @@ function AllStakedNfts() {
 
 
         <SmallNftBlock>
-            <Box paddingTop="10px">
+            <Box paddingTop="18px">
                 <Text>+</Text>
                 <Text>more</Text>
             </Box>
@@ -169,29 +170,37 @@ export function StakingMainInfo(props: any) {
     const { activity } = useStaking();
 
     const activityList = useMemo(() => {
-        return activity.slice(0,3).map((object, i) => <HistoryAction key={i} paddingTop="4px">
+        return activity.slice(0,3).map((object, i) => <HistoryAction key={i} 
+        paddingTop="4px" 
+        borderRadius='10px' 
+        backgroundColor='white'
+        border='1px solid black'
+        height='100px'
+        color='black'
+        >
             <OperationDecect operation={object}></OperationDecect>
         </HistoryAction>)
     }, [activity]);
 
     return <MainPageContainer {...props}
-       
         transition={appTheme.transition}
         borderRadius={appTheme.borderRadiusXl}
     >
-        {/* <Grid gap={4    }
-            alignItems="center"
-            justifyContent="center"
-            templateColumns={['repeat(1, 1fr)', 'repeat(1, 1fr)', 'repeat(6, 1fr)']}
-        > */}
-        <Flex dir="row">
-            <StakingInfo />
+        <Flex dir="row" gap={10}>
+            <StakingInfo  />
+
+            <Flex flexDir="column" width='100%' alignItems='flex-start' marginTop='20px'>
+                <Text fontSize='18px' color='black' fontWeight="bold"><Label>All staked</Label></Text>
+                    <AllStakedNfts />
+                    <Text marginTop='15px' paddingBottom='7px' fontSize='18px' color='black' fontWeight="bold"><Label>Activity feed</Label></Text>
+                    {activityList}
+            </Flex>
         </Flex>
 
             {/* <GridItem colSpan={[1, 1, 3]}>
                 <StakingInfo />
             </GridItem> */}
-            <GridItem>
+            {/* <GridItem>
                 <VStack textAlign="center" paddingTop="3">
                     <Text fontSize="sm" fontWeight="bold"><Label>Rewards</Label></Text>
                     <RewardImage />
@@ -201,15 +210,12 @@ export function StakingMainInfo(props: any) {
                         <TotalClaimed />
                     </Box>
                 </VStack>
-            </GridItem>
-            <GridItem>
+            </GridItem> */}
+            {/* <GridItem>
                 <InfoColumn>
-                    <Text fontSize={["xl", "xl", "sm"]} fontWeight="bold"><Label>Staked NFT</Label></Text>
-                    <AllStakedNfts />
-                    <Text fontSize="sm" fontWeight="bold"><Label>Activity feed</Label></Text>
-                    {activityList}
+                   
                 </InfoColumn>
-            </GridItem>
+            </GridItem> */}
             {/* <GridItem>
                 <InfoColumn minW="240px" alignItems="flex-start"> */}
                     {/* <Text fontSize={["xl", "xl", "sm"]} fontWeight="bold"><Label>Actions</Label></Text> */}

@@ -37,7 +37,7 @@ export default function StakePlatformStats() {
     }, [platform]);
 
     return <HistoryAction backgroundColor="#5E301D" color="#EACC9D" borderRadius='15px' height='90px'>
-        <HStack justify="center" height='100%'>
+        <HStack justify="center" height='100%' spacing={5}>
             <Stat value={info.itemsAvailable}>Total</Stat>
                 <Divider orientation='vertical' h='50%' borderColor='rgba(1,1,1,0,3)' />
             <Stat value={info.totalStacked}>Staked</Stat>
