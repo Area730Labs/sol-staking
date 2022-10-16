@@ -101,11 +101,7 @@ export function StakeNftsListTab(props: NftTabContentProps) {
     const heading = (
         <Flex flexDirection='column' alignItems='flex-start' gap='5px'>
             <Text fontSize='35px'>NFT'S IN YOUR WALLET</Text>
-<<<<<<< HEAD
-            <Box display="inline-block" paddingLeft="4">Go to<Button marginLeft="2" typ="black" size="sm" onClick={() => setNftsTab("unstake")}><Label>Staked</Label></Button></Box>
-=======
             {/* <Box  display="inline-block" >Go to<Button marginLeft="2" backgroundColor='#5E301D' color='white' size="sm" onClick={() => setNftsTab("unstake")}><Label>Staked</Label></Button></Box> */}
->>>>>>> 24abc63e4a8ee2325561726302136525735ed07d
         </Flex>
     );
 
