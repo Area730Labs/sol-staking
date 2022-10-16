@@ -183,7 +183,7 @@ export function NftSelectorTabs() {
     //     setFirstShowup(false);
     // }, [nftsTabCounter]);
 
-    return <MainPageContainer paddingY="20px" paddingBottom="40" marginBottom='200px'>
+    return <MainPageContainer paddingY="20px" paddingBottom="40" marginBottom='100px'>
         <Tabs variant='solid-rounded' colorScheme='teal'>
             <TabList>
                 <Tab>Stake</Tab>

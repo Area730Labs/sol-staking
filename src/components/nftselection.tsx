@@ -60,7 +60,7 @@ export function NftSelection(props: NftSelectionProps | any) {
   return <GridItem
     cursor="pointer"
     // ='100%'
-    w="290px"
+    w="280px"
     h='345px'
     borderRadius='15px'
     boxShadow="xl"

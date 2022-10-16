@@ -67,11 +67,13 @@ export function Footer() {
                 <Text color="#9A9CA1" fontSize='16px'>Copyright© 2022. <Label>All right reserved.</Label></Text>
                 <Text cursor='pointer' color="#9A9CA1" fontSize='16px' textDecoration='underline'><Label>Help</Label></Text>
                 <Text cursor='pointer' color="#9A9CA1" fontSize='16px' textDecoration='underline'><Label>Privacy</Label></Text>
-                <Text cursor='pointer' color="#9A9CA1" fontSize='16px' textDecoration='underline'><Label>Messages</Label></Text>
+                <Text cursor='pointer' color="#9A9CA1" fontSize='16px' textDecoration='underline'><Label>Message Us</Label></Text>
+                
                 <Spacer />
-                <Box cursor='pointer'><TelegramComponent /></Box>
-                <Box cursor='pointer'><TwitterComponent /></Box>
-                <Box cursor='pointer'><DiscordComponent /></Box>
+
+                <Box cursor='pointer' onClick={() =>  window.open("https://www.solmads.io/", '_blank')}><TelegramComponent /></Box>
+                <Box cursor='pointer' onClick={() =>  window.open("https://twitter.com/solmadnft", '_blank')}><TwitterComponent /></Box>
+                <Box cursor='pointer' onClick={() =>  window.open("https://discord.com/invite/solmads", '_blank')}><DiscordComponent /></Box>
             </Flex>
         </Flex>
     </Box>
