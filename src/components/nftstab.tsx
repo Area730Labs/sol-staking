@@ -15,6 +15,7 @@ import MainPageContainer from "./mainpagecontainer";
 import { Button } from "./button";
 import { Label } from "./label";
 import { useStaking } from "../state/stacking";
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 
 export interface NftsTabProps {
     heading: JSX.Element
@@ -62,13 +63,13 @@ export function StakeNftsListTab(props: NftTabContentProps) {
     }
 
     const heading = (
-        <Flex flexDirection='column' alignItems='self-start' gap='5px'>
+        <Flex flexDirection='column' alignItems='flex-start' gap='5px'>
             <Text fontSize='35px'>NFT'S IN YOUR WALLET</Text>
-            <Box  display="inline-block" paddingLeft="4">Go to<Button marginLeft="2" typ="black" size="sm" onClick={() => setNftsTab("unstake")}><Label>Staked</Label></Button></Box>
+            {/* <Box  display="inline-block" >Go to<Button marginLeft="2" backgroundColor='#5E301D' color='white' size="sm" onClick={() => setNftsTab("unstake")}><Label>Staked</Label></Button></Box> */}
         </Flex>
     );
 
-    return <NftsTab emptyLabel={<Label>no NFT's to stake</Label>} heading={heading}>
+    return <NftsTab emptyLabel={<Label>No NFT's to stake</Label>} heading={heading}>
         {nftsInWallet.length > 0 ? <NftsSelector maxChunk={props.maxSelection} items={nftsInWallet} actionHandler={stakeSelectedItems} actionLabel={<Label>Stake selected</Label>} /> : null}
     </NftsTab>
 }
@@ -146,11 +147,25 @@ export function NftSelectorTabs() {
     //     setFirstShowup(false);
     // }, [nftsTabCounter]);
 
-    return <MainPageContainer paddingY="20px" paddingBottom="40">
-        <Box></Box>
-        {nftsTab === "stake" ?
+    return <MainPageContainer paddingY="20px" paddingBottom="40" marginBottom='200px'>
+        <Tabs variant='solid-rounded' colorScheme='teal'>
+            <TabList>
+                <Tab>Stake</Tab>
+                <Tab>Unstake</Tab>
+            </TabList>
+            <TabPanels marginLeft={0}>
+                <TabPanel>
+                <StakeNftsListTab maxSelection={config.max_items_per_stake} />
+                </TabPanel>
+                <TabPanel>
+                <StakedNftsListTab maxSelection={config.max_items_per_unstake} />
+                </TabPanel>
+            </TabPanels>
+        </Tabs>
+        
+        {/* {nftsTab === "stake" ?
             <StakeNftsListTab maxSelection={config.max_items_per_stake} /> :
             <StakedNftsListTab maxSelection={config.max_items_per_unstake} />
-        }
+        } */}
     </MainPageContainer>
 }
