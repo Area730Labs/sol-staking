@@ -44,8 +44,8 @@ export interface StakingContextType {
 
     activity: Operation[]
 
-    getNft(key: PublicKey) : Nft | null
-    platform_staked : PublicKey[]
+    getNft(key: PublicKey): Nft | null
+    platform_staked: PublicKey[]
 
 }
 
@@ -66,7 +66,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     const [pendingRewards, setPendingRewards] = useState<number>(0);
     const [dailyRewards, setDailyrewards] = useState(0);
     const [activity, setActivity] = useState<Operation[]>(getStakingActivityFromCache(config.stacking_config))
-   
+
     const [staked, setStaked] = useState<PublicKey[]>(getStakedFromCache(config.stacking_config))
 
     const [api, setApi] = useState<Api>(new Api("https://cldfn.com", "/staking/", config.stacking_config.toBase58()));
@@ -83,7 +83,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     // console.log('uncompressed size',JSON.stringify(nfts).length)
     // console.log('compressed size', JSON.stringify(compressed).length)
 
-    function getNft(pk : PublicKey) : Nft | null {
+    function getNft(pk: PublicKey): Nft | null {
 
         let pk_str = pk.toBase58();
 
@@ -98,7 +98,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
             }
         }
 
-       return null;
+        return null;
     }
 
     function fromStakeReceipt(receipt: StakingReceipt): Nft {
@@ -183,24 +183,31 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     }
 
     function incomePerNftCalculator(item: Nft): number {
-        const basicIncomePerNft = calcBasicIncomePerNft();
-        if (nftMultMap == null) {
-            return basicIncomePerNft;
+
+        if (item != undefined) {
+
+
+            const basicIncomePerNft = calcBasicIncomePerNft();
+            if (nftMultMap == null) {
+                return basicIncomePerNft;
+            } else {
+
+                const itemAddr = item.address.toBase58();
+                const multBb = nftMultMap[itemAddr];
+                const finalResult = basicIncomePerNft * multBb / BASIS_POINTS_100P;
+                // console.log(` --- ${itemAddr} `);
+                // console.log(` --  mult ${multBb} `)
+                // console.log(` --  final ${pretty(finalResult)} `)
+
+                const multFact = finalResult / basicIncomePerNft;
+
+                // console.log(` --  base mult fact: ${prettyNumber(multFact)}`)
+                // console.log(' ')
+
+                return finalResult;
+            }
         } else {
-
-            const itemAddr = item.address.toBase58();
-            const multBb = nftMultMap[itemAddr];
-            const finalResult = basicIncomePerNft * multBb / BASIS_POINTS_100P;
-            // console.log(` --- ${itemAddr} `);
-            // console.log(` --  mult ${multBb} `)
-            // console.log(` --  final ${pretty(finalResult)} `)
-
-            const multFact = finalResult / basicIncomePerNft;
-
-            // console.log(` --  base mult fact: ${prettyNumber(multFact)}`)
-            // console.log(' ')
-
-            return finalResult;
+            return 0.0;
         }
     }
 
@@ -333,7 +340,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                 }).then((rawitems) => {
                     let result = [];
 
-                    console.log('got raw staked items ...  ',rawitems)
+                    console.log('got raw staked items ...  ', rawitems)
 
                     for (var it of rawitems) {
                         result.push(new PublicKey(it.mint))
@@ -343,7 +350,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                 })
             }, 360, config.stacking_config.toBase58()).then(items => {
 
-                console.log('setting staked items to ... ',items)
+                console.log('setting staked items to ... ', items)
 
                 setStaked(items);
             });
@@ -416,8 +423,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                 updateStakedNfts(stakedNfts);
             });
 
-            getNftsInWalletCached({ nfts} as StakingContextType, wallet.publicKey as PublicKey, solanaConnection).then(items => {
-                console.warn('found items for staking' ,items);
+            getNftsInWalletCached({ nfts } as StakingContextType, wallet.publicKey as PublicKey, solanaConnection).then(items => {
+                console.warn('found items for staking', items);
                 updateNfts(items);
             })
 
