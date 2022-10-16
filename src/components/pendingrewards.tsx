@@ -82,29 +82,29 @@ export function ClaimPendingRewardsButton(props: any) {
         }
     }
 
-    return (<Button border='2px solid black'  width='240px' paddingLeft='20px' paddingRight='20px' backgroundColor='black' color='white' marginTop='15px' onClick={claimPendingRewardsHandler} {...props}>
-        <Flex gap='15px' justifyContent='center' alignItems='center'>
-                  Claim rewards <Box color='black' width='28px' height='28px' fontWeight='bold' borderRadius='14px' backgroundColor='white' lineHeight='28px'>I</Box>
-                  </Flex>
+    return (<Button border='2px solid black' width='240px' paddingLeft='20px' paddingRight='20px' backgroundColor='black' color='white' marginTop='15px' onClick={claimPendingRewardsHandler} {...props}>
+        <Flex gap='15px' justifyContent='center' alignItems='center' fontFamily="Outfit">
+            Claim rewards <Box color='black' width='28px' height='28px' fontWeight='bold' borderRadius='14px' backgroundColor='white' lineHeight='28px'>I</Box>
+        </Flex>
     </Button>)
 }
 
 
 export function PendingRewards(props: any) {
 
-    let { config, pretty,pendingRewards } = useStaking();
-  
+    let { config, pretty, pendingRewards } = useStaking();
+
     // let pendingRewards = 50230000008;
 
     return <Box  >
-      {pendingRewards > 0 ?
-        <Box
-          borderRadius="25px"
-        //   backgroundColor={}
-          border={`2px solid ${appTheme.stressColor2}`}
-          p="2"
-          px="4"
-        >+<Countup float="true" number={pretty(pendingRewards)} timems="300" /> {config.reward_token_name}</Box>
-        : null}
+        {pendingRewards > 0 ?
+            <Box
+                borderRadius="25px"
+                //   backgroundColor={}
+                border={`2px solid ${appTheme.stressColor2}`}
+                p="2"
+                px="4"
+            >+<Countup float="true" number={pretty(pendingRewards)} timems="300" /> {config.reward_token_name}</Box>
+            : null}
     </Box>
-  }
+}

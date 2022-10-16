@@ -23,6 +23,7 @@ import Moment from "react-moment";
 
 import config from "../config.json";
 import appTheme from "../state/theme"
+import { ChakraProps } from "@chakra-ui/react";
 
 function HistoryActionNftLink(props: { nft: NftType }) {
     return <Box>
@@ -175,7 +176,12 @@ export function OperationDecect({ operation: op }: { operation: Operation }) {
     return <></>
 }
 
-export function StakingMainInfo(props: any) {
+
+export interface StakingMainInfoProps extends ChakraProps {
+
+}
+
+export function StakingMainInfo(props: StakingMainInfoProps) {
 
     const { activity } = useStaking();
 
