@@ -58,7 +58,7 @@ export function Staking(props: StakingProviderProps) {
                         alignItems='center'
                     >
                         <TotalClaimed fontFamily="Londrina Solid" fontWeight='bold' fontSize={rFontSize} />
-                        <Text fontWeight='bold' fontFamily="Outfit" fontSize={rLabelSize} color='#8F949A'><Label>Total claimed reward</Label></Text>
+                        <Text fontWeight='bold' fontFamily="Outfit" fontSize={rLabelSize} color='#8F949A'><Label>total claimed rewards</Label></Text>
                     </Flex>
                     <Box
                         zIndex="0"
@@ -73,7 +73,7 @@ export function Staking(props: StakingProviderProps) {
                     ></Box>
                 </Box>
 
-                <Flex direction='row' justifyContent='center' alignItems='center' gap='15px'>
+                <Flex direction='row' justifyContent='center' alignItems='center' gap='15px' zIndex="1000">
                     <StakeButton />
                     <ClaimPendingRewardsButton />
                 </Flex>
