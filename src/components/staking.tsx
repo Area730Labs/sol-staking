@@ -34,9 +34,13 @@ export function StakingInfo() {
 
 export function Staking(props: StakingProviderProps) {
 
-    const rewardsBlockWidth = "856px"
-    const rewardsBlockHeight = "256px"
-    const brad = "40px"
+    const rewardsBlockWidth = "606px"
+    const rewardsBlockHeight = "166px"
+    const rewardsBorder = "4px"
+    const brad = "26px"
+    const rFontSize = "55px"
+    const rLabelSize = "23px"
+
 
     return <Box>
         <StakingProvider config={props.config} nfts={props.nfts}>
@@ -48,13 +52,13 @@ export function Staking(props: StakingProviderProps) {
                         height={rewardsBlockHeight}
                         backgroundColor='white'
                         borderRadius={brad}
-                        border='6px solid black'
+                        border={`${rewardsBorder} solid black`}
                         direction='column'
                         justifyContent='center'
                         alignItems='center'
                     >
-                        <TotalClaimed fontFamily="Londrina Solid" fontWeight='bold' fontSize='90px' />
-                        <Text fontWeight='bold' fontFamily="Outfit" fontSize='37px' color='#8F949A'><Label>Total claimed reward</Label></Text>
+                        <TotalClaimed fontFamily="Londrina Solid" fontWeight='bold' fontSize={rFontSize} />
+                        <Text fontWeight='bold' fontFamily="Outfit" fontSize={rLabelSize} color='#8F949A'><Label>Total claimed reward</Label></Text>
                     </Flex>
                     <Box
                         zIndex="0"
@@ -65,7 +69,7 @@ export function Staking(props: StakingProviderProps) {
                         width={rewardsBlockWidth}
                         height={rewardsBlockHeight}
                         background="black"
-                        border="6px solid black"
+                        border={`${rewardsBorder} solid black`}
                     ></Box>
                 </Box>
 
