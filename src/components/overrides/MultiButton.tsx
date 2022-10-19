@@ -4,6 +4,7 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { ChakraProps } from '@chakra-ui/react';
 import { Box, Text, Img } from '@chakra-ui/react';
 import ConnectButton from '../ConnectButton';
+import { toast } from 'react-toastify';
 
 export interface MultiButtonProps extends ChakraProps {
     children: string
@@ -35,13 +36,12 @@ const WalletButtonImage = (props: WalletButtonImageProps) => {
 export const WalletModalButtonOverride = ({ children = 'SELECT WALLET', onClick, ...props }) => {
     const { visible, setVisible } = useWalletModal();
 
-    const handleClick = useCallback(
-        (event: any) => {
-            if (onClick) onClick(event);
-            if (!event.defaultPrevented) setVisible(!visible);
-        },
-        [onClick, setVisible, visible]
-    );
+    const handleClick = useCallback((event: any) => {
+
+        if (onClick) onClick(event);
+        if (!event.defaultPrevented) setVisible(!visible);
+
+    }, [onClick, setVisible, visible]);
 
     return <WalletButtonImage onClick={handleClick}>{children}</WalletButtonImage>;
 };
@@ -49,13 +49,10 @@ export const WalletModalButtonOverride = ({ children = 'SELECT WALLET', onClick,
 const WalletConnectButtonOverride = ({ children, onClick, ...props }) => {
     const { wallet, connect, connecting, connected } = useWallet();
 
-    const handleClick: any = useCallback(
-        (event) => {
+    const handleClick: any = useCallback((event) => {
             if (onClick) onClick(event);
             if (!event.defaultPrevented) connect().catch(() => { });
-        },
-        [onClick, connect]
-    );
+        },[onClick, connect]);
 
     const content = useMemo(() => {
         if (children) return children;
