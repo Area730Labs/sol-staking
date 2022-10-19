@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState, useRef } from "react";
 import * as web3 from '@solana/web3.js'
 import { PublicKey } from '@solana/web3.js'
 import { WalletAdapter } from "@solana/wallet-adapter-base";
@@ -34,7 +34,9 @@ export interface AppContextType {
     sendTx: SendTxFuncType
 
     lang: Lang,
-    setLang: { (value: Lang) }
+    setLang: { (value: Lang) },
+    tab: number,
+    setTab: any
 }
 
 export interface SolanaRpc {
@@ -105,6 +107,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     const [userUpdatesCounter, setUserUpdatesCounter] = useState(0);
 
     const [nfts, setNFts] = useState([]);
+
+    const [tab, setTab] = useState(0);
 
     const [rpcQueue, setRpcQueue] = useState<QueuedRpcRequest[]>([]);
     const [queueProcessorStarted, setStarted] = useState(false);
@@ -413,7 +417,9 @@ export function AppProvider({ children }: { children: ReactNode; }) {
 
             // lang 
             lang,
-            setLang
+            setLang,
+            tab, 
+            setTab
 
         } as AppContextType;
 
@@ -423,7 +429,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         nftsTab, nftsTabClickCounter,
         rpc_wrapper, connectedWallet,
         curtx, userUpdatesCounter,
-        lang,
+        lang, tab, setTab
     ]);
 
     return (
