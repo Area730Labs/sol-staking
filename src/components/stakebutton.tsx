@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAppContext } from "../state/app";
 import * as phantom from "@solana/wallet-adapter-phantom";
 import { WalletReadyState } from "@solana/wallet-adapter-base";
@@ -8,15 +8,26 @@ import {useWalletModal} from "@solana/wallet-adapter-react-ui"
 import { Button } from "./button";
 import { Label } from "./label";
 
+
+
 export default function StakeButton(props: any) {
 
 
     const { wallet } = useWallet();
     const {setVisible} = useWalletModal();
-    const { setNftsTab } = useAppContext();
+    const { setNftsTab, setTab } = useAppContext();
+
+    const [upd, setUpd] = useState(0);
+
+    useEffect(() => {
+        
+    }, [upd]);
 
     function stakeHandler() {
         setNftsTab("stake");
+        setTab(0);
+
+        document.querySelector('#nft-tabs').scrollIntoView({behavior: 'smooth'});
 
         if (wallet == null) {
             setVisible(true);

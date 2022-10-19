@@ -17,6 +17,8 @@ import { Label } from "./label";
 import { useStaking } from "../state/stacking";
 import Nft from "../types/Nft";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
+import { useEffect, useRef } from "react";
+
 
 export interface NftsTabProps {
     heading: JSX.Element
@@ -114,9 +116,10 @@ export function StakedNftsListTab(props: NftTabContentProps) {
     </NftsTab>
 }
 
-export function NftSelectorTabs() {
 
-    const { setNftsTab } = useAppContext();
+export function NftSelectorTabs() {
+    const { setNftsTab, tab, setTab } = useAppContext();
+
 
     // const scrollRef = React.useRef<HTMLInputElement>(null);
     // const [firstShowup, setFirstShowup] = React.useState(true);
@@ -134,8 +137,14 @@ export function NftSelectorTabs() {
     //     setFirstShowup(false);
     // }, [nftsTabCounter]);
 
-    return <MainPageContainer  paddingY="20px" paddingBottom="40" marginBottom='100px' overflow='initial' >
-        <Tabs variant='solid-rounded'>
+
+    const handleTabsChange = (index) => {
+        setTab(index)
+    }
+    
+
+    return <MainPageContainer  paddingY="20px" paddingBottom="40" marginBottom='100px' overflow='initial' id='nft-tabs' >
+        <Tabs variant='solid-rounded' index={tab} onChange={handleTabsChange}>
             <TabList>
                 <Tab _selected={{ color: 'white', bg: '#5E301D' }} onClick={() => {
                     setNftsTab("stake");
