@@ -2,12 +2,12 @@ import {
   ChakraProvider,
   Box,
   Grid,
-  theme,
   Flex,
   Spacer,
   Text,
   Container,
-  Link
+  Link,
+  theme
 } from "@chakra-ui/react"
 
 import { AppProvider } from "./state/app"
