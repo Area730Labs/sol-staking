@@ -94,7 +94,7 @@ export function Footer() {
                         marginTop='15px'
                         onClick={stakeCbHandler}
                     >
-                        <Flex gap='15px' alignItems='center'>
+                        <Flex gap='15px' alignItems='center' justifyContent='center'>
                             <Label>Stake selected</Label> <Box color='white' width='36px' height='36px' fontWeight='bold' borderRadius='18px' backgroundColor='black' lineHeight='36px'>{stakeModalContext.selectedItemsCount}</Box>
                         </Flex>
                     </Button>
@@ -109,7 +109,7 @@ export function Footer() {
                     marginTop='15px'
                     onClick={unstakeCbHandler}
                     >
-                    <Flex gap='15px' alignItems='center'>
+                    <Flex gap='15px' alignItems='center' justifyContent='center'>
                         <Label>Unstake selected</Label> <Box color='white' width='36px' height='36px' fontWeight='bold' borderRadius='18px' backgroundColor='black' lineHeight='36px'>{stakedModalContext.selectedItemsCount}</Box>
                     </Flex>
                     </Button>
