@@ -135,12 +135,12 @@ export function NftSelectorTabs() {
     // }, [nftsTabCounter]);
 
     return <MainPageContainer  paddingY="20px" paddingBottom="40" marginBottom='100px' overflow='initial' >
-        <Tabs variant='solid-rounded' colorScheme='teal'>
+        <Tabs variant='solid-rounded'>
             <TabList>
-                <Tab onClick={() => {
+                <Tab _selected={{ color: 'white', bg: '#5E301D' }} onClick={() => {
                     setNftsTab("stake");
                 }}><Label>Stake</Label></Tab>
-                <Tab onClick={() => {
+                <Tab _selected={{ color: 'white', bg: '#5E301D' }} onClick={() => {
                     setNftsTab("unstake")
                 }}><Label>Unstake</Label></Tab>
             </TabList>

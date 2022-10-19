@@ -3,6 +3,7 @@ export const DiscordComponent = (props) => (
       width={37}
       height={27}
       fill="none"
+      transform="scale(0.8)"
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
@@ -18,6 +19,7 @@ export const DiscordComponent = (props) => (
       width={35}
       height={28}
       fill="none"
+      transform="scale(0.8)"
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
@@ -33,6 +35,7 @@ export const DiscordComponent = (props) => (
       width={36}
       height={31}
       fill="none"
+      transform="scale(0.8)"
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

@@ -80,11 +80,11 @@ export function Footer() {
         as="footer"
         width='100%'
         role="contentinfo"
-        padding='20px 20px 15px 20px'
+        padding='15px 20px 10px 20px'
         backgroundColor='#ffffff'
     >
         {/* <Box>Tab: {nftsTab}</Box> */}
-        <Flex direction='column' width='100%' height='100%' alignItems='center' gap='10px'>
+        <Flex direction='column' width='990px' height='100%' alignItems='center' gap='10px' margin='auto'>
             {nftsTab == "stake" ?
                 <>
                     {stakeModalContext.selectedItemsPopupVisible && (
@@ -118,10 +118,10 @@ export function Footer() {
             }
             <Spacer />
             <Flex direction='row' gap='25px' width='100%'>
-                <Text color="#9A9CA1" fontSize='16px'>Copyright© 2022. <Label>All right reserved.</Label></Text>
-                <Text cursor='pointer' color="#9A9CA1" fontSize='16px' textDecoration='underline'><Label>Help</Label></Text>
-                <Text cursor='pointer' color="#9A9CA1" fontSize='16px' textDecoration='underline'><Label>Privacy</Label></Text>
-                <Text cursor='pointer' color="#9A9CA1" fontSize='16px' textDecoration='underline'><Label>Message Us</Label></Text>
+                <Text color="#9A9CA1" fontSize='14px'>Copyright© 2022. <Label>All right reserved.</Label></Text>
+                <Text cursor='pointer' color="#9A9CA1" fontSize='14px' textDecoration='underline'><Label>Help</Label></Text>
+                <Text cursor='pointer' color="#9A9CA1" fontSize='14px' textDecoration='underline'><Label>Privacy</Label></Text>
+                <Text cursor='pointer' color="#9A9CA1" fontSize='14px' textDecoration='underline'><Label>Message Us</Label></Text>
 
                 <Spacer />
 

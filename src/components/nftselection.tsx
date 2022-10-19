@@ -122,7 +122,7 @@ function MultiplicationWithSuggestion(props: { value: number, children: any }) {
     return <Box
       borderRadius="30px"
       // background={!isHovering ? appTheme.stressColor : appTheme.stressColor2}
-      background='#EACC9D'
+      background='#ffd085'
       // boxShadow="dark-lg"
       // color={!isHovering ? "white" : "black"}
       color='#5E301D'
