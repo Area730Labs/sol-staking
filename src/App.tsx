@@ -84,12 +84,12 @@ export function App() {
                   height='126px'
                   position="relative"
                   zIndex="2001">
-                  <Box marginTop='23px'  >
-                    <LogoComponent />
+                  <Box marginTop='19px' marginLeft='8px' >
+                    <LogoComponent  />
                   </Box>
 
                   <Spacer />
-                  <LangSelector />
+                  {/* <LangSelector /> */}
                   <MultiButton>
                     Connect
                   </MultiButton>

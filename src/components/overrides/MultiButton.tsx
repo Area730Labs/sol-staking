@@ -19,17 +19,7 @@ const WalletButtonImage = (props: WalletButtonImageProps) => {
 
     let { children, ...rest } = props;
 
-    return <Box
-        position="absolute"
-        height="95px"
-        zIndex={150}
-        right="10px"
-        top="0px"
-        cursor="pointer"
-        {...rest}
-    >
-        <ConnectButton label={props.children} />
-    </Box>
+    return <ConnectButton label={props.children} {...rest} />
 }
 
 
