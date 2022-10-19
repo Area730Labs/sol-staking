@@ -8,9 +8,9 @@ import { CurrentTx, getCurrentTx, storeCurrentTx } from "./currenttx"
 import { getLanguageFromCache, Lang } from "../components/langselector";
 import global_config from '../config.json'
 import { getAllNfts } from "../blockchain/nfts";
-import { getOrConstruct } from "../types/cacheitem";
-import { Toast } from "react-toastify/dist/components";
+import { useWallet } from "@solana/wallet-adapter-react"
 import { getMinimumBalanceForRentExemptAccount } from "@solana/spl-token";
+
 export type RankMultiplyerMap = { [key: string]: number }
 export type NftsSelectorTab = "stake" | "unstake"
 export type TransactionType = "stake" | "unstake" | "platform" | "claim" | "other"
@@ -251,6 +251,18 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             })();
         }
     }, [web3Handler]);
+
+    const { publicKey, connected, wallet: wp } = useWallet();
+
+    useEffect(() => {
+
+        if (connected) {
+            setWallet(wp.adapter);
+        } else {
+            setWallet(null);
+        }
+
+    }, [publicKey, connected, wp])
 
 
     function changeNftsTab(openedTab: NftsSelectorTab) {

@@ -21,7 +21,6 @@ import LangSelector from "./components/langselector"
 import global_config from "./config.json"
 import AppMainModal from "./appmainmodal"
 
-import nfts from "./data/nfts.json"
 
 import { Staking } from "./components/staking";
 import { Lines } from "./components/lines";
@@ -31,8 +30,12 @@ import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react
 import Config from "./config.json"
 import { useMemo } from "react";
 import { SolflareWalletAdapter, PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
+
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 
+import nfts from "./data/nfts.json"
+require('@solana/wallet-adapter-react-ui/styles.css');
+require("./styles/overrides.css")
 
 export function App() {
 
