@@ -1,8 +1,7 @@
-import { Box, Flex, Spacer, Text } from "@chakra-ui/react";
+import { Box, chakra, Flex, Spacer, Text } from "@chakra-ui/react";
 import { toast } from 'react-toastify'
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "./button";
-import Fadeable from "./fadeable";
 import { DiscordComponent, TelegramComponent, TwitterComponent } from "./icons";
 import { Label } from "./label";
 import { useStaking } from "../state/stacking";
@@ -13,6 +12,23 @@ import { createClaimIx, createStakeNftIx, createStakeOwnerIx, createUnstakeNftIx
 import { getStakeOwnerForWallet } from "../state/user";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 
+import { shouldForwardProp } from '@chakra-ui/react';
+import { motion, isValidMotionProp } from 'framer-motion';
+import { duration } from "moment";
+
+const ChakraBox = chakra(motion.div, {
+
+    /**
+     * Allow motion props and non-Chakra props to be forwarded.
+     */
+    shouldForwardProp: (prop) => isValidMotionProp(prop) || shouldForwardProp(prop),
+});
+
+const animation = {
+    scale: [1, 2, 1],
+    borderRadius: ["20%","36px"],
+};
+
 export function Footer() {
 
     const staking = useStaking();
@@ -20,9 +36,24 @@ export function Footer() {
 
     const { nftsTab, sendTx, wallet, solanaConnection } = useAppContext();
 
-    const unstakeCbHandler = useCallback(async () => {
+    const [height, setHeight] = useState(0);
+    const [anim,setAnim] = useState(null);
 
-        // toast.info(`perform action with selected items: ${JSON.stringify(stakeModalContext.selectedItems)}`)
+    const [counter, setCounter] = useState(0);
+
+    useEffect(() => {
+        if (stakedModalContext.selectedItemsCount > 0 || stakeModalContext.selectedItemsCount > 0) {
+            setHeight(132)
+            setAnim(animation);
+            setCounter(counter + 1);
+        } else {
+            setAnim(null);
+            setAnim(animation);
+            setHeight(0);
+        }
+    }, [stakedModalContext.selectedItemsCount, stakeModalContext.selectedItemsCount]);
+
+    const unstakeCbHandler = useCallback(async () => {
 
         let instructions = [] as TransactionInstruction[];
 
@@ -51,8 +82,6 @@ export function Footer() {
 
 
     const stakeCbHandler = useCallback(() => {
-
-        toast.info(`perform action with selected items: ${JSON.stringify(stakeModalContext.selectedItems)}`)
 
         let instructions = [] as TransactionInstruction[];
 
@@ -85,37 +114,67 @@ export function Footer() {
     >
         {/* <Box>Tab: {nftsTab}</Box> */}
         <Flex direction='column' width='990px' height='100%' alignItems='center' gap='10px' margin='auto'>
-            {nftsTab == "stake" ?
-                <>
-                    {stakeModalContext.selectedItemsPopupVisible && (
-                        <Button
-                        width='310px'
-                        border='3px solid black'
-                        marginTop='15px'
-                        onClick={stakeCbHandler}
-                    >
-                        <Flex gap='15px' alignItems='center' justifyContent='center'>
-                            <Label>Stake selected</Label> <Box color='white' width='36px' height='36px' fontWeight='bold' borderRadius='18px' backgroundColor='black' lineHeight='36px'>{stakeModalContext.selectedItemsCount}</Box>
-                        </Flex>
-                    </Button>
-                    )}
-                    
-                </> :
-                <>
-                {stakedModalContext.selectedItemsPopupVisible && (
-                    <Button
-                    width='310px'
-                    border='3px solid black'
-                    marginTop='15px'
-                    onClick={unstakeCbHandler}
-                    >
-                    <Flex gap='15px' alignItems='center' justifyContent='center'>
-                        <Label>Unstake selected</Label> <Box color='white' width='36px' height='36px' fontWeight='bold' borderRadius='18px' backgroundColor='black' lineHeight='36px'>{stakedModalContext.selectedItemsCount}</Box>
-                    </Flex>
-                    </Button>
-                )} 
-                </>
-            }
+            <Box height={height + "px"} transition="all .2s ease-out">
+                {nftsTab == "stake" ?
+                    <>
+                        {stakeModalContext.selectedItemsPopupVisible && (
+                            <Button
+                                width='310px'
+                                border='3px solid black'
+                                marginTop='15px'
+                                onClick={stakeCbHandler}
+                            >
+                                <Flex gap='15px' alignItems='center' justifyContent='center'>
+                                    <Label>Stake selected</Label>
+                                    <ChakraBox
+                                        key={counter}
+                                        color='white'
+                                        width='36px'
+                                        height='36px'
+                                        fontWeight='bold'
+                                        borderRadius='18px'
+                                        backgroundColor='black'
+                                        lineHeight='36px'
+                                        animate={anim}
+                                        transition="all .2s ease">
+                                        {stakeModalContext.selectedItemsCount}
+                                    </ChakraBox>
+                                    {/* <Box
+                                        color='white'
+                                        width='36px'
+                                        height='36px'
+                                        fontWeight='bold'
+                                        borderRadius='18px'
+                                        backgroundColor='black'
+                                        lineHeight='36px'
+                                        animate={{
+                                            scale: [1, 2, 2, 1, 1],
+                                            rotate: [0, 0, 270, 270, 0],
+                                            borderRadius: ["20%", "20%", "50%", "50%", "20%"],
+                                        }}
+
+                                    >{stakeModalContext.selectedItemsCount}</Box> */}
+                                </Flex>
+                            </Button>
+                        )}
+
+                    </> :
+                    <>
+                        {stakedModalContext.selectedItemsPopupVisible && (
+                            <Button
+                                width='310px'
+                                border='3px solid black'
+                                marginTop='15px'
+                                onClick={unstakeCbHandler}
+                            >
+                                <Flex gap='15px' alignItems='center' justifyContent='center'>
+                                    <Label>Unstake selected</Label> <Box color='white' width='36px' height='36px' fontWeight='bold' borderRadius='18px' backgroundColor='black' lineHeight='36px'>{stakedModalContext.selectedItemsCount}</Box>
+                                </Flex>
+                            </Button>
+                        )}
+                    </>
+                }
+            </Box>
             <Spacer />
             <Flex direction='row' gap='25px' width='100%'>
                 <Text color="#9A9CA1" fontSize='14px'>Copyright© 2022. <Label>All right reserved.</Label></Text>
@@ -129,6 +188,6 @@ export function Footer() {
                 <Box cursor='pointer' onClick={() => window.open("https://twitter.com/solmadnft", '_blank')}><TwitterComponent /></Box>
                 <Box cursor='pointer' onClick={() => window.open("https://discord.com/invite/solmads", '_blank')}><DiscordComponent /></Box>
             </Flex>
-        </Flex>
-    </Box>
+        </Flex >
+    </Box >
 }

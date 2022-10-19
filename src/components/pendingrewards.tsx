@@ -14,6 +14,7 @@ import { Flex } from "@chakra-ui/layout";
 import { useState } from "react";
 import { ChakraProps } from "@chakra-ui/react";
 import { Label } from "./label";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 
 function RewardInfoBlock(props: ChakraProps & any) {
     return <Box
@@ -80,6 +81,7 @@ export function ClaimPendingRewardsButton(props: any) {
     const ctx = useAppContext();
     const staking = useStaking();
     const { setModalVisible, setTaxModal } = useModal();
+    const { setVisible } = useWalletModal();
 
     // const [hovered, setHovered] = useState(false);
     const [opactiy, setOpacity] = useState(0.0);
@@ -89,15 +91,20 @@ export function ClaimPendingRewardsButton(props: any) {
     async function claimPendingRewardsHandler() {
 
         if (ctx.wallet == null || ctx.wallet.publicKey == null) {
-            toast.info('No wallet connected. Use Stake button for now');
+            setVisible(true);
         } else {
-            const [taxed, totalTax] = staking.getTaxedItems();
 
-            if (totalTax > 0) {
-                setTaxModal(true);
-                setModalVisible(true);
+            if (pendingRewards == 0) {
+                toast.warn(<Label>No rewards to claim</Label>)
             } else {
-                claimPendingrewardsHandlerImpl(ctx, staking);
+
+                const [taxed, totalTax] = staking.getTaxedItems();
+                if (totalTax > 0) {
+                    setTaxModal(true);
+                    setModalVisible(true);
+                } else {
+                    claimPendingrewardsHandlerImpl(ctx, staking);
+                }
             }
         }
     }
