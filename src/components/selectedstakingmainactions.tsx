@@ -1,16 +1,10 @@
-import { Box, Container, HStack, Text, VStack, Grid, GridItem, Flex, Spacer } from "@chakra-ui/layout";
-import DailyRewardValue from "../dailyrewardvalue";
-import { DevButtons } from "../dev";
-import TotalClaimed from "../totalclaimed";
+import { Box, Text, Grid, Flex, Spacer } from "@chakra-ui/layout";
 import { Label } from "./label";
 import MainPageContainer from "./mainpagecontainer";
-import { ClaimPendingRewardsButton, PendingRewards } from "./pendingrewards";
-import RewardImage from "./rewardimage";
-import StakeButton from "./stakebutton";
 import { StakingInfo } from "./staking";
 import Address from "./address";
 import HistoryAction from "./historyaction";
-import SmallStakedNftsList, { StakedSmallNft } from "../smallstakednftslist";
+import { StakedSmallNft } from "../smallstakednftslist";
 import SmallNftBlock from "../smallnftblock";
 import { PublicKey } from "@solana/web3.js";
 import global_config from "../config.json"

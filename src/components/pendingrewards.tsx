@@ -13,6 +13,7 @@ import appTheme from "../state/theme"
 import { Flex } from "@chakra-ui/layout";
 import { useState } from "react";
 import { ChakraProps } from "@chakra-ui/react";
+import { Label } from "./label";
 
 function RewardInfoBlock(props: ChakraProps & any) {
     return <Box
@@ -81,12 +82,9 @@ export function ClaimPendingRewardsButton(props: any) {
     const { setModalVisible, setTaxModal } = useModal();
 
     // const [hovered, setHovered] = useState(false);
-    const [opactiy,setOpacity] = useState(0.0);
+    const [opactiy, setOpacity] = useState(0.0);
 
-    const { pretty, config } = useStaking();
-
-    // todo use real 
-    const pendingRewards = 293503633937.23939;
+    const { pendingRewards, pretty, config } = useStaking();
 
     async function claimPendingRewardsHandler() {
 
@@ -130,7 +128,21 @@ export function ClaimPendingRewardsButton(props: any) {
             >
                 {pretty(pendingRewards)} {config.reward_token_name}
             </Box>
-            : null
+            : <Box
+                transition="all .1s ease"
+                opacity={opactiy}
+                position="absolute"
+                borderRadius="32px"
+                bottom={"0px"}
+                right={"-150px"}
+                padding="4"
+                backgroundColor="rgb(255 208 133)"
+                color="rgb(94 48 29)"
+                fontFamily="Outfit"
+                cursor="pointer"
+            >
+                <Label>No pending rewards</Label>
+            </Box>
         }
     </Box>)
 }
@@ -139,8 +151,6 @@ export function ClaimPendingRewardsButton(props: any) {
 export function PendingRewards(props: any) {
 
     let { config, pretty, pendingRewards } = useStaking();
-
-    // let pendingRewards = 50230000008;
 
     return <Box  >
         {pendingRewards > 0 ?

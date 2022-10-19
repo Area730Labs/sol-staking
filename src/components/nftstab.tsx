@@ -1,18 +1,10 @@
-import { Flex, Text, Box, HStack } from "@chakra-ui/layout";
-import { WalletAdapter } from "@solana/wallet-adapter-base";
-import { Connection, PublicKey, TransactionInstruction } from "@solana/web3.js";
-import React from "react";
-import { toast } from "react-toastify";
-import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
-import { createClaimIx, createStakeNftIx, createStakeOwnerIx, createUnstakeNftIx } from "../blockchain/instructions";
+import { Flex, Text, Box } from "@chakra-ui/layout";
+import { PublicKey  } from "@solana/web3.js";
 import EmptyRow from "../emptyrow";
 import NftsSelector from "../stake";
-import { SolanaRpc, useAppContext } from "../state/app";
-import { getStakeOwnerForWallet } from "../state/user";
-import appTheme from "../state/theme"
+import { useAppContext } from "../state/app";
 import config from "../config.json"
 import MainPageContainer from "./mainpagecontainer";
-import { Button } from "./button";
 import { Label } from "./label";
 import { useStaking } from "../state/stacking";
 import Nft from "../types/Nft";
@@ -45,7 +37,6 @@ export function StakeNftsListTab(props: NftTabContentProps) {
     const { sendTx, setNftsTab } = useAppContext();
     const staking = useStaking();
     const { config, stakeModalContext } = staking;
-
 
     const nftsInWallet: Nft[] = [
         {
@@ -109,8 +100,8 @@ export function StakedNftsListTab(props: NftTabContentProps) {
         </Flex>
     );
 
-    return <NftsTab emptyLabel={<Label>No NFT's to unstake</Label>} heading={heading}>
-        {items.length > 0 ? <NftsSelector modalState={modalContext} maxChunk={props.maxSelection} items={items} /> : null}
+    return <NftsTab emptyLabel={<Label>no staked NFT's</Label>} heading={heading}>
+        {items.length > 0 ? <><Box>length &nbsp; 0</Box><NftsSelector modalState={modalContext} maxChunk={props.maxSelection} items={items} /></> : null}
     </NftsTab>
 }
 
