@@ -85,6 +85,7 @@ export function ClaimPendingRewardsButton(props: any) {
 
     const { pretty, config } = useStaking();
 
+    // todo use real 
     const pendingRewards = 293503633937.23939;
 
     async function claimPendingRewardsHandler() {
@@ -122,8 +123,8 @@ export function ClaimPendingRewardsButton(props: any) {
                 bottom={"0px"}
                 right={"-150px"}
                 padding="4"
-                backgroundColor="rgba(0,0,0,.6)"
-                color="white"
+                backgroundColor="rgb(255 208 133)"
+                color="rgb(94 48 29)"
                 fontFamily="Outfit"
                 cursor="pointer"
             >
