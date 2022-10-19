@@ -21,7 +21,7 @@ import LangSelector from "./components/langselector"
 import global_config from "./config.json"
 import AppMainModal from "./appmainmodal"
 
-
+import { LogoComponent } from "./components/icons";
 import { Staking } from "./components/staking";
 import { Lines } from "./components/lines";
 import { MultiButton } from "./components/overrides/MultiButton";
@@ -84,11 +84,12 @@ export function App() {
                   height='126px'
                   position="relative"
                   zIndex="2001">
-                  <Box marginTop='23px'>
-                    <img src={process.env.PUBLIC_URL + '/logo512.png'} />
+                  <Box marginTop='19px' marginLeft='8px' >
+                    <LogoComponent  />
                   </Box>
+
                   <Spacer />
-                  <LangSelector />
+                  {/* <LangSelector /> */}
                   <MultiButton>
                     Connect
                   </MultiButton>
