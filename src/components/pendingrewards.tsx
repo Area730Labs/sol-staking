@@ -6,12 +6,26 @@ import { createClaimIx, createClaimStakeOwnerIx, createStakeOwnerIx, findAssocia
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 import { createAssociatedTokenAccountInstruction } from "@solana/spl-token";
 import { getStakeOwnerForWallet } from "../state/user";
-import { Label } from "./label";
 import { Button } from "./button";
 import { Box } from "@chakra-ui/layout";
 import Countup from "./countup";
 import appTheme from "../state/theme"
 import { Flex } from "@chakra-ui/layout";
+import { useState } from "react";
+import { ChakraProps } from "@chakra-ui/react";
+
+function RewardInfoBlock(props: ChakraProps & any) {
+    return <Box
+        color='black'
+        width='28px'
+        height='28px'
+        fontWeight='bold'
+        borderRadius='14px'
+        backgroundColor='white'
+        lineHeight='28px'
+        {...props}
+    >I</Box>
+}
 
 export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, stakingctx: StakingContextType) {
 
@@ -66,6 +80,13 @@ export function ClaimPendingRewardsButton(props: any) {
     const staking = useStaking();
     const { setModalVisible, setTaxModal } = useModal();
 
+    // const [hovered, setHovered] = useState(false);
+    const [opactiy,setOpacity] = useState(0.0);
+
+    const { pretty, config } = useStaking();
+
+    const pendingRewards = 293503633937.23939;
+
     async function claimPendingRewardsHandler() {
 
         if (ctx.wallet == null || ctx.wallet.publicKey == null) {
@@ -82,11 +103,35 @@ export function ClaimPendingRewardsButton(props: any) {
         }
     }
 
-    return (<Button border='2px solid black' width='240px' paddingLeft='20px' paddingRight='20px' backgroundColor='black' color='white' marginTop='15px' onClick={claimPendingRewardsHandler} {...props}>
-        <Flex gap='15px' justifyContent='center' alignItems='center' fontFamily="Outfit">
-            Claim rewards <Box color='black' width='28px' height='28px' fontWeight='bold' borderRadius='14px' backgroundColor='white' lineHeight='28px'>I</Box>
-        </Flex>
-    </Button>)
+    return (<Box position="relative">
+        <Button border='2px solid black' width='240px' paddingLeft='20px' paddingRight='20px' backgroundColor='black' color='white' marginTop='15px' onClick={claimPendingRewardsHandler} {...props}>
+            <Flex gap='15px' justifyContent='center' alignItems='center' fontFamily="Outfit">
+                Claim rewards <RewardInfoBlock onMouseEnter={() => {
+                    setOpacity(1);
+                }} onMouseLeave={() => {
+                    setOpacity(0);
+                }} />
+            </Flex>
+        </Button>
+        {pendingRewards > 0 ?
+            <Box
+                transition="all .1s ease"
+                opacity={opactiy}
+                position="absolute"
+                borderRadius="32px"
+                bottom={"0px"}
+                right={"-150px"}
+                padding="4"
+                backgroundColor="rgba(0,0,0,.6)"
+                color="white"
+                fontFamily="Outfit"
+                cursor="pointer"
+            >
+                {pretty(pendingRewards)} {config.reward_token_name}
+            </Box>
+            : null
+        }
+    </Box>)
 }
 
 
