@@ -18,6 +18,8 @@ import { duration } from "moment";
 
 const ChakraBox = chakra(motion.div, {
 
+    animationDuration : "",
+
     /**
      * Allow motion props and non-Chakra props to be forwarded.
      */
@@ -25,7 +27,7 @@ const ChakraBox = chakra(motion.div, {
 });
 
 const animation = {
-    scale: [1, 2, 1],
+    scale: [1, 1.5,1],
     borderRadius: ["20%","36px"],
 };
 
@@ -44,11 +46,11 @@ export function Footer() {
     useEffect(() => {
         if (stakedModalContext.selectedItemsCount > 0 || stakeModalContext.selectedItemsCount > 0) {
             setHeight(132)
-            setAnim(animation);
+            // setAnim(animation);
             setCounter(counter + 1);
         } else {
-            setAnim(null);
-            setAnim(animation);
+            // setAnim(null);
+            // setAnim(animation);
             setHeight(0);
         }
     }, [stakedModalContext.selectedItemsCount, stakeModalContext.selectedItemsCount]);
@@ -135,8 +137,10 @@ export function Footer() {
                                         borderRadius='18px'
                                         backgroundColor='black'
                                         lineHeight='36px'
-                                        animate={anim}
-                                        transition="all .2s ease">
+                                        animate={animation}
+                                        transition={{duration:"0.2"}}
+                                        // transition="all .2s ease"
+                                        >
                                         {stakeModalContext.selectedItemsCount}
                                     </ChakraBox>
                                     {/* <Box
