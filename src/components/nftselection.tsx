@@ -5,6 +5,7 @@ import { Box, GridItem, Text } from "@chakra-ui/layout";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Image } from "@chakra-ui/image";
 import { useAppContext } from "../state/app";
+import config from "../config.json";
 import { StakingContextType, useStaking } from "../state/stacking";
 
 export interface NftSelectionProps {
@@ -17,11 +18,21 @@ export interface NftSelectionProps {
 export function NftSelection(props: NftSelectionProps | any) {
 
   const ctx = useAppContext();
+  const staking = props.staking
 
   const [selected, setSelected] = useState<boolean>(false);
+  const [mult, setMult] = useState(0);
+  const [dailyIncome, setDailyIncome] = useState(0);
 
   const nftInfo = props.item;
   const borderSize = props.borderSize ?? 4;
+
+  useEffect(() => {
+    if (staking.nftMultMap != null) {
+      setMult(staking.nftMultMap[nftInfo.address.toBase58()] / 10000)
+      setDailyIncome(staking.pretty(staking.incomePerNftCalculator(props.item)))
+    }
+  }, [staking.platform, staking.nftMultMap])
 
   function clickHandler() {
 
