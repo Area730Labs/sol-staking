@@ -38,40 +38,40 @@ export function StakeNftsListTab(props: NftTabContentProps) {
 
     const { sendTx, setNftsTab } = useAppContext();
     const staking = useStaking();
-    const { config, stakeModalContext } = staking;
+    const { config, stakeModalContext,nftsInWallet } = staking;
 
-    const nftsInWallet: Nft[] = [
-        {
-            address: new PublicKey("7xkNyQH8xyfKeDnWuSjFvuFAQA22odY9JCsmJfY9oUbN"),
-            name: "Solmads OG Pass #209",
-            image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/6kNSZRefRxGsCUgccL-eE8gIj-hLcitQpLlh19vI3eo",
-        },
-        {
-            address: new PublicKey("5gf8U7nWGoTb9s9VrEUoTsMgCVYXjZn3UykMjzSGLTUq"),
-            name: "Solmads OG Pass #111",
-            image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/gRHy0kzQkzlZf-GS7EauOG13vZ8d9VT9vNU9J_ABuvo"
-        },
-        {
-            address: new PublicKey("AEoTin5HbEekwFhvHcHAqGaeuLz2PS562jFZsPM1Gvjc"),
-            "name": "Solmads OG Pass #1",
-            image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/vzdQhvB_aHW4x3rLAeoOxUsMytTzXXpcIrfCwscXjCI"
-        },
-        {
-            address: new PublicKey("7xkNyQH8xyfKeDnWuSjFvuFAQA22odY9JCsmJfY9oUbN"),
-            name: "Solmads OG Pass #209",
-            image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/6kNSZRefRxGsCUgccL-eE8gIj-hLcitQpLlh19vI3eo",
-        },
-        {
-            address: new PublicKey("5gf8U7nWGoTb9s9VrEUoTsMgCVYXjZn3UykMjzSGLTUq"),
-            name: "Solmads OG Pass #111",
-            image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/gRHy0kzQkzlZf-GS7EauOG13vZ8d9VT9vNU9J_ABuvo"
-        },
-        {
-            address: new PublicKey("AEoTin5HbEekwFhvHcHAqGaeuLz2PS562jFZsPM1Gvjc"),
-            "name": "Solmads OG Pass #1",
-            image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/vzdQhvB_aHW4x3rLAeoOxUsMytTzXXpcIrfCwscXjCI"
-        }
-    ];
+    // const nftsInWallet: Nft[] = [
+    //     {
+    //         address: new PublicKey("7xkNyQH8xyfKeDnWuSjFvuFAQA22odY9JCsmJfY9oUbN"),
+    //         name: "Solmads OG Pass #209",
+    //         image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/6kNSZRefRxGsCUgccL-eE8gIj-hLcitQpLlh19vI3eo",
+    //     },
+    //     {
+    //         address: new PublicKey("5gf8U7nWGoTb9s9VrEUoTsMgCVYXjZn3UykMjzSGLTUq"),
+    //         name: "Solmads OG Pass #111",
+    //         image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/gRHy0kzQkzlZf-GS7EauOG13vZ8d9VT9vNU9J_ABuvo"
+    //     },
+    //     {
+    //         address: new PublicKey("AEoTin5HbEekwFhvHcHAqGaeuLz2PS562jFZsPM1Gvjc"),
+    //         "name": "Solmads OG Pass #1",
+    //         image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/vzdQhvB_aHW4x3rLAeoOxUsMytTzXXpcIrfCwscXjCI"
+    //     },
+    //     {
+    //         address: new PublicKey("7xkNyQH8xyfKeDnWuSjFvuFAQA22odY9JCsmJfY9oUbN"),
+    //         name: "Solmads OG Pass #209",
+    //         image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/6kNSZRefRxGsCUgccL-eE8gIj-hLcitQpLlh19vI3eo",
+    //     },
+    //     {
+    //         address: new PublicKey("5gf8U7nWGoTb9s9VrEUoTsMgCVYXjZn3UykMjzSGLTUq"),
+    //         name: "Solmads OG Pass #111",
+    //         image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/gRHy0kzQkzlZf-GS7EauOG13vZ8d9VT9vNU9J_ABuvo"
+    //     },
+    //     {
+    //         address: new PublicKey("AEoTin5HbEekwFhvHcHAqGaeuLz2PS562jFZsPM1Gvjc"),
+    //         "name": "Solmads OG Pass #1",
+    //         image: "https://img-cdn.magiceden.dev/rs:fill:640:640:0:0/plain/https://arweave.net/vzdQhvB_aHW4x3rLAeoOxUsMytTzXXpcIrfCwscXjCI"
+    //     }
+    // ];
 
     const heading = (
         <Flex flexDirection='column' alignItems='flex-start' gap='5px'>

@@ -45,7 +45,7 @@ export function Footer() {
 
     useEffect(() => {
         if (stakedModalContext.selectedItemsCount > 0 || stakeModalContext.selectedItemsCount > 0) {
-            setHeight(132)
+            setHeight(82)
             // setAnim(animation);
             setCounter(counter + 1);
         } else {

@@ -15,6 +15,7 @@ import { PublicKey } from "@solana/web3.js";
 import { TaxedItem } from "../types/taxeditem";
 import { Operation } from "../types/operation";
 import { Api } from "../api";
+import { getRank } from "../blockchain/instructions";
 
 export interface StakingContextType {
     config: Config,
@@ -415,6 +416,11 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                 const rule = platform.multiplyRule;
 
                 for (var it of nfts) {
+
+                    if (it.props.rank == undefined) {
+                        it.props.rank = getRank(it.props);
+                    }
+
                     const matched = matchRule(rule, it.props.rank)
                     if (matched != null) {
 

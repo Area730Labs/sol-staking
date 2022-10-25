@@ -30,16 +30,30 @@ import { updateStaking, UpdateStakingAccounts, UpdateStakingArgs } from "./idl/i
 import { resizeObject, ResizeObjectAccounts } from "./idl/instructions/resizeObject";
 import { StakingContextType } from "../state/stacking";
 
+export function getRank(props: any): number {
+    if (props.Age == "Learner") {
+        return 1;
+    } else if (props.Age == "Earner") {
+        return 2;
+    } else if (props.Age == "Elder") {
+        return 3;
+    }
+}
 
 export function getMerkleTree(staking: StakingContextType): MerkleTree {
 
     const leaves = buildLeaves(
-        staking.nfts.map((e, i) => ({
-            address: new PublicKey(e.address),
-            props: e.props,
-            name: e.name,
-            image: e.image
-        } as Nft))
+        staking.nfts.map((e, i) => {
+
+            e.props.rank = getRank(e.props);
+
+            return {
+                address: new PublicKey(e.address),
+                props: e.props,
+                name: e.name,
+                image: e.image
+            } as Nft
+        })
     );
 
     const tree = new MerkleTree(leaves);
@@ -189,13 +203,13 @@ export function createUpdateStakingPlatformIx(
         start: new BN(now.getTime()),
         root: whitelist.getRootArray(),
         multiplierRule: {
-            steps: 6,
+            steps: 2,
             conds: [{
-                from: 1,
-                value: 500
+                from: 2,
+                value: 167
             }, {
-                from: 4,
-                value: 230
+                from: 3,
+                value: 300
             }, {
                 from: 31,
                 value: 210
@@ -217,7 +231,7 @@ export function createUpdateStakingPlatformIx(
             }] as Condition[]
         } as Rule,
         taxRule: {
-            steps: 7,
+            steps: 0,
             conds: [{
                 from: 0,
                 value: 60

@@ -22,6 +22,7 @@ import { Label } from "./label";
 import { Button } from "./button";
 import { DiscordComponent, TelegramComponent, TwitterComponent } from "./icons";
 import { Footer } from "./footer";
+import { DevButtons } from "../dev";
 
 export function StakingInfo() {
 
@@ -81,9 +82,10 @@ export function Staking(props: StakingProviderProps) {
                 </Flex>
             </Flex>
 
-            <StakingMainInfo fontFamily="Outfit" marginTop="10" p="3" zIndex="2000"/>
+            <StakingMainInfo fontFamily="Outfit" marginTop="10" p="3" zIndex="2000" />
+            <DevButtons></DevButtons>
             <NftSelectorTabs />
-            <Footer/>
+            <Footer />
         </StakingProvider>
     </Box>
 }

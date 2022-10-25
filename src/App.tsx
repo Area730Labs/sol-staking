@@ -33,7 +33,7 @@ import { SolflareWalletAdapter, PhantomWalletAdapter } from '@solana/wallet-adap
 
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 
-import nfts from "./data/nfts.json"
+import nfts from "./data/solmads.json"
 require('@solana/wallet-adapter-react-ui/styles.css');
 require("./styles/overrides.css")
 
@@ -57,7 +57,7 @@ export function App() {
       pauseOnHover
     />
     <ConnectionProvider endpoint={Config.cluster_url}>
-      <WalletProvider wallets={wallets} >
+      <WalletProvider wallets={wallets} autoConnect={true} >
         <WalletModalProvider>
           <AppProvider>
             <ModalProvider>
