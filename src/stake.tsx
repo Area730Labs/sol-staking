@@ -14,6 +14,7 @@ import NftSelectorGrid from "./components/nftselectorgrid";
 import React, { ReactNode } from "react";
 import global_config from "./config.json"
 import { NftSelectorContext, useStaking } from "./state/stacking";
+import { NftPlaceholder } from "./components/NftPlaceholder";
 
 export interface NftsSelectorProps {
     items: Nft[]
@@ -85,13 +86,7 @@ export default function NftsSelector(props: NftsSelectorProps) {
 
     if (items && diffToDraw != 0) {
         for (var i = 0; i < diffToDraw; i++) {
-            nftsPlaceholders.push(<GridItem
-                key={i}
-                w="100%"
-                maxH='280px'
-                borderRadius={appTheme.borderRadius}
-                transition={appTheme.transition}
-                backgroundColor={"whiteAlpha.100"}></GridItem>)
+            nftsPlaceholders.push(<NftPlaceholder/>)
         }
     }
 

@@ -206,7 +206,8 @@ export function createUpdateStakingPlatformIx(
             steps: 2,
             conds: [{
                 from: 2,
-                value: 167
+                valueIsBp: true,
+                value: 16667
             }, {
                 from: 3,
                 value: 300

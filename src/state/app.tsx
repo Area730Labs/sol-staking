@@ -160,7 +160,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                         }>
                     >
                 > {
-                    return this.generate_result_promise(QueuedRpcRequestType.get_program_accs, [
+                    return this.generate_result_promise(QueuedRpcRequestType.get_parsed_token_accs, [
                         ownerAddress,
                         filter,
                         commitment
@@ -173,9 +173,12 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                 },
                 generate_result_promise(typ: QueuedRpcRequestType, args_value: any[]): Promise<any> {
 
+
+                    const copiedType = typ; 
+
                     return new Promise<any>((resolve, reject) => {
                         rpcQueue.push({
-                            type: typ,
+                            type: copiedType,
                             args: args_value,
                             resolve: resolve,
                             reject: reject,

@@ -103,7 +103,7 @@ export function StakedNftsListTab(props: NftTabContentProps) {
     );
 
     return <NftsTab emptyLabel={<Label>no staked NFT's</Label>} heading={heading}>
-        {items.length > 0 ? <><Box>length &nbsp; 0</Box><NftsSelector modalState={modalContext} maxChunk={props.maxSelection} items={items} /></> : null}
+        {items.length > 0 ? <><NftsSelector modalState={modalContext} maxChunk={props.maxSelection} items={items} /></> : null}
     </NftsTab>
 }
 

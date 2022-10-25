@@ -8,6 +8,7 @@ import { useAppContext } from "../state/app";
 import config from "../config.json";
 import { useStaking } from "../state/stacking";
 import { toast } from "react-toastify";
+import { roundDecimals } from "./countup";
 
 export interface NftSelectionProps {
   item: Nft
@@ -17,25 +18,23 @@ export interface NftSelectionProps {
 
 export function NftSelection(props: NftSelectionProps | any) {
 
-  const ctx = useAppContext();
   const staking = useStaking();
 
   const [selected, setSelected] = useState<boolean>(false);
-  const [mult, setMult] = useState(2);
+  const [mult, setMult] = useState(1);
   const [dailyIncome, setDailyIncome] = useState(0);
 
   const nftInfo = props.item;
-  const borderSize = props.borderSize ?? 4;
 
-  // useEffect(() => {
-  //   if (staking.nftMultMap != null) {
-  //     setMult(staking.nftMultMap[nftInfo.address.toBase58()] / 10000)
-  //     setDailyIncome(staking.pretty(staking.incomePerNftCalculator(props.item)))
-  //   } else {
-  //     setMult(100);
-  //     setDailyIncome(Math.random()*100)
-  //   }
-  // }, [staking.platform, staking.nftMultMap])
+  useEffect(() => {
+    if (staking.nftMultMap != null) {
+      setMult(staking.nftMultMap[nftInfo.address.toBase58()] / 10000)
+      setDailyIncome(staking.pretty(staking.incomePerNftCalculator(props.item)))
+    } else {
+      setMult(100);
+      setDailyIncome(Math.random()*100)
+    }
+  }, [staking.platform, staking.nftMultMap])
 
   function clickHandler() {
 
@@ -136,7 +135,7 @@ function MultiplicationWithSuggestion(props: { value: number, children: any }) {
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
-      {!isHovering ? "x" + props.value : props.children}
+      {!isHovering ? "x" + roundDecimals(props.value) : props.children}
     </Box>
   } else {
     return null;

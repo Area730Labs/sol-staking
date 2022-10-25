@@ -4,6 +4,7 @@ import { StakingReceipt } from './idl/accounts/StakingReceipt';
 import global_config from "../config.json"
 import { Config } from "../types/config"
 import { SolanaRpc } from '../state/app';
+import { toast } from 'react-toastify';
 
 export async function getStakedNfts(config: Config, connection: SolanaRpc, owner: solana.PublicKey): Promise<StakingReceipt[]> {
 

@@ -16,7 +16,7 @@ function removeSpaces(str: string): string {
     return str.replace(reg, "");
 }
 
-function roundDecimals(num: number) {
+export function roundDecimals(num: number) {
     return Math.round((num + Number.EPSILON) * 100) / 100
 }
 

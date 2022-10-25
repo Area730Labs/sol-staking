@@ -11,6 +11,7 @@ import global_config from "../config.json"
 import { StakingContextType } from "./stacking";
 import { config } from "process";
 import { SolanaRpc } from "./app";
+import { toast } from "react-toastify";
 
 export async function getStakedNftsCached(config: Config, solanaConnection: SolanaRpc, wallet: PublicKey, force: boolean = false,): Promise<StakingReceipt[]> {
     return getOrConstruct<StakingReceipt[]>(force, "staked_by", async () => {
@@ -104,6 +105,7 @@ async function get_cached_nfts_of_wallet(force: boolean,wallet : PublicKey, conn
  * @returns 
  */
 export function getNftsInWalletCached(staking: StakingContextType, wallet: PublicKey, connection: SolanaRpc, force: boolean = false): Promise<Nft[]> {
+    
     return get_cached_nfts_of_wallet(force,wallet,connection).then(function (resp) {
 
         // whitelist by data available
