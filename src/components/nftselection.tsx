@@ -1,22 +1,23 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Nft from "../types/Nft";
 import appTheme from "../state/theme"
 import { Box, GridItem, Text } from "@chakra-ui/layout";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Image } from "@chakra-ui/image";
-import { useAppContext } from "../state/app";
-import config from "../config.json";
+import { NftsSelectorTab } from "../state/app";
 import { useStaking } from "../state/stacking";
-import { toast } from "react-toastify";
 import { roundDecimals } from "./countup";
+import { ChakraProps } from "@chakra-ui/react";
 
-export interface NftSelectionProps {
+export interface NftSelectionProps extends ChakraProps {
   item: Nft
   borderSize?: number
-  onSelect?: { (pubkey: Nft, state: boolean): boolean }
+  onSelectClick?: { (pubkey: Nft, state: boolean): boolean }
+  tab : NftsSelectorTab
+  children?: any
 }
 
-export function NftSelection(props: NftSelectionProps | any) {
+export function NftSelection(props: NftSelectionProps) {
 
   const staking = useStaking();
 
@@ -25,6 +26,21 @@ export function NftSelection(props: NftSelectionProps | any) {
   const [dailyIncome, setDailyIncome] = useState(0);
 
   const nftInfo = props.item;
+
+  const {stakedModalContext: {selectedItemsCount: unstakeSelected}} = staking;
+  const {stakeModalContext: {selectedItemsCount: stakeSelected}} = staking;
+
+
+  useEffect(() => {
+
+    if (props.tab == 'unstake' && unstakeSelected == 0) {
+      setSelected(false)
+    }
+    if (props.tab == 'stake' && stakeSelected == 0) {
+      setSelected(false)
+    }
+
+  },[unstakeSelected, stakeSelected])
 
   useEffect(() => {
     if (staking.nftMultMap != null) {
@@ -40,7 +56,7 @@ export function NftSelection(props: NftSelectionProps | any) {
 
     const newState = !selected;
 
-    const shouldSelect = props?.onSelect(props.item, newState);
+    const shouldSelect = props?.onSelectClick(props.item, newState);
 
     if (shouldSelect) {
       if (!selected) {

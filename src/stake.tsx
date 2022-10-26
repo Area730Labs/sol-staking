@@ -1,6 +1,6 @@
 import { Connection, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { toast } from "react-toastify";
-import { SolanaRpc, useAppContext } from "./state/app"
+import { NftsSelectorTab, SolanaRpc, useAppContext } from "./state/app"
 import Nft from "./types/Nft";
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { Box, GridItem } from "@chakra-ui/layout";
@@ -24,15 +24,7 @@ export interface NftsSelectorProps {
 
     modalState: NftSelectorContext
 
-    // actionLabel: ReactNode
-    // actionHandler: {
-    //     (
-    //         wallet: WalletAdapter,
-    //         solanaConnection: SolanaRpc,
-    //         selectedItems: { [key: string]: boolean }
-    //     ): Promise<any>
-    // },
-
+    tab : NftsSelectorTab
 }
 
 export default function NftsSelector(props: NftsSelectorProps) {
@@ -93,15 +85,16 @@ export default function NftsSelector(props: NftsSelectorProps) {
     return <Box position="relative">
         <NftSelectorGrid>
             {items && items.map((it, idx) => {
-
                 // todo: check why its possible
+                // fixed : all staked items by person where in one array
 
                 if (it != null) {
                     return <NftSelection
                         key={idx}
                         item={it}
+                        tab={props.tab}
                         position="relative"
-                        onSelect={selectionHandler}
+                        onSelectClick={selectionHandler}
                     >
                     </NftSelection>
                 } else {

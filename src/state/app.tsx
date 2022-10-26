@@ -317,9 +317,10 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                         case 'claim': {
                             const timeTook = new Date().getTime() - curtx.CreatedAt;
                             console.log('calc income for time when tx were confirming', timeTook)
+                           
+                            // todo set pending rewards 
                             // setPendingRewards(0);
-
-                            toast.info('unable to set setPendingRewards(0). they moved to staking context')
+                            console.warn('unable to set setPendingRewards(0). they moved to staking context')
 
                             setUserUpdatesCounter(userUpdatesCounter + 1);
                             break;

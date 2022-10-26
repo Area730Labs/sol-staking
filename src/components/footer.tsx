@@ -82,8 +82,16 @@ export function Footer() {
 
             return sendTx(instructions, 'unstake', [], {
                 mints: mints,
+            }).then(() => {
+                // cleanup selection
+                stakedModalContext.setSelectedItemsCount(0);
+                stakedModalContext.setSelectedItems({});
             }).catch((e) => {
                 toast.error(`Unable to unstake: ${e.message}`)
+
+                stakedModalContext.setSelectedItemsCount(0);
+                stakedModalContext.setSelectedItems({});
+
             });
         });
 
