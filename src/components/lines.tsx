@@ -6,7 +6,7 @@ export function Line(props: { top: number }) {
   return <Box position="absolute" height="0" width="100vw" border="1px solid #FFFFFF" top={props.top + "px"}></Box>
 }
 
-export function VerticalLine(props: { left: number, top: number }) {
+export function VerticalLine(props: { left: number, top: number, key: any }) {
   return <Box position="absolute" top={props.top+"px"} height="70vh" width="0" border="1px solid #FFFFFF" left={props.left + "px"}></Box>
 }
 
@@ -24,7 +24,7 @@ export function Lines() {
 
     for (let i = 0; i < linesCountH; i++) {
       const hOffset = boxSizeWidth * i;
-      subresult.push(<Line top={hOffset}></Line>)
+      subresult.push(<Line top={hOffset} key={i}></Line>)
     }
 
     return subresult;
@@ -46,7 +46,7 @@ export function Lines() {
         topOffset = 0;
       }
 
-      subresult.push(<VerticalLine left={hOffset} top={topOffset}/>)
+      subresult.push(<VerticalLine left={hOffset} top={topOffset} key={i}/>)
     }
 
     return subresult;

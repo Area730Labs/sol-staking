@@ -21,9 +21,9 @@ export function StakedSmallNft(props: StakedSmallNftProps | any) {
         const { item, ...rest } = props;
 
         return <SmallNftBlock {...rest}>
-            <Tooltip label={props.item.name} fontSize='md'>
+            {/* <Tooltip label={props.item.name} fontSize='md' > */}
                 <Image cursor="pointer" src={props.item.image} borderRadius={appTheme.borderRadius} width="76px" />
-            </Tooltip>
+            {/* </Tooltip> */}
         </SmallNftBlock>
     } else {
         return null;
