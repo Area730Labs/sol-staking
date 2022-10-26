@@ -21,7 +21,7 @@ export interface NftsTabProps {
 export function NftsTab(props: NftsTabProps) {
     return <Box color='black'>
         <Flex>
-            <Text fontWeight="bold" marginBottom="4">{props.heading}</Text>
+            <Box fontWeight="bold" marginBottom="4">{props.heading}</Box>
         </Flex>
         {props.children ?? <Box position="relative">
             <EmptyRow />
@@ -74,7 +74,7 @@ export function StakeNftsListTab(props: NftTabContentProps) {
     // ];
 
     const heading = (
-        <Flex flexDirection='column' alignItems='flex-start' gap='5px'>
+        <Flex as={'span'} flexDirection='column' alignItems='flex-start' gap='5px'>
             <Text fontSize='35px'>NFT'S IN YOUR WALLET</Text>
             {/* <Box  display="inline-block" >Go to<Button marginLeft="2" backgroundColor='#5E301D' color='white' size="sm" onClick={() => setNftsTab("unstake")}><Label>Staked</Label></Button></Box> */}
         </Flex>
@@ -97,7 +97,7 @@ export function StakedNftsListTab(props: NftTabContentProps) {
         <Flex flexDirection='column' alignItems='self-start' gap='5px'>
             <Text fontSize='35px'>YOUR STAKED NFTs</Text>
             <Box>
-                Earning <Box display="inline-block" p="1.5" borderRadius="17px" color="white" backgroundColor='#5E301D'>{pretty(dailyRewards)}  {config.reward_token_name}</Box> per day
+                Earning <Box as={'span'} display="inline-block" p="1.5" borderRadius="17px" color="white" backgroundColor='#5E301D'>{pretty(dailyRewards)}  {config.reward_token_name}</Box> per day
             </Box>
         </Flex>
     );

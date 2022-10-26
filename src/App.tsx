@@ -6,8 +6,7 @@ import {
   Spacer,
   Text,
   Container,
-  Link,
-  theme
+  Link
 } from "@chakra-ui/react"
 
 import { AppProvider } from "./state/app"
@@ -44,7 +43,7 @@ export function App() {
     new PhantomWalletAdapter(),
   ], []);
 
-  return <ChakraProvider theme={theme}>
+  return <ChakraProvider >
     <ToastContainer
       position="bottom-right"
       autoClose={3000}
@@ -72,7 +71,6 @@ export function App() {
                   height="70vh"
                   width="100%"
                   position="absolute"
-                  z-zIndex="-10"
                   style={{ background: "linear-gradient(180.01deg, rgba(234, 204, 157, 0.61) 0.01%, rgba(234, 204, 157, 0.21) 28.86%, rgba(234, 204, 157, 0.160166) 59.07%, rgba(234, 204, 157, 0) 84.02%)" }}
                 >
                   <Lines></Lines>

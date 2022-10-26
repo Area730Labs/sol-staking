@@ -11,7 +11,7 @@ export default function EmptyRow() {
     const nftsPlaceholders = [];
 
     for (var i = 0; i < maxPerRow; i++) {
-        nftsPlaceholders.push(<NftPlaceholder/>)
+        nftsPlaceholders.push(<NftPlaceholder key={i} />)
     }
 
     return <NftSelectorGrid>{nftsPlaceholders}</NftSelectorGrid>
