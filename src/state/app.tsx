@@ -404,15 +404,13 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     useEffect(() => {
         if (connectedWallet != null && connectedWallet.connected) {
 
-            toast.info('update all nfts list due to user updates counter ' + userUpdatesCounter);
+            // toast.info('update all nfts list due to user updates counter ' + userUpdatesCounter);
 
             setCurtx(getCurrentTx(connectedWallet));
 
             let all_nfts_cache = getAllNfts(rpc_wrapper, connectedWallet.publicKey);
 
-            console.log('all nfts cached', all_nfts_cache);
-
-
+            // console.log('all nfts cached', all_nfts_cache);
         } else {
 
             setCurTxWrapper(null);

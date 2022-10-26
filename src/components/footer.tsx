@@ -177,25 +177,9 @@ export function Footer() {
                                         lineHeight='36px'
                                         animate={animation}
                                         transition={{ duration: "0.2" }}
-                                    // transition="all .2s ease"
                                     >
                                         {stakeModalContext.selectedItemsCount}
                                     </ChakraBox>
-                                    {/* <Box
-                                        color='white'
-                                        width='36px'
-                                        height='36px'
-                                        fontWeight='bold'
-                                        borderRadius='18px'
-                                        backgroundColor='black'
-                                        lineHeight='36px'
-                                        animate={{
-                                            scale: [1, 2, 2, 1, 1],
-                                            rotate: [0, 0, 270, 270, 0],
-                                            borderRadius: ["20%", "20%", "50%", "50%", "20%"],
-                                        }}
-
-                                    >{stakeModalContext.selectedItemsCount}</Box> */}
                                 </Flex>
                             </Button>
                         )}

@@ -425,7 +425,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
                     const incomePerStakedItem = diff * income_per_minute;
 
-                    console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
+                    console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals, " staked secs :",diff*60)
 
                     income += incomePerStakedItem;
                 }
