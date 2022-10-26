@@ -36,7 +36,10 @@ export interface AppContextType {
     lang: Lang,
     setLang: { (value: Lang) },
     tab: number,
-    setTab: any
+    setTab: any,
+
+    // 
+    userUpdatesCounter: number
 }
 
 export interface SolanaRpc {
@@ -174,7 +177,7 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                 generate_result_promise(typ: QueuedRpcRequestType, args_value: any[]): Promise<any> {
 
 
-                    const copiedType = typ; 
+                    const copiedType = typ;
 
                     return new Promise<any>((resolve, reject) => {
                         rpcQueue.push({
@@ -323,7 +326,11 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                     }
                     case 'stake':
                     case 'unstake': {
-                        setUserUpdatesCounter(userUpdatesCounter + 1);
+
+                        setTimeout(() => {
+                            setUserUpdatesCounter(userUpdatesCounter + 1);
+                        }, 3000);
+
                         break;
                     }
                     default: {
@@ -360,6 +367,8 @@ export function AppProvider({ children }: { children: ReactNode; }) {
     // initialization
     useEffect(() => {
         if (connectedWallet != null && connectedWallet.connected) {
+
+            toast.info('update all nfts list due to user updates counter ' + userUpdatesCounter);
 
             setCurtx(getCurrentTx(connectedWallet));
 
@@ -421,8 +430,9 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             // lang 
             lang,
             setLang,
-            tab, 
-            setTab
+            tab,
+            setTab,
+            userUpdatesCounter
 
         } as AppContextType;
 

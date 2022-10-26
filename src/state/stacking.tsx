@@ -50,6 +50,9 @@ export interface StakingContextType {
 
     stakeModalContext: NftSelectorContext
     stakedModalContext: NftSelectorContext
+
+
+    update(): void
 }
 
 const StakingContext = createContext<StakingContextType>(null);
@@ -93,6 +96,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     const [pendingRewards, setPendingRewards] = useState<number>(0);
     const [dailyRewards, setDailyrewards] = useState(0);
     const [activity, setActivity] = useState<Operation[]>(getStakingActivityFromCache(config.stacking_config))
+
+    const [updatesCounter, setUpdatesCounter] = useState(0);
 
     const [staked, setStaked] = useState<PublicKey[]>(getStakedFromCache(config.stacking_config))
 
@@ -138,7 +143,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     // for background tasks
     const [curInterval, setCurInterval] = useState(null);
 
-    const { solanaConnection, wallet } = useAppContext();
+    const { solanaConnection, wallet, userUpdatesCounter } = useAppContext();
 
     function pretty(value: number): number {
         return Math.round(((value / config.reward_token_decimals) + Number.EPSILON) * 100) / 100
@@ -466,6 +471,24 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         }
     }, [wallet]);
 
+
+    useEffect(() => {
+        setUpdatesCounter(updatesCounter + 1)
+    },[userUpdatesCounter]);
+
+    useEffect(() => {
+
+        if (wallet) {
+            toast.info('requested staked nfts update')
+            getStakedNftsCached(config, solanaConnection, wallet.publicKey).then((stakedNfts) => {
+                updateStakedNfts(stakedNfts);
+            });
+        } else {
+            console.log('no update nft triggered: wallet is empty')
+        }
+
+    }, [updatesCounter, wallet])
+
     function getTaxedItems(): [TaxedItem[], number] {
         var result = [] as TaxedItem[];
         var totalTax = 0;
@@ -520,6 +543,10 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
     const memoedValue = useMemo(() => {
 
+        const updatesCounterImpl = () => {
+            setUpdatesCounter(updatesCounter + 1)
+        }
+
         const result: StakingContextType = {
 
             stakeModalContext: stakeModalContext,
@@ -551,7 +578,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
             activity,
             getNft,
 
-            platform_staked: staked
+            platform_staked: staked,
+            update: updatesCounterImpl,
         }
 
         return result;
@@ -561,7 +589,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         activity,
         // modals contexts
         stakeModalContext, stakedModalContext,
-        tab
+        tab,
+        updatesCounter
     ]);
 
     return (

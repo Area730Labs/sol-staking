@@ -44,17 +44,18 @@ export function getMerkleTree(staking: StakingContextType): MerkleTree {
 
     const leaves = buildLeaves(
         staking.nfts.map((e, i) => {
-
-            e.props.rank = getRank(e.props);
+            const curRank = getRank(e.props);
 
             return {
                 address: new PublicKey(e.address),
-                props: e.props,
+                props: { rank: curRank },
                 name: e.name,
                 image: e.image
             } as Nft
         })
     );
+
+    console.log('leaves:',JSON.stringify(leaves))
 
     const tree = new MerkleTree(leaves);
     return tree;
@@ -203,18 +204,17 @@ export function createUpdateStakingPlatformIx(
         start: new BN(now.getTime()),
         root: whitelist.getRootArray(),
         multiplierRule: {
-            steps: 2,
+            steps: 3,
             conds: [{
-                from: 2,
-                valueIsBp: true,
-                value: 16667
-            }, {
-                from: 3,
+                from: 1,
                 value: 300
             }, {
-                from: 31,
-                value: 210
+                from: 2,
+                value: 500,
             }, {
+                from: 3,
+                value: 900
+            }, , {
                 from: 101,
                 value: 180
             }, {

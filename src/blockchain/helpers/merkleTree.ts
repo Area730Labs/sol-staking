@@ -1,4 +1,5 @@
 import { keccak_256 } from "js-sha3";
+import { toast } from "react-toastify";
 
 export class MerkleTree {
   leafs: Array<Buffer>;
@@ -67,6 +68,7 @@ export class MerkleTree {
       }
       res.push(arr)
     }
+
     return res;
   }
 
