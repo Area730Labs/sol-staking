@@ -6,7 +6,7 @@ import { DiscordComponent, TelegramComponent, TwitterComponent } from "./icons";
 import { Label } from "./label";
 import { useStaking } from "../state/stacking";
 import { useAppContext } from "../state/app";
-import { PublicKey, TransactionInstruction } from "@solana/web3.js";
+import { PublicKey, TransactionInstruction, TransactionMessage, VersionedTransaction } from "@solana/web3.js";
 import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { createClaimIx, createStakeNftIx, createStakeOwnerIx, createUnstakeNftIx } from "../blockchain/instructions";
 import { getStakeOwnerForWallet } from "../state/user";
@@ -15,10 +15,11 @@ import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 import { shouldForwardProp } from '@chakra-ui/react';
 import { motion, isValidMotionProp } from 'framer-motion';
 import { duration } from "moment";
+import { useConnection } from "@solana/wallet-adapter-react";
 
 const ChakraBox = chakra(motion.div, {
 
-    animationDuration : "",
+    animationDuration: "",
 
     /**
      * Allow motion props and non-Chakra props to be forwarded.
@@ -27,8 +28,8 @@ const ChakraBox = chakra(motion.div, {
 });
 
 const animation = {
-    scale: [1, 1.5,1],
-    borderRadius: ["20%","36px"],
+    scale: [1, 1.5, 1],
+    borderRadius: ["20%", "36px"],
 };
 
 export function Footer() {
@@ -39,9 +40,10 @@ export function Footer() {
     const { nftsTab, sendTx, wallet, solanaConnection } = useAppContext();
 
     const [height, setHeight] = useState(0);
-    const [anim,setAnim] = useState(null);
+    const [anim, setAnim] = useState(null);
 
     const [counter, setCounter] = useState(0);
+    const { connection } = useConnection();
 
     useEffect(() => {
         if (stakedModalContext.selectedItemsCount > 0 || stakeModalContext.selectedItemsCount > 0) {
@@ -91,6 +93,29 @@ export function Footer() {
             instructions.push(createStakeNftIx(staking, new PublicKey(it), wallet as WalletAdapter));
         }
 
+        /*
+        connection.getLatestBlockhash().then(async (bhval) => {
+
+            const lookupTableAccountAddr = new PublicKey("7GyC9PKJF27cek4p6EnCemH2HyFxLmnSmM4hh6T1u2dA");
+
+            const lookupTableAccount = await connection
+                .getAddressLookupTable(lookupTableAccountAddr)
+                .then((res) => res.value);
+
+            const messageV0 = new TransactionMessage({
+                payerKey: wallet.publicKey,
+                recentBlockhash: bhval.blockhash,
+                instructions: instructions, // note this is an array of instructions
+            }).compileToV0Message([lookupTableAccount]);
+
+
+            const transactionV0 = new VersionedTransaction(messageV0);
+
+            // sign the v0 transaction using the file system wallet we created named `payer`
+            transactionV0.sign([wallet.publicKey]);
+
+        })*/
+
         return sendTx(instructions, 'stake').catch((e) => {
             toast.error(`Unable to stake: ${e.message}`)
         }).then((signature) => {
@@ -138,9 +163,9 @@ export function Footer() {
                                         backgroundColor='black'
                                         lineHeight='36px'
                                         animate={animation}
-                                        transition={{duration:"0.2"}}
-                                        // transition="all .2s ease"
-                                        >
+                                        transition={{ duration: "0.2" }}
+                                    // transition="all .2s ease"
+                                    >
                                         {stakeModalContext.selectedItemsCount}
                                     </ChakraBox>
                                     {/* <Box

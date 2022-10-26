@@ -184,7 +184,7 @@ class TxHandler {
         for (var txIx of instructions) {
             tx.add(txIx);
         }
-
+        
         if (signers != null && signers.length > 0) {
             return this.wallet.sendTransaction(tx, this.connection, {
                 signers: signers,

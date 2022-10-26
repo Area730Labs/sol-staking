@@ -1,6 +1,8 @@
-import { Box,Flex } from "@chakra-ui/layout";
+import { Box, Flex } from "@chakra-ui/layout";
 import { createInitializeMintInstruction, createMintToInstruction, getMinimumBalanceForRentExemptAccount, MintLayout, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
+import { useConnection } from "@solana/wallet-adapter-react";
+import { SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
+import { AddressLookupTableInstruction, AddressLookupTableProgram, Keypair, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import BN from "bn.js";
 import { useMemo, useState } from "react";
 import { toast } from "react-toastify";
@@ -52,7 +54,10 @@ export function DevButtons() {
 
     const { wallet, sendTx } = useAppContext();
     const staking = useStaking();
-    const {config} = staking;
+    const { config } = staking;
+
+    const { connection } = useConnection();
+
 
     function updatePlatformButtonHandler() {
 
@@ -147,6 +152,51 @@ export function DevButtons() {
         });
     }
 
+
+    async function createLookupTable() {
+
+        const ixs = [];
+
+        const slot = await connection.getSlot();
+
+        const [lookupTableInst, lookupTableAddress] =
+            AddressLookupTableProgram.createLookupTable({
+                authority: wallet.publicKey,
+                payer: wallet.publicKey,
+                recentSlot: slot,
+            });
+
+        console.log("lookup table address:", lookupTableAddress.toBase58());
+
+        ixs.push(lookupTableInst)
+
+        const extendIx = AddressLookupTableProgram.extendLookupTable({
+            lookupTable: lookupTableAddress,
+            authority: wallet.publicKey,
+            payer: wallet.publicKey,
+            addresses: [
+                SystemProgram.programId,
+                SYSVAR_RENT_PUBKEY,
+                TOKEN_PROGRAM_ID,
+                config.escrow,
+                config.platform_config,
+                config.stacking_config,
+                config.stacking_config_alias,
+                config.rewards_mint,
+                config.rewards_token_account,
+                config.program_id,
+                config.platform_config,
+            ],
+        })
+
+        ixs.push(extendIx);
+
+
+        sendTx(ixs,'other').then((sig : string) => {
+            toast.info('tx sent: '+sig)
+        })
+    }
+
     const [showFade, setFade] = useState(false);
 
     const mainVisible = useMemo(() => {
@@ -176,7 +226,8 @@ export function DevButtons() {
             <Button size="sm" onClick={mintToTreasury}>Mint Tokens</Button>
             <Button typ="black" size="sm" onClick={updatePlatformButtonHandler}>Update</Button>
 
-            <Button size="sm" onClick={() => setFade(!showFade)}>Fade</Button>
+            {/* <Button size="sm" onClick={() => setFade(!showFade)}>Fade</Button> */}
+            <Button size="sm" onClick={() =>createLookupTable()}>CreateTableLookup</Button>
 
             <Fadeable
                 isVisible={showFade}

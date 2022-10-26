@@ -1,5 +1,5 @@
 
-import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, Transaction, TransactionInstruction } from "@solana/web3.js"
+import { AddressLookupTableProgram, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY, Transaction, TransactionInstruction } from "@solana/web3.js"
 import { buildLeaves } from "./helpers";
 import { MerkleTree } from "./helpers/merkleTree";
 import { WalletAdapter } from "@solana/wallet-adapter-base";
@@ -55,7 +55,7 @@ export function getMerkleTree(staking: StakingContextType): MerkleTree {
         })
     );
 
-    console.log('leaves:',JSON.stringify(leaves))
+    console.log('leaves:', JSON.stringify(leaves))
 
     const tree = new MerkleTree(leaves);
     return tree;
