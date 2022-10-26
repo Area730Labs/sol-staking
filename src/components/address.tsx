@@ -59,7 +59,7 @@ export default function Address(props: AddressArgs | any) {
             //     backgroundColor: appTheme.themeColorAlpha(0.9) 
             // }}
         >
-        <Link fontSize='14px' fontWeight='bold' color='grey' _activeLink={{textDecoration:"none"}} _hover={{textDecoration:"none"}} href={"https://solscan.io/address/" + addrStr}>{linkText}</Link>
+        <Link fontSize='14px' target='_blank' fontWeight='bold' color='grey' _activeLink={{textDecoration:"none"}} _hover={{textDecoration:"none"}} href={"https://solscan.io/address/" + addrStr}>{linkText}</Link>
         <LinkComponent />
         </Flex>
         
