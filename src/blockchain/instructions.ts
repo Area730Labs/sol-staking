@@ -55,8 +55,6 @@ export function getMerkleTree(staking: StakingContextType): MerkleTree {
         })
     );
 
-    console.log('leaves:', JSON.stringify(leaves))
-
     const tree = new MerkleTree(leaves);
     return tree;
 }

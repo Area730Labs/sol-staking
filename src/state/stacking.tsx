@@ -1,10 +1,10 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import { StakingReceipt } from "../blockchain/idl/accounts/StakingReceipt";
+import { StakingReceipt, StakingReceiptFields } from "../blockchain/idl/accounts/StakingReceipt";
 import { BASIS_POINTS_100P, prettyNumber } from "../data/uitls";
 import Nft from "../types/Nft";
 import Platform, { matchRule } from "../types/paltform";
-import { RankMultiplyerMap, useAppContext } from "./app";
+import { NftsSelectorTab, RankMultiplyerMap, useAppContext } from "./app";
 import { getPlatformInfo, getPlatformInfoFromCache, getStakedFromCache, getStakingActivityFromCache, platform_staked_cache } from "./platform";
 import global_config from '../config.json'
 import { Config } from "../types/config";
@@ -16,6 +16,8 @@ import { TaxedItem } from "../types/taxeditem";
 import { Operation } from "../types/operation";
 import { Api } from "../api";
 import { getRank } from "../blockchain/instructions";
+import { NftsTabProps } from "../components/nftstab";
+import BN from "bn.js";
 
 export interface StakingContextType {
     config: Config,
@@ -53,6 +55,7 @@ export interface StakingContextType {
 
 
     update(): void
+    moveToTab(tab: NftsSelectorTab, mints: string[])
 }
 
 const StakingContext = createContext<StakingContextType>(null);
@@ -75,6 +78,32 @@ export interface NftSelectorContext {
     setSelectedPopupVisible(val: boolean)
 }
 
+function within(addr: string, mints: string[]): boolean {
+    for (var mint of mints) {
+        if (mint === addr) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function findNftFromConfig(mint: string, nfts: any[]): Nft {
+    const found = nfts.find((it) => {
+        if (it.address == mint) {
+            return true;
+        }
+    });
+
+
+    const n: Nft = {
+        address: new PublicKey(found.address),
+        name: found.name,
+        image: found.image
+    };
+
+
+    return n;
+}
 
 export function StakingProvider({ children, config, nfts }: StakingProviderProps) {
 
@@ -114,6 +143,71 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
     // console.log('uncompressed size',JSON.stringify(nfts).length)
     // console.log('compressed size', JSON.stringify(compressed).length)
+
+    function moveToTab(tab: NftsSelectorTab, mints: string[]) {
+
+        if (tab == 'unstake') {
+            {
+                // remove from wallet
+                {
+                    const newNfts = [];
+
+                    for (var it of userNfts) {
+                        if (!within(it.address.toBase58(), mints)) {
+                            newNfts.push(it);
+                        }
+                    }
+
+                    updateNfts(newNfts);
+                }
+                // add to staked
+                {
+
+                    let newStaked = [];
+
+                    for (var it0 of mints) {
+                        const nf: StakingReceiptFields = {
+                            staker: wallet.publicKey,
+                            mint: new PublicKey(it0),
+                            lastClaim: new BN(0),
+                        } as StakingReceiptFields;
+
+                        newStaked.push(new StakingReceipt(nf))
+                    }
+
+                    updateStakedNfts(newStaked);
+
+                }
+            }
+        } else if (tab == 'stake') {
+            {
+                // remove from wallet
+                {
+                    const newStakedNfts = [];
+
+                    for (var it00 of stackedNfts) {
+                        if (!within(it00.mint.toBase58(), mints)) {
+                            newStakedNfts.push(it00);
+                        }
+                    }
+
+                    updateStakedNfts(newStakedNfts);
+                }
+                // add to staked
+                {
+                    const newUserNfts = userNfts;
+
+                    for (var it0 of mints) {
+                        // check whitelist
+
+                        newUserNfts.push(findNftFromConfig(it0, nfts))
+                    }
+
+                    updateNfts(newUserNfts);
+                }
+            }
+        }
+    }
 
     function getNft(pk: PublicKey): Nft | null {
 
@@ -185,10 +279,14 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         let staked_diff = cur_ts - item.stakedAt.toNumber();
         let staking_days = staked_diff / day_seconds;
 
-        let matched_rule = matchRule(platform.taxRule, staking_days);
-
         // calc tax percent
-        let tax_bp = matched_rule.value;
+        let tax_bp = 0;
+
+        let matched_rule = matchRule(platform.taxRule, staking_days);
+        if (matched_rule != undefined) {
+            tax_bp = matched_rule.value;
+        }
+
         let tax_value = 0;
 
         let rewards_diff = cur_ts - item.lastClaim.toNumber();
@@ -461,7 +559,6 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
             });
 
             getNftsInWalletCached({ nfts } as StakingContextType, wallet.publicKey as PublicKey, solanaConnection).then(items => {
-                console.warn('found items for staking', items);
                 updateNfts(items);
             })
 
@@ -473,21 +570,48 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
 
     useEffect(() => {
-        setUpdatesCounter(updatesCounter + 1)
-    },[userUpdatesCounter]);
 
-    useEffect(() => {
+        const key = "last_stake_op"
 
-        if (wallet) {
-            toast.info('requested staked nfts update')
-            getStakedNftsCached(config, solanaConnection, wallet.publicKey).then((stakedNfts) => {
-                updateStakedNfts(stakedNfts);
-            });
-        } else {
-            console.log('no update nft triggered: wallet is empty')
+        const lastOp = localStorage.getItem(key)
+
+        // todo check staking id before removing 
+        localStorage.removeItem(key)
+
+        if (lastOp != "" && lastOp != undefined) {
+            // handle stake op
+
+            try {
+                const lastOpParsed = JSON.parse(lastOp);
+                const mints: string[] = lastOpParsed.args.mints;
+
+                // todo check staking id
+                if (lastOpParsed.op === 'stake') {
+                    moveToTab('unstake', mints);
+                } else {
+                    moveToTab('stake', mints);
+                }
+            } catch (e: any) {
+                console.warn("raw: " + lastOp)
+                console.warn("unable to decode last stake op args : ", e)
+            }
+
         }
 
-    }, [updatesCounter, wallet])
+        setUpdatesCounter(updatesCounter + 1)
+    }, [userUpdatesCounter]);
+
+    // useEffect(() => {
+    //     if (updatesCounter > 0 && wallet) {
+    //         toast.info('requested staked nfts update : '+updatesCounter)
+    //         getStakedNftsCached(config, solanaConnection, wallet.publicKey).then((stakedNfts) => {
+    //             updateStakedNfts(stakedNfts);
+    //         });
+    //     } else {
+    //         console.log('no update nft triggered: wallet is empty')
+    //     }
+
+    // }, [updatesCounter, wallet])
 
     function getTaxedItems(): [TaxedItem[], number] {
         var result = [] as TaxedItem[];
@@ -548,6 +672,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         }
 
         const result: StakingContextType = {
+
+            moveToTab,
 
             stakeModalContext: stakeModalContext,
             stakedModalContext,

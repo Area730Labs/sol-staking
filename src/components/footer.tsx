@@ -69,15 +69,20 @@ export function Footer() {
                 instructions.push(createStakeOwnerIx(config, wallet.publicKey, stakeOwnerAddress));
             }
 
+            const mints = [];
+
             for (var it in stakedModalContext.selectedItems) {
 
                 const mint = new PublicKey(it);
+                mints.push(mint);
 
                 instructions.push(createClaimIx(config, mint, wallet.publicKey, stakeOwnerAddress))
                 instructions.push(createUnstakeNftIx(config, mint, wallet.publicKey));
             }
 
-            return sendTx(instructions, 'unstake').catch((e) => {
+            return sendTx(instructions, 'unstake', [], {
+                mints: mints,
+            }).catch((e) => {
                 toast.error(`Unable to unstake: ${e.message}`)
             });
         });
@@ -89,8 +94,14 @@ export function Footer() {
 
         let instructions = [] as TransactionInstruction[];
 
+        let mints = [];
+
         for (var it in stakeModalContext.selectedItems) {
-            instructions.push(createStakeNftIx(staking, new PublicKey(it), wallet as WalletAdapter));
+
+            const mint = new PublicKey(it);
+            mints.push(mint);
+
+            instructions.push(createStakeNftIx(staking, mint, wallet as WalletAdapter));
         }
 
         /*
@@ -116,7 +127,9 @@ export function Footer() {
 
         })*/
 
-        return sendTx(instructions, 'stake').catch((e) => {
+        return sendTx(instructions, 'stake', [], {
+            mints: mints,
+        }).catch((e) => {
             toast.error(`Unable to stake: ${e.message}`)
         }).then((signature) => {
             // cleanup selection

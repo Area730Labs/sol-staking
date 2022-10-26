@@ -86,7 +86,7 @@ export default function NftsSelector(props: NftsSelectorProps) {
 
     if (items && diffToDraw != 0) {
         for (var i = 0; i < diffToDraw; i++) {
-            nftsPlaceholders.push(<NftPlaceholder/>)
+            nftsPlaceholders.push(<NftPlaceholder key={i}/>)
         }
     }
 

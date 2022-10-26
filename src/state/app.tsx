@@ -14,7 +14,7 @@ import { getMinimumBalanceForRentExemptAccount } from "@solana/spl-token";
 export type RankMultiplyerMap = { [key: string]: number }
 export type NftsSelectorTab = "stake" | "unstake"
 export type TransactionType = "stake" | "unstake" | "platform" | "claim" | "other"
-export type SendTxFuncType = { (ixs: web3.TransactionInstruction[], typ: TransactionType, signers?: web3.Signer[]): Promise<web3.TransactionSignature> }
+export type SendTxFuncType = { (ixs: web3.TransactionInstruction[], typ: TransactionType, signers?: web3.Signer[], args?: any): Promise<web3.TransactionSignature> }
 
 export interface AppContextType {
     // solana 
@@ -312,30 +312,66 @@ export function AppProvider({ children }: { children: ReactNode; }) {
             }).then((item: TransactionType) => {
 
                 const tx_type = curtx.Type;
+                try {
+                    switch (tx_type) {
+                        case 'claim': {
+                            const timeTook = new Date().getTime() - curtx.CreatedAt;
+                            console.log('calc income for time when tx were confirming', timeTook)
+                            // setPendingRewards(0);
 
-                switch (tx_type) {
-                    case 'claim': {
-                        const timeTook = new Date().getTime() - curtx.CreatedAt;
-                        console.log('calc income for time when tx were confirming', timeTook)
-                        // setPendingRewards(0);
+                            toast.info('unable to set setPendingRewards(0). they moved to staking context')
 
-                        toast.info('unable to set setPendingRewards(0). they moved to staking context')
-
-                        setUserUpdatesCounter(userUpdatesCounter + 1);
-                        break;
-                    }
-                    case 'stake':
-                    case 'unstake': {
-
-                        setTimeout(() => {
                             setUserUpdatesCounter(userUpdatesCounter + 1);
-                        }, 3000);
+                            break;
+                        }
+                        case 'stake': {
 
-                        break;
+                            const k = 'last_stake_args';
+                            const stakeArgs = JSON.parse(localStorage.getItem(k))
+                            localStorage.removeItem(k)
+
+                            if (stakeArgs?.mints.length > 0) {
+                                // toast.info('staked some item+: ' + stakeArgs.mints[0])
+
+                                localStorage.setItem('last_stake_op',JSON.stringify({
+                                    "staking": "", // staking ref
+                                    "op": 'stake',
+                                    "args": stakeArgs
+                                }))
+
+                            }
+
+                            setUserUpdatesCounter(userUpdatesCounter + 1);
+
+                            break;
+                        }
+                        case 'unstake': {
+
+                            const k = 'last_unstake_args';
+                            const unstakeArgs = JSON.parse(localStorage.getItem(k))
+                            localStorage.removeItem(k);
+
+                            if (unstakeArgs?.mints.length > 0) {
+                                // toast.info('unstaked some item+: ' + unstakeArgs.mints[0])
+                            
+                                localStorage.setItem('last_stake_op',JSON.stringify({
+                                    "staking": "", // staking ref
+                                    "op": 'unstake',
+                                    "args": unstakeArgs
+                                }))
+
+                            }
+
+                            setUserUpdatesCounter(userUpdatesCounter + 1);
+
+                            break;
+                        }
+                        default: {
+                            toast.warn('unknown tx type got: ' + tx_type)
+                        }
                     }
-                    default: {
-                        toast.warn('unknown tx type got: ' + tx_type)
-                    }
+                } catch (e: any) {
+                    console.warn(`got an exception while handling tx callback: ${e.message}`)
                 }
 
                 setCurTxWrapper(null);
@@ -383,11 +419,13 @@ export function AppProvider({ children }: { children: ReactNode; }) {
         }
     }, [connectedWallet, userUpdatesCounter]);
 
-    function sendTx(ixs: web3.TransactionInstruction[], typ: TransactionType = 'other', signers?: []): Promise<web3.TransactionSignature> {
+    function sendTx(ixs: web3.TransactionInstruction[], typ: TransactionType = 'other', signers?: [], args?: any): Promise<web3.TransactionSignature> {
 
         if (curtx != null) {
             return Promise.reject(new Error("wait till current transaction is confirmed"));
         }
+
+        localStorage.setItem(`last_${typ}_args`, JSON.stringify(args))
 
         const txhandler = new TxHandler(web3Handler, connectedWallet, []);
 

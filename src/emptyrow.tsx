@@ -3,6 +3,7 @@ import NftSelectorGrid from "./components/nftselectorgrid";
 import appTheme from "./state/theme"
 import global_config from "./config.json"
 import { NftPlaceholder } from "./components/NftPlaceholder";
+import { toast } from "react-toastify";
 
 
 export default function EmptyRow() {
