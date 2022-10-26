@@ -8,6 +8,7 @@ import { NftsSelectorTab } from "../state/app";
 import { useStaking } from "../state/stacking";
 import { roundDecimals } from "./countup";
 import { ChakraProps } from "@chakra-ui/react";
+import { ChakraBox } from "./footer";
 
 export interface NftSelectionProps extends ChakraProps {
   item: Nft
@@ -16,6 +17,11 @@ export interface NftSelectionProps extends ChakraProps {
   tab : NftsSelectorTab
   children?: any
 }
+
+const animation = {
+  scale: [1, 1.5, 1],
+  borderRadius: ["20%", "36px"],
+};
 
 export function NftSelection(props: NftSelectionProps) {
 
@@ -93,7 +99,7 @@ export function NftSelection(props: NftSelectionProps) {
     onClick={clickHandler}
     {...props}
   >
-    {selected ? <Box
+    {selected ? <ChakraBox
       color="black"
       borderRadius="50%"
       border={`2.5px solid black`}
@@ -105,9 +111,11 @@ export function NftSelection(props: NftSelectionProps) {
       top="5px"
       p="2"
       px="3"
+      animate={animation}
+      transition={{ duration: "0.15" }}
     >
       <CheckIcon />
-    </Box> : null}
+    </ChakraBox> : null}
 
     <Box p="3"
       paddingBottom="4"

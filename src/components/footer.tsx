@@ -14,10 +14,9 @@ import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 
 import { shouldForwardProp } from '@chakra-ui/react';
 import { motion, isValidMotionProp } from 'framer-motion';
-import { duration } from "moment";
 import { useConnection } from "@solana/wallet-adapter-react";
 
-const ChakraBox = chakra(motion.div, {
+export const ChakraBox = chakra(motion.div, {
 
     animationDuration: "",
 
