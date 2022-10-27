@@ -53,7 +53,7 @@
      },
      "disable_cache": true,
      "debug_simulate_tx": false,
-     "max_items_per_stake": 3,
+     "max_items_per_stake": 1,
      "max_items_per_unstake": 5,
      "max_nfts_per_row": 3,
      "data_commitment": "confirmed",
