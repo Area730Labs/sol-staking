@@ -28,7 +28,7 @@ import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react
 
 import Config from "./config.json"
 import { useMemo } from "react";
-import { SolflareWalletAdapter, PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { SolflareWalletAdapter, PhantomWalletAdapter, LedgerWalletAdapter } from '@solana/wallet-adapter-wallets';
 
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 
@@ -41,6 +41,7 @@ export function App() {
   const wallets = useMemo(() => [
     new SolflareWalletAdapter(),
     new PhantomWalletAdapter(),
+    new LedgerWalletAdapter()
   ], []);
 
   return <ChakraProvider >
