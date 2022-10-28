@@ -29,12 +29,44 @@ import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react
 import Config from "./config.json"
 import { useMemo } from "react";
 import { SolflareWalletAdapter, PhantomWalletAdapter, LedgerWalletAdapter } from '@solana/wallet-adapter-wallets';
-
+import { useEffect, useState } from 'react';
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 
 import nfts from "./data/solmads.json"
 require('@solana/wallet-adapter-react-ui/styles.css');
 require("./styles/overrides.css")
+
+const useIsMobile = (breakpoint = 640) => {
+  const checkForDevice = () => window.innerWidth < breakpoint;
+
+  const [isMobile, setIsMobile] = useState(checkForDevice());
+
+  useEffect(() => {
+    const handlePageResized = () => {
+      setIsMobile(checkForDevice());
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handlePageResized);
+      window.addEventListener('orientationchange', handlePageResized);
+      window.addEventListener('load', handlePageResized);
+      window.addEventListener('reload', handlePageResized);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', handlePageResized);
+        window.removeEventListener('orientationchange', handlePageResized);
+        window.removeEventListener('load', handlePageResized);
+        window.removeEventListener('reload', handlePageResized);
+      }
+    };
+  }, []);
+
+  return {
+    isMobile,
+  };
+};
 
 export function App() {
 
@@ -43,6 +75,14 @@ export function App() {
     new PhantomWalletAdapter(),
     new LedgerWalletAdapter()
   ], []);
+
+  const {isMobile} = useIsMobile();
+
+  if (isMobile){
+    return (<Flex alignItems='center' justifyContent='center' width='100vw' height='100vh'>
+      <Text fontFamily="Outfit">Please open this website on desktop, mobile is not supported</Text>
+    </Flex>);
+  }
 
   return <ChakraProvider >
     <ToastContainer
