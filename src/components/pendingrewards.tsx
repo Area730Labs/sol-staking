@@ -12,7 +12,7 @@ import Countup from "./countup";
 import appTheme from "../state/theme"
 import { Flex } from "@chakra-ui/layout";
 import { useState } from "react";
-import { ChakraProps } from "@chakra-ui/react";
+import { ChakraProps, Spinner } from "@chakra-ui/react";
 import { Label } from "./label";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 
@@ -29,7 +29,7 @@ function RewardInfoBlock(props: ChakraProps & any) {
     >I</Box>
 }
 
-export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, stakingctx: StakingContextType) {
+export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, stakingctx: StakingContextType): Promise<void> {
 
     const { wallet, solanaConnection, sendTx } = appctx;
     const { stackedNfts, config } = stakingctx;
@@ -42,38 +42,45 @@ export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, sta
     const rewardsTokenMint = config.rewards_mint;
     const tokAcc = findAssociatedTokenAddress(wallet.publicKey, rewardsTokenMint);
 
-    StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeOwnerInfo: StakeOwner) => {
+    const result0 = new Promise<void>((resolve, reject) => {
 
-        if (stakeOwnerInfo == null) {
-            ixs.push(createStakeOwnerIx(config, wallet.publicKey, stakeOwnerAddress));
-        }
+        StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeOwnerInfo: StakeOwner) => {
 
-        for (var it of stackedNfts) {
-            // ixs.push(createUnstakeNftIx(it))
-            ixs.push(createClaimIx(config, it.mint, it.staker, stakeOwnerAddress))
-        }
+            if (stakeOwnerInfo == null) {
+                ixs.push(createStakeOwnerIx(config, wallet.publicKey, stakeOwnerAddress));
+            }
 
-        // check if user has token account
-        return solanaConnection.getAccountInfo(tokAcc, "confirmed");
-    }).then((item) => {
-        if (item == null) {
-            // not exists
-            ixs.push(createAssociatedTokenAccountInstruction(
-                wallet.publicKey,
-                tokAcc,
-                wallet.publicKey,
-                rewardsTokenMint
-            ));
+            for (var it of stackedNfts) {
+                // ixs.push(createUnstakeNftIx(it))
+                ixs.push(createClaimIx(config, it.mint, it.staker, stakeOwnerAddress))
+            }
 
-        }
-    }).then(() => {
-        ixs.push(createClaimStakeOwnerIx(config, wallet.publicKey, stakeOwnerAddress, rewardsTokenMint));
+            // check if user has token account
+            return solanaConnection.getAccountInfo(tokAcc, "confirmed");
+        }).then((item) => {
+            if (item == null) {
+                // not exists
+                ixs.push(createAssociatedTokenAccountInstruction(
+                    wallet.publicKey,
+                    tokAcc,
+                    wallet.publicKey,
+                    rewardsTokenMint
+                ));
 
-        sendTx(ixs, 'claim').catch((e) => {
-            toast.error(`Unable to claim: ${e.message}`)
-        })
+            }
+        }).then(() => {
+            ixs.push(createClaimStakeOwnerIx(config, wallet.publicKey, stakeOwnerAddress, rewardsTokenMint));
+            sendTx(ixs, 'claim').catch((e) => {
+                toast.error(`Unable to claim: ${e.message}`)
+            })
+
+        }).finally(() => {
+            resolve(null);
+        });
 
     });
+
+    return result0;
 }
 
 export function ClaimPendingRewardsButton(props: any) {
@@ -85,7 +92,7 @@ export function ClaimPendingRewardsButton(props: any) {
 
     // const [hovered, setHovered] = useState(false);
     const [opactiy, setOpacity] = useState(0.0);
-
+    const [claiming, setClaiming] = useState(false);
     const { pendingRewards, pretty, config } = useStaking();
 
     async function claimPendingRewardsHandler() {
@@ -103,20 +110,35 @@ export function ClaimPendingRewardsButton(props: any) {
                     setTaxModal(true);
                     setModalVisible(true);
                 } else {
-                    claimPendingrewardsHandlerImpl(ctx, staking);
+                    claimPendingrewardsHandlerImpl(ctx, staking).then(() => {
+                        setClaiming(false);
+                    });
                 }
             }
         }
     }
 
     return (<Box position="relative">
-        <Button border='2px solid black' width='240px' paddingLeft='20px' paddingRight='20px' backgroundColor='black' color='white' marginTop='15px' onClick={claimPendingRewardsHandler} {...props}>
+        <Button
+            border='2px solid black'
+            width='240px'
+            paddingLeft='20px'
+            paddingRight='20px'
+            backgroundColor='black'
+            color={!claiming?'white':'gray'}
+            marginTop='15px'
+            onClick={() => {
+                if (!claiming) {
+                    setClaiming(true);
+                    claimPendingRewardsHandler();
+                }
+            }} {...props}>
             <Flex gap='15px' justifyContent='center' alignItems='center' fontFamily="Outfit">
-                Claim rewards <RewardInfoBlock onMouseEnter={() => {
+                Claim rewards {claiming ? <Flex height="100%" flexDirection="column" alignItems="center"><Spinner /></Flex> : <RewardInfoBlock onMouseEnter={() => {
                     setOpacity(1);
                 }} onMouseLeave={() => {
                     setOpacity(0);
-                }} />
+                }} />}
             </Flex>
         </Button>
         {pendingRewards > 0 ?
