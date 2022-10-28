@@ -103,12 +103,14 @@ export function ClaimPendingRewardsButton(props: any) {
 
             if (pendingRewards == 0) {
                 toast.warn(<Label>No rewards to claim</Label>)
+                setClaiming(false);
             } else {
 
                 const [taxed, totalTax] = staking.getTaxedItems();
                 if (totalTax > 0) {
                     setTaxModal(true);
                     setModalVisible(true);
+                    setClaiming(false);
                 } else {
                     claimPendingrewardsHandlerImpl(ctx, staking).then(() => {
                         setClaiming(false);
