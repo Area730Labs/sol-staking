@@ -146,6 +146,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
     function moveToTab(tab: NftsSelectorTab, mints: string[]) {
 
+        const nowT = (new Date().getTime())/1000;
+
         if (tab == 'unstake') {
             {
                 // remove from wallet
@@ -170,6 +172,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                             staker: wallet.publicKey,
                             mint: new PublicKey(it0),
                             lastClaim: new BN(0),
+                            stakedAt: new BN(nowT),
                         } as StakingReceiptFields;
 
                         newStaked.push(new StakingReceipt(nf))
