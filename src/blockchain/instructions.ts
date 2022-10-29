@@ -117,6 +117,7 @@ export function createStakeNftIx(config: StakingContextType, mint: PublicKey, ow
         } as StakeNftBumps,
         proof: proof,
         rank: nftToStake.props.rank,
+        flags: 0,
     } as StakeNftArgs, {
         staker: owner.publicKey,
         platformConfig: config.config.platform_config,
