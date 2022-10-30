@@ -19,7 +19,12 @@ export interface StakingConfigFields {
   rewardsAccount: PublicKey
   nftsStaked: BN
   active: boolean
-  spanEmissionPerNft: BN
+
+  withFlags : number,
+  withOgPass: number,
+  ogPassMultiplyer: BN,
+  spareSpace: BN,
+
   baseSpanEmissions: BN
   start: BN
   root: Array<number>
@@ -45,7 +50,12 @@ export interface StakingConfigJSON {
   rewardsAccount: string
   nftsStaked: string
   active: boolean
-  spanEmissionPerNft: string
+
+  withFlags : number,
+  withOgPass: number,
+  ogPassMultiplyer: string,
+  spareSpace: string,
+
   baseSpanEmissions: string
   start: string
   root: Array<number>
@@ -71,7 +81,12 @@ export class StakingConfig {
   readonly rewardsAccount: PublicKey
   readonly nftsStaked: BN
   readonly active: boolean
-  readonly spanEmissionPerNft: BN
+
+  readonly  withFlags : number
+  readonly withOgPass: number
+  readonly ogPassMultiplyer: BN
+  readonly spareSpace: BN
+  
   readonly baseSpanEmissions: BN
   readonly start: BN
   readonly root: Array<number>
@@ -101,6 +116,12 @@ export class StakingConfig {
     borsh.u64("nftsStaked"),
     borsh.bool("active"),
     borsh.u64("spanEmissionPerNft"),
+
+    borsh.u8("withFlags"),
+    borsh.u8("withOgPass"),
+    borsh.u16("ogPassMultiplyer"),
+    borsh.u32("spareSpace"),
+    
     borsh.u64("baseSpanEmissions"),
     borsh.i64("start"),
     borsh.array(borsh.u8(), 32, "root"),
@@ -126,7 +147,12 @@ export class StakingConfig {
     this.rewardsAccount = fields.rewardsAccount
     this.nftsStaked = fields.nftsStaked
     this.active = fields.active
-    this.spanEmissionPerNft = fields.spanEmissionPerNft
+
+    this.withFlags = fields.withFlags
+    this.withOgPass = fields.withOgPass
+    this.ogPassMultiplyer = fields.ogPassMultiplyer
+    this.spareSpace = fields.spareSpace
+
     this.baseSpanEmissions = fields.baseSpanEmissions
     this.start = fields.start
     this.root = fields.root
@@ -197,7 +223,12 @@ export class StakingConfig {
       rewardsAccount: dec.rewardsAccount,
       nftsStaked: dec.nftsStaked,
       active: dec.active,
-      spanEmissionPerNft: dec.spanEmissionPerNft,
+     
+      withFlags:dec.withFlags
+      ,withOgPass:dec.withOgPass
+      ,ogPassMultiplyer:dec.ogPassMultiplyer
+      ,spareSpace:dec.spareSpace,
+
       baseSpanEmissions: dec.baseSpanEmissions,
       start: dec.start,
       root: dec.root,
@@ -225,7 +256,12 @@ export class StakingConfig {
       rewardsAccount: this.rewardsAccount.toString(),
       nftsStaked: this.nftsStaked.toString(),
       active: this.active,
-      spanEmissionPerNft: this.spanEmissionPerNft.toString(),
+      
+      withFlags:this.withFlags,
+      withOgPass:this.withOgPass,
+      ogPassMultiplyer:this.ogPassMultiplyer.toString(),
+      spareSpace:this.spareSpace.toString(),
+
       baseSpanEmissions: this.baseSpanEmissions.toString(),
       start: this.start.toString(),
       root: this.root,
@@ -253,7 +289,12 @@ export class StakingConfig {
       rewardsAccount: new PublicKey(obj.rewardsAccount),
       nftsStaked: new BN(obj.nftsStaked),
       active: obj.active,
-      spanEmissionPerNft: new BN(obj.spanEmissionPerNft),
+     
+      withFlags:obj.withFlags,
+      withOgPass:obj.withOgPass,
+      ogPassMultiplyer:new BN(obj.ogPassMultiplyer),
+      spareSpace:new  BN(obj.spareSpace),
+
       baseSpanEmissions: new BN(obj.baseSpanEmissions),
       start: new BN(obj.start),
       root: obj.root,
