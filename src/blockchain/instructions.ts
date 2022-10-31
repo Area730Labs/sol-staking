@@ -130,6 +130,8 @@ export function createStakeNftIx(config: StakingContextType, mint: PublicKey, ow
 
     const proof = tree.getProofArray(indexStaked);
 
+    const nftInfo = config.getNft(mint);
+
     // let proof1b = proofToBa(proof);
 
     // const proof2 = proofToBa(tree.getProofArray(10));
@@ -179,7 +181,7 @@ export function createStakeNftIx(config: StakingContextType, mint: PublicKey, ow
         } as StakeNftBumps,
         proof: proof,
         rank: nftToStake.props.rank,
-        flags: 0,
+        flags: nftInfo.flags,
     } as StakeNftArgs, {
         staker: owner.publicKey,
         platformConfig: config.config.platform_config,

@@ -15,7 +15,7 @@ import { PublicKey } from "@solana/web3.js";
 import { TaxedItem } from "../types/taxeditem";
 import { Operation } from "../types/operation";
 import { Api } from "../api";
-import { getRank } from "../blockchain/instructions";
+import { getFlags, getRank } from "../blockchain/instructions";
 import BN from "bn.js";
 
 export interface StakingContextType {
@@ -221,7 +221,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                     image: it.image,
                     address: new PublicKey(it.address),
                     name: it.name,
-                    props: it.props
+                    props: it.props,
+                    flags: getFlags(it),
                 } as Nft
             }
         }
