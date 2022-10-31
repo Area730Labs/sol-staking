@@ -452,6 +452,9 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                 return StakeOwner.fetch(solanaConnection, stakeOwnerAddress);
             }).then((stake_owner) => {
                 if (stake_owner != null) {
+
+                    console.log('stake owner :',stake_owner.toJSON())
+
                     const totalRewards = savedIncomeValues + stake_owner.balance.toNumber();
                     setPendingRewards(totalRewards);
                 }

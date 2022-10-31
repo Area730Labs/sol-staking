@@ -82,7 +82,7 @@ export class StakingConfig {
   readonly nftsStaked: BN
   readonly active: boolean
 
-  readonly  withFlags : number
+  readonly withFlags : number
   readonly withOgPass: number
   readonly ogPassMultiplyer: BN
   readonly spareSpace: BN
@@ -115,7 +115,7 @@ export class StakingConfig {
     borsh.publicKey("rewardsAccount"),
     borsh.u64("nftsStaked"),
     borsh.bool("active"),
-    borsh.u64("spanEmissionPerNft"),
+    // borsh.u64("spanEmissionPerNft"),
 
     borsh.u8("withFlags"),
     borsh.u8("withOgPass"),
@@ -173,8 +173,6 @@ export class StakingConfig {
     address: PublicKey
   ): Promise<StakingConfig | null> {
     const info = await c.getAccountInfo(address)
-
-    console.log('got StakingConfig@fetch: ',info)
 
     if (info === null) {
       return null

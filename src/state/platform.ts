@@ -100,6 +100,8 @@ export async function getPlatformInfo(force: boolean, conn: SolanaRpc, platformK
 
         return StakingConfig.fetch(conn, platformKey).then(platformConfig => {
 
+            console.warn("got staking config ",platformConfig.toJSON())
+
             const config = {
                 alias: platformConfig.alias.toBase58(),
 
