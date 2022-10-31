@@ -34,7 +34,7 @@ const animation = {
 export function Footer() {
 
     const staking = useStaking();
-    const { stakeModalContext, stakedModalContext, config } = staking;
+    const { stakeModalContext, stakedModalContext, config, getNft } = staking;
 
     const { nftsTab, sendTx, wallet, solanaConnection } = useAppContext();
 
@@ -75,7 +75,14 @@ export function Footer() {
                 const mint = new PublicKey(it);
                 mints.push(mint);
 
-                instructions.push(createClaimIx(config, mint, wallet.publicKey, stakeOwnerAddress))
+                const nftInfo = getNft(mint);
+
+                // todo fix to use bitset flag
+                if (nftInfo.flags != 1) {
+                    // console.log(' -- flags is not 1 for :',mint.toBase58())
+                    instructions.push(createClaimIx(config, mint, wallet.publicKey, stakeOwnerAddress))
+                }
+
                 instructions.push(createUnstakeNftIx(config, mint, wallet.publicKey));
             }
 

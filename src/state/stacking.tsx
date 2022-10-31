@@ -55,6 +55,9 @@ export interface StakingContextType {
 
     update(): void
     moveToTab(tab: NftsSelectorTab, mints: string[])
+
+    hasOg: number
+
 }
 
 const StakingContext = createContext<StakingContextType>(null);
@@ -122,6 +125,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     const [userNfts, updateNfts] = useState<Nft[]>([]);
     const [stackedNfts, updateStakedNfts] = useState<StakingReceipt[]>([] as StakingReceipt[]);
     const [pendingRewards, setPendingRewards] = useState<number>(0);
+    const [hasOg, setOg] = useState<number>(0);
+
     const [dailyRewards, setDailyrewards] = useState(0);
     const [activity, setActivity] = useState<Operation[]>(getStakingActivityFromCache(config.stacking_config))
 
@@ -465,6 +470,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
                     const totalRewards = pendingRewards + stake_owner.balance.toNumber();
                     setPendingRewards(totalRewards);
+                    setOg(stake_owner.ogPassCounter)
+
                 }
             })
         } else {
@@ -719,6 +726,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
             platform_staked: staked,
             update: updatesCounterImpl,
+            hasOg
         }
 
         return result;
@@ -729,7 +737,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         // modals contexts
         stakeModalContext, stakedModalContext,
         tab,
-        updatesCounter
+        updatesCounter,
+        hasOg,
     ]);
 
     return (

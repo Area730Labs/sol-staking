@@ -51,8 +51,12 @@ export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, sta
             }
 
             for (var it of stackedNfts) {
-                // ixs.push(createUnstakeNftIx(it))
-                ixs.push(createClaimIx(config, it.mint, it.staker, stakeOwnerAddress))
+                const nftInfo = stakingctx.getNft(it.mint);
+
+                // todo fix to use bitset flag
+                if (nftInfo.flags != 1) {
+                    ixs.push(createClaimIx(config, it.mint, it.staker, stakeOwnerAddress))
+                }
             }
 
             // check if user has token account
@@ -93,7 +97,7 @@ export function ClaimPendingRewardsButton(props: any) {
     // const [hovered, setHovered] = useState(false);
     const [opactiy, setOpacity] = useState(0.0);
     const [claiming, setClaiming] = useState(false);
-    const { pendingRewards, pretty, config } = useStaking();
+    const { pendingRewards, pretty, config, hasOg } = useStaking();
 
     async function claimPendingRewardsHandler() {
 
@@ -123,11 +127,11 @@ export function ClaimPendingRewardsButton(props: any) {
     return (<Box position="relative">
         <Button
             border='2px solid black'
-            width='240px'
+            width='270px'
             paddingLeft='20px'
             paddingRight='20px'
             backgroundColor='black'
-            color={!claiming?'white':'gray'}
+            color={!claiming ? 'white' : 'gray'}
             marginTop='15px'
             onClick={() => {
                 if (!claiming) {
@@ -136,7 +140,7 @@ export function ClaimPendingRewardsButton(props: any) {
                 }
             }} {...props}>
             <Flex gap='15px' justifyContent='center' alignItems='center' fontFamily="Outfit">
-                Claim rewards {claiming ? <Flex height="100%" flexDirection="column" alignItems="center"><Spinner /></Flex> : <RewardInfoBlock onMouseEnter={() => {
+             Claim rewards {hasOg>0?<Box backgroundColor="red" borderRadius="6px" padding="2px 6px">2x</Box>:null} {claiming ? <Flex height="100%" flexDirection="column" alignItems="center"><Spinner /></Flex> : <RewardInfoBlock onMouseEnter={() => {
                     setOpacity(1);
                 }} onMouseLeave={() => {
                     setOpacity(0);
