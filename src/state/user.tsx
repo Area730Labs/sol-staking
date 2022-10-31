@@ -4,7 +4,7 @@ import { StakingReceipt, StakingReceiptJSON } from "../blockchain/idl/accounts/S
 import { getAllNfts, getStakedNfts } from "../blockchain/nfts";
 import { constructCacheKey, getOrConstruct, getOrConstructSkipGlobalCacheFlag } from "../types/cacheitem";
 import Nft from "../types/Nft";
-import { calcAddressWithTwoSeeds } from "../blockchain/instructions";
+import { calcAddressWithTwoSeeds, getFlags } from "../blockchain/instructions";
 
 import { Config } from "../types/config"
 import global_config from "../config.json"
@@ -129,6 +129,7 @@ export function getNftsInWalletCached(staking: StakingContextType, wallet: Publi
                     address: new PublicKey(found.address),
                     image: found.image,
                     props: found.props,
+                    flags: getFlags(found),
                 })
             }
         }

@@ -14,7 +14,7 @@ export interface NftSelectionProps extends ChakraProps {
   item: Nft
   borderSize?: number
   onSelectClick?: { (pubkey: Nft, state: boolean): boolean }
-  tab : NftsSelectorTab
+  tab: NftsSelectorTab
   children?: any
 }
 
@@ -33,9 +33,8 @@ export function NftSelection(props: NftSelectionProps) {
 
   const nftInfo = props.item;
 
-  const {stakedModalContext: {selectedItemsCount: unstakeSelected}} = staking;
-  const {stakeModalContext: {selectedItemsCount: stakeSelected}} = staking;
-
+  const { stakedModalContext: { selectedItemsCount: unstakeSelected } } = staking;
+  const { stakeModalContext: { selectedItemsCount: stakeSelected } } = staking;
 
   useEffect(() => {
 
@@ -46,7 +45,7 @@ export function NftSelection(props: NftSelectionProps) {
       setSelected(false)
     }
 
-  },[unstakeSelected, stakeSelected])
+  }, [unstakeSelected, stakeSelected])
 
   useEffect(() => {
     if (staking.nftMultMap != null) {
@@ -54,7 +53,7 @@ export function NftSelection(props: NftSelectionProps) {
       setDailyIncome(staking.pretty(staking.incomePerNftCalculator(props.item)))
     } else {
       setMult(100);
-      setDailyIncome(Math.random()*100)
+      setDailyIncome(Math.random() * 100)
     }
   }, [staking.platform, staking.nftMultMap])
 
@@ -71,14 +70,25 @@ export function NftSelection(props: NftSelectionProps) {
         setSelected(false);
       }
     }
-
   }
 
   const border = React.useMemo(() => {
+
+    let color = "white";
+    if (nftInfo.flags === 1) {
+      color = "rgb(255 208 133)";
+    }
+
     if (!selected) {
-      return `2.5px solid white`
+      return `2.5px solid ${color}`
     } else {
-      return `2.5px solid ${appTheme.selectedBorderColor}`
+
+      let selectedColor = appTheme.selectedBorderColor;
+      if (color != "white") {
+        selectedColor = color;
+      } 
+
+      return `2.5px solid ${selectedColor}`
     }
   }, [selected]);
 
@@ -123,11 +133,11 @@ export function NftSelection(props: NftSelectionProps) {
       textAlign="left"
       fontFamily='Outfit'
     >
-      <Box overflowY="hidden" borderRadius='15px'  backgroundColor={appTheme.themeColorAlpha(0.1)}>
+      <Box overflowY="hidden" borderRadius='15px' backgroundColor={appTheme.themeColorAlpha(0.1)}>
         <Image margin="0 auto" width='100%' src={nftInfo.image ?? ""} borderRadius='15px' />
       </Box>
-      <Text width="100%" marginTop="2" fontSize='20px'  color="black" >{nftInfo.name}</Text>
-      <Text width="100%"  fontSize='17px' color="black" marginBottom="2" marginTop='-4px'>SolMad</Text>
+      <Text width="100%" marginTop="2" fontSize='20px' color="black" >{nftInfo.name}</Text>
+      <Text width="100%" fontSize='17px' color="black" marginBottom="2" marginTop='-4px'>SolMad</Text>
 
     </Box>
     <MultiplicationWithSuggestion value={mult}>

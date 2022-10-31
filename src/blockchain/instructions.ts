@@ -41,9 +41,9 @@ export function getRank(props: any): number {
     }
 }
 
-export function getFlags(props: any): number {
+export function getFlags(item: any): number {
 
-    if (props.og_pass === true) {
+    if (item.og_pass === true) {
         return 1;
     }
 
@@ -55,7 +55,7 @@ export function getMerkleTree(staking: StakingContextType): MerkleTree {
     const leaves = buildLeaves(
         staking.nfts.map((e, i) => {
             const curRank = getRank(e.props);
-            const flags = getFlags(e.props)
+            const flags = getFlags(e)
 
             return {
                 address: new PublicKey(e.address),

@@ -14,15 +14,18 @@ import { useMemo } from "react";
 import { Operation } from "../types/operation";
 import { Nft as NftType } from "../blockchain/types";
 import Moment from "react-moment";
-
-import config from "../config.json";
 import appTheme from "../state/theme"
 import { ChakraProps } from "@chakra-ui/react";
 
 function HistoryActionNftLink(props: { nft: NftType }) {
-    return <Box>
-        <Image cursor="pointer" src={props.nft.image} borderRadius={appTheme.borderRadius} width="76px" />
-    </Box>
+
+    if (props.nft == undefined) {
+        return <Box backgroundColor="rgb(255 208 133)"  width="76px" height="76px" borderRadius="6px"></Box>
+    } else {
+        return <Box>
+            <Image cursor="pointer" src={props.nft.image} borderRadius={appTheme.borderRadius} width="76px" />
+        </Box>
+    }
 }
 
 function InfoColumn(props: any) {
@@ -87,6 +90,7 @@ function HistoryOperation(props: HistoryOperationProps) {
     if (childContent == null) {
         if (props.mint != null) {
             let nft = getNft(props.mint);
+
             childContent = <HistoryActionNftLink nft={nft} />
         }
     }
@@ -129,7 +133,7 @@ export function ClaimOperation({ operation: object }: { operation: Operation }) 
         minWidth='100px'
         width='auto'
         backgroundColor='#ffd085' fontWeight="bold" color="black" p="6px" borderRadius='34px' lineHeight='56px'>
-        <Text paddingLeft='15px' paddingRight='65px' textAlign="center"  color='#5E301D' fontSize='20px'>+{pretty(object.value)}</Text>
+        <Text paddingLeft='15px' paddingRight='65px' textAlign="center" color='#5E301D' fontSize='20px'>+{pretty(object.value)}</Text>
     </Box>
 
     return <HistoryOperation time={object.blockchain_time} performer={object.performer} label="claimed" middleContent={claimAmount}>

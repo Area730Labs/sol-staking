@@ -16,7 +16,6 @@ import { TaxedItem } from "../types/taxeditem";
 import { Operation } from "../types/operation";
 import { Api } from "../api";
 import { getRank } from "../blockchain/instructions";
-import { NftsTabProps } from "../components/nftstab";
 import BN from "bn.js";
 
 export interface StakingContextType {
