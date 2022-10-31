@@ -29,7 +29,7 @@ import { Condition } from "./idl/types/Condition";
 import { updateStaking, UpdateStakingAccounts, UpdateStakingArgs } from "./idl/instructions/updateStaking";
 import { resizeObject, ResizeObjectAccounts } from "./idl/instructions/resizeObject";
 import { StakingContextType } from "../state/stacking";
-import { getStakeOwnerForWallet } from "../state/user";
+
 
 export function getRank(props: any): number {
     if (props.Age == "Learner") {
@@ -45,7 +45,7 @@ export function getFlags(props: any): number {
 
     if (props.og_pass === true) {
         return 1;
-    } 
+    }
 
     return 0;
 }
@@ -100,6 +100,19 @@ export function createResizeObjectIx(typ: number, address: PublicKey, signer: Wa
     return resizeObject(args, accounts);
 }
 
+function proofToBa(proof: any[]): Uint8Array {
+
+    let ar = [];
+    for (var top of proof) {
+
+        for (var inner of top) {
+            ar.push(inner);
+        }
+    }
+
+    return new Uint8Array(ar);
+}
+
 export function createStakeNftIx(config: StakingContextType, mint: PublicKey, owner: WalletAdapter): TransactionInstruction {
 
     const tree = getMerkleTree(config);
@@ -116,6 +129,36 @@ export function createStakeNftIx(config: StakingContextType, mint: PublicKey, ow
     }
 
     const proof = tree.getProofArray(indexStaked);
+
+    // let proof1b = proofToBa(proof);
+
+    // const proof2 = proofToBa(tree.getProofArray(10));
+    // const proof3 = proofToBa(tree.getProofArray(1000));
+    // const proof4 = proofToBa(tree.getProofArray(2000));
+
+    // const uber = [];
+
+    // for (var x of proof1b) {
+    //     uber.push(x);
+    // }
+
+    // console.log('global_chunks',globalChunks)
+
+    // for (var y of proof2) {
+    //     uber.push(y);
+    // }
+    // for (var xz of proof3) {
+    //     uber.push(xz);
+    // }
+
+    // for (var xzy of proof4) {
+    //     uber.push(xzy);
+    // }
+
+    // const compressed = pako.deflate(new Uint8Array(uber));
+
+    // console.log('input : ', uber.length, " compressed: ", compressed.length)
+
 
     const [stakingReceipt, receiptBump] = calcAddressWithSeed(config.config, "receipt", mint);
     const [stakingDeposit, depositBump] = calcAddressWithSeed(config.config, "deposit", mint);
@@ -150,7 +193,7 @@ export function createStakeNftIx(config: StakingContextType, mint: PublicKey, ow
         clock: SYSVAR_CLOCK_PUBKEY,
         rent: SYSVAR_RENT_PUBKEY,
         systemProgram: SystemProgram.programId
-    } as StakeNftAccounts,stakeOwnerAddress)
+    } as StakeNftAccounts, stakeOwnerAddress)
 }
 
 export function calcAddressWithSeed(config: Config, seed: string, address: PublicKey): [PublicKey, number] {
@@ -479,7 +522,7 @@ function createUnstakeNftIx(config: Config, mint: PublicKey, staker: PublicKey):
         tokenProgram: TOKEN_PROGRAM_ID,
     } as UnstakeNftAccounts;
 
-    return unstakeNft(accounts,stakeOwnerAddress);
+    return unstakeNft(accounts, stakeOwnerAddress);
 }
 
 export { createUnstakeNftIx, createClaimIx, createStakeOwnerIx, createClaimStakeOwnerIx }

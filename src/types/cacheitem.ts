@@ -24,6 +24,19 @@ export function constructCacheKey(key: string, args: string[]): string {
     const keyValue = key + delimiter + args.join(delimiter);
     return keyValue
 }
+
+var disable_disable_cache: boolean = false;
+
+export function getOrConstructSkipGlobalCacheFlag<T>(force: boolean, key: string, constructor: { (): Promise<T> }, validitySeconds: number, ...args: string[]): Promise<T> {
+    const prevVal = disable_disable_cache;
+
+    disable_disable_cache = true;
+
+    return getOrConstruct(force, key, constructor, validitySeconds, ...args).finally(() => {
+        disable_disable_cache = prevVal;
+    });
+}
+
 /**
  * 
  * @param key prefix for cache key
@@ -33,8 +46,10 @@ export function constructCacheKey(key: string, args: string[]): string {
  */
 export async function getOrConstruct<T>(force: boolean, key: string, constructor: { (): Promise<T> }, validitySeconds: number, ...args: string[]): Promise<T> {
 
-    if (!force && config.disable_cache) {
-        force = true;
+    if (!disable_disable_cache) {
+        if (!force && config.disable_cache) {
+            force = true;
+        }
     }
 
     // ts
@@ -47,6 +62,7 @@ export async function getOrConstruct<T>(force: boolean, key: string, constructor
     const strkey = localStorage.getItem(keyValue)
 
     let construct = false;
+
     if (strkey == null) {
         construct = true;
     } else {
@@ -69,9 +85,6 @@ export async function getOrConstruct<T>(force: boolean, key: string, constructor
         })
 
         localStorage.setItem(keyValue, cacheObject);
-
         return newObject;
     }
-
-
 }

@@ -2,7 +2,7 @@ import { WalletAdapter } from "@solana/wallet-adapter-base";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { StakingReceipt, StakingReceiptJSON } from "../blockchain/idl/accounts/StakingReceipt";
 import { getAllNfts, getStakedNfts } from "../blockchain/nfts";
-import { constructCacheKey, getOrConstruct } from "../types/cacheitem";
+import { constructCacheKey, getOrConstruct, getOrConstructSkipGlobalCacheFlag } from "../types/cacheitem";
 import Nft from "../types/Nft";
 import { calcAddressWithTwoSeeds } from "../blockchain/instructions";
 
@@ -10,6 +10,7 @@ import { Config } from "../types/config"
 import global_config from "../config.json"
 import { StakingContextType } from "./stacking";
 import { SolanaRpc } from "./app";
+import { toast } from "react-toastify";
 
 export async function getStakedNftsCached(config: Config, solanaConnection: SolanaRpc, wallet: PublicKey, force: boolean = false,): Promise<StakingReceipt[]> {
     return getOrConstruct<StakingReceipt[]>(force, "staked_by", async () => {
@@ -64,14 +65,13 @@ export function getStakeOwnerForWallet(config: Config, wallet: PublicKey): Promi
         )
 
         return Promise.resolve(stakeOwnerAddress);
-    }, 86400 * 365, wallet.toBase58()).then((val) => {
+    }, 5, wallet.toBase58()).then((val) => {
         if (typeof val == "string") {
             return new PublicKey(val);
         } else {
             return val;
         }
     });
-
 
 }
 

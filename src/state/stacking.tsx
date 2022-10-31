@@ -10,7 +10,7 @@ import global_config from '../config.json'
 import { Config } from "../types/config";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 import { getNftsInWalletCached, getStakedNftsCached, getStakeOwnerForWallet } from "./user";
-import { getOrConstruct } from "../types/cacheitem";
+import { getOrConstruct, getOrConstructSkipGlobalCacheFlag } from "../types/cacheitem";
 import { PublicKey } from "@solana/web3.js";
 import { TaxedItem } from "../types/taxeditem";
 import { Operation } from "../types/operation";
@@ -146,7 +146,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
     function moveToTab(tab: NftsSelectorTab, mints: string[]) {
 
-        const nowT = (new Date().getTime())/1000;
+        const nowT = (new Date().getTime()) / 1000;
 
         if (tab == 'unstake') {
             {
@@ -406,7 +406,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
     useEffect(() => {
 
-        if (platform != null && wallet != null && nftMultMap != null && stackedNfts.length > 0) {
+        if (platform != null && wallet != null && nftMultMap != null) {
 
             // calc inco me 
             let income = 0;
@@ -414,56 +414,60 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
             const curTimestamp = (new Date()).getTime() / 1000;
 
             let dailyRewardsValue = 0;
+            let savedIncomeValues = 0;
 
-            for (var it of stackedNfts) {
+            if (stackedNfts.length > 0) {
+                for (var it of stackedNfts) {
 
-                const perDay = incomePerNftCalculator(fromStakeReceipt(it));
+                    const perDay = incomePerNftCalculator(fromStakeReceipt(it));
 
-                let income_per_minute = perDay / (24 * 60);
+                    let income_per_minute = perDay / (24 * 60);
 
-                dailyRewardsValue += perDay;
+                    dailyRewardsValue += perDay;
 
-                const diff = (curTimestamp - it.lastClaim.toNumber()) / 60;
-                if (diff > 0) {
+                    const diff = (curTimestamp - it.lastClaim.toNumber()) / 60;
+                    if (diff > 0) {
 
-                    const incomePerStakedItem = diff * income_per_minute;
+                        const incomePerStakedItem = diff * income_per_minute;
 
-                    console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals, " staked secs :",diff*60)
+                        console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals, " staked secs :", diff * 60)
 
-                    income += incomePerStakedItem;
+                        income += incomePerStakedItem;
+                    }
                 }
-            }
 
-            setDailyrewards(dailyRewardsValue);
+                setDailyrewards(dailyRewardsValue);
 
-            let incomeNewValue = income;
+                let incomeNewValue = income;
 
-            if (incomeNewValue == 0) {
-                console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
-            }
-
-            setPendingRewards(incomeNewValue);
-
-            const savedIncomeValues = incomeNewValue;
-
-            getStakeOwnerForWallet(config, wallet.publicKey).then(async (stakeOwnerAddress) => {
-
-                // connection expected to be always available 
-                return StakeOwner.fetch(solanaConnection, stakeOwnerAddress);
-            }).then((stake_owner) => {
-                if (stake_owner != null) {
-
-                    console.log('stake owner :',stake_owner.toJSON())
-
-                    const totalRewards = savedIncomeValues + stake_owner.balance.toNumber();
-                    setPendingRewards(totalRewards);
+                if (incomeNewValue == 0) {
+                    console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
                 }
-            });
+
+                setPendingRewards(incomeNewValue);
+            }
         }
         // todo handle wallet disconnection
         // need to set ZERO earnings
 
     }, [stackedNfts, platform, wallet, nftMultMap]);
+
+
+    useEffect(() => {
+        if (wallet != null && wallet.connected) {
+            getStakeOwnerForWallet(config, wallet.publicKey).then(async (stakeOwnerAddress) => {
+                // connection expected to be always available 
+                return StakeOwner.fetch(solanaConnection, stakeOwnerAddress);
+            }).then((stake_owner) => {
+                if (stake_owner != null) {
+                    const totalRewards = pendingRewards + stake_owner.balance.toNumber();
+                    setPendingRewards(totalRewards);
+                }
+            })
+        } else {
+            setPendingRewards(0);
+        }
+    }, [wallet])
 
     useEffect(() => {
 
