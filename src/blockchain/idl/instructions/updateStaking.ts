@@ -12,7 +12,10 @@ export interface UpdateStakingArgs {
   multiplierRule: types.RuleFields
   taxRule: types.RuleFields
   distributionType: number
-  spanDuration: BN
+  spanDuration: BN,
+  withFlags: number,
+  withOgPasses : number,
+  ogPassMultiplyer: BN,
 }
 
 export interface UpdateStakingAccounts {
@@ -29,6 +32,9 @@ export const layout = borsh.struct([
   types.Rule.layout("taxRule"),
   borsh.u8("distributionType"),
   borsh.u64("spanDuration"),
+  borsh.u8("withFlags"),
+  borsh.u8("withOgPasses"),
+  borsh.u16("ogPassMultiplyer")
 ])
 
 export function updateStaking(
@@ -51,6 +57,9 @@ export function updateStaking(
       taxRule: types.Rule.toEncodable(args.taxRule),
       distributionType: args.distributionType,
       spanDuration: args.spanDuration,
+      withFlags: args.withFlags,
+      withOgPasses: args.withOgPasses,
+      ogPassMultipyer: args.ogPassMultiplyer,
     },
     buffer
   )

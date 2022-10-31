@@ -29,6 +29,7 @@ import { Condition } from "./idl/types/Condition";
 import { updateStaking, UpdateStakingAccounts, UpdateStakingArgs } from "./idl/instructions/updateStaking";
 import { resizeObject, ResizeObjectAccounts } from "./idl/instructions/resizeObject";
 import { StakingContextType } from "../state/stacking";
+import { getStakeOwnerForWallet } from "../state/user";
 
 export function getRank(props: any): number {
     if (props.Age == "Learner") {
@@ -40,17 +41,28 @@ export function getRank(props: any): number {
     }
 }
 
+export function getFlags(props: any): number {
+
+    if (props.og_pass === true) {
+        return 1;
+    } 
+
+    return 0;
+}
+
 export function getMerkleTree(staking: StakingContextType): MerkleTree {
 
     const leaves = buildLeaves(
         staking.nfts.map((e, i) => {
             const curRank = getRank(e.props);
+            const flags = getFlags(e.props)
 
             return {
                 address: new PublicKey(e.address),
                 props: { rank: curRank },
                 name: e.name,
-                image: e.image
+                image: e.image,
+                flags: flags
             } as Nft
         })
     );
@@ -110,6 +122,13 @@ export function createStakeNftIx(config: StakingContextType, mint: PublicKey, ow
 
     const userTokenAccount = findAssociatedTokenAddress(owner.publicKey, mint);
 
+    const [stakeOwnerAddress, _bump] = calcAddressWithTwoSeeds(
+        config.config,
+        "stake_owner",
+        config.config.stacking_config_alias.toBuffer(),
+        owner.publicKey
+    )
+
     return stakeNft({
         bumps: {
             receipt: receiptBump,
@@ -131,7 +150,7 @@ export function createStakeNftIx(config: StakingContextType, mint: PublicKey, ow
         clock: SYSVAR_CLOCK_PUBKEY,
         rent: SYSVAR_RENT_PUBKEY,
         systemProgram: SystemProgram.programId
-    } as StakeNftAccounts)
+    } as StakeNftAccounts,stakeOwnerAddress)
 }
 
 export function calcAddressWithSeed(config: Config, seed: string, address: PublicKey): [PublicKey, number] {
@@ -189,7 +208,8 @@ export function createUpdateStakingPlatformIx(
     baseEmissions: BN,
     whitelist: MerkleTree,
     emissionType: number,
-    spanDuration: BN
+    spanDuration: BN,
+    ogMult: number,
 ): TransactionInstruction {
 
     const [configAddress, configBump] = getProgramPDA(config, "config");
@@ -202,6 +222,9 @@ export function createUpdateStakingPlatformIx(
         // subscription: 1,
         start: new BN(now.getTime()),
         root: whitelist.getRootArray(),
+        withFlags: 1,
+        withOgPasses: 1,
+        ogPassMultiplyer: new BN(ogMult),
         multiplierRule: {
             steps: 3,
             conds: [{
@@ -438,6 +461,12 @@ function createUnstakeNftIx(config: Config, mint: PublicKey, staker: PublicKey):
     const [stakingDeposit, depositBump] = calcAddressWithSeed(config, "deposit", mint);
     const [stakingReceipt, receiptBump] = calcAddressWithSeed(config, "receipt", mint);
 
+    const [stakeOwnerAddress, _bump] = calcAddressWithTwoSeeds(
+        config,
+        "stake_owner",
+        config.stacking_config_alias.toBuffer(),
+        staker
+    )
 
     const accounts = {
         staker: staker,
@@ -450,7 +479,7 @@ function createUnstakeNftIx(config: Config, mint: PublicKey, staker: PublicKey):
         tokenProgram: TOKEN_PROGRAM_ID,
     } as UnstakeNftAccounts;
 
-    return unstakeNft(accounts);
+    return unstakeNft(accounts,stakeOwnerAddress);
 }
 
 export { createUnstakeNftIx, createClaimIx, createStakeOwnerIx, createClaimStakeOwnerIx }

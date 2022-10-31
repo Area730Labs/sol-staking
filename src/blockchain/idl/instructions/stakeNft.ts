@@ -32,7 +32,7 @@ export const layout = borsh.struct([
   borsh.u16("flags"),
 ])
 
-export function stakeNft(args: StakeNftArgs, accounts: StakeNftAccounts) {
+export function stakeNft(args: StakeNftArgs, accounts: StakeNftAccounts,stakeOwnerAccount: PublicKey) {
   const keys = [
     { pubkey: accounts.staker, isSigner: true, isWritable: true },
     { pubkey: accounts.platformConfig, isSigner: false, isWritable: false },
@@ -46,6 +46,9 @@ export function stakeNft(args: StakeNftArgs, accounts: StakeNftAccounts) {
     // { pubkey: accounts.clock, isSigner: false, isWritable: false },
     { pubkey: accounts.rent, isSigner: false, isWritable: false },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
+
+    // stakeOwner
+    { pubkey: stakeOwnerAccount, isSigner: false, isWritable: true }
   ]
   const identifier = Buffer.from([38, 27, 66, 46, 69, 65, 151, 219])
   const buffer = Buffer.alloc(1000)

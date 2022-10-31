@@ -12,7 +12,7 @@ export interface UnstakeNftAccounts {
   tokenProgram: PublicKey
 }
 
-export function unstakeNft(accounts: UnstakeNftAccounts) {
+export function unstakeNft(accounts: UnstakeNftAccounts, stakeOwnerAccount: PublicKey) {
   const keys = [
     { pubkey: accounts.staker, isSigner: true, isWritable: false },
     { pubkey: accounts.stakingConfig, isSigner: false, isWritable: true },
@@ -22,6 +22,9 @@ export function unstakeNft(accounts: UnstakeNftAccounts) {
     { pubkey: accounts.stakerNftAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.escrowNftAccount, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
+
+    // stake owner when with og passes 
+    { pubkey: stakeOwnerAccount, isSigner: false, isWritable: true }
   ]
   const identifier = Buffer.from([17, 182, 24, 211, 101, 138, 50, 163])
   const data = identifier

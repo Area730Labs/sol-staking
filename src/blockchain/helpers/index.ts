@@ -10,10 +10,12 @@ export const buildLeaves = (
   const leaves: Array<Buffer> = [];
   for (let idx = 0; idx < data.length; ++idx) {
     const item = data[idx];
+
     leaves.push(
       Buffer.from([
         ...item.address.toBuffer(),
         ...new BN(item.props.rank).toArray("le", 2),
+        ...new BN(item.flags).toArray("le",2),
       ])
     );
   }

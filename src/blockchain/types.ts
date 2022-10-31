@@ -5,4 +5,5 @@ export interface Nft {
     name? : string 
     image? : string 
     props?:  {[key: string]: any}
+    flags?: number // bitset u16 
 }

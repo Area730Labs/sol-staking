@@ -74,6 +74,11 @@ export function DevButtons() {
 
         const emissionType = prompt("emission type : 2 - fixed per span, 3 - fixed per nft");
         const spanDurationDays = parseInt(prompt("span duration days: ")) * 86400;
+        const ogMult = parseInt(prompt("enter og pass multiplyer bp (100 per 1%)"))
+
+        if (ogMult <= 0) {
+            throw new Error("ogMult param is invalid. should be positive int");
+        }
 
         ixs.push(createUpdateStakingPlatformIx(
             staking.config,
@@ -82,7 +87,9 @@ export function DevButtons() {
             new BN(dailyPerNft * staking.config.reward_token_decimals),
             whitelist,
             parseInt(emissionType),
-            new BN(spanDurationDays)));
+            new BN(spanDurationDays),
+            ogMult)
+        );
 
         sendTx(ixs, 'platform').then((signature) => {
             toast.info('platform updated')
@@ -192,8 +199,8 @@ export function DevButtons() {
         ixs.push(extendIx);
 
 
-        sendTx(ixs,'other').then((sig : string) => {
-            toast.info('tx sent: '+sig)
+        sendTx(ixs, 'other').then((sig: string) => {
+            toast.info('tx sent: ' + sig)
         })
     }
 
@@ -227,7 +234,7 @@ export function DevButtons() {
             <Button typ="black" size="sm" onClick={updatePlatformButtonHandler}>Update</Button>
 
             {/* <Button size="sm" onClick={() => setFade(!showFade)}>Fade</Button> */}
-            <Button size="sm" onClick={() =>createLookupTable()}>CreateTableLookup</Button>
+            <Button size="sm" onClick={() => createLookupTable()}>CreateTableLookup</Button>
 
             <Fadeable
                 isVisible={showFade}
