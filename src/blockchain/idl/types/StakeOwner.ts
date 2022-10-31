@@ -8,18 +8,33 @@ export interface StakeOwnerFields {
   staker: PublicKey
   stakingConfig: PublicKey
   balance: BN
+  version: number
+  ogPassCounter : number
+  unused: PublicKey
+  unused2: PublicKey
 }
 
 export interface StakeOwnerJSON {
   staker: string
   stakingConfig: string
   balance: string
+  version: number
+  ogPassCounter : number
+  unused: string
+  unused2: string
 }
 
 export class StakeOwner {
   readonly staker: PublicKey
   readonly stakingConfig: PublicKey
   readonly balance: BN
+  readonly version : number
+  readonly ogPassCounter : number
+  readonly unused: PublicKey
+  readonly unused2: PublicKey
+
+
+
 
   static readonly discriminator = Buffer.from([
     138, 120, 209, 254, 145, 208, 127, 60,
@@ -29,12 +44,22 @@ export class StakeOwner {
     borsh.publicKey("staker"),
     borsh.publicKey("stakingConfig"),
     borsh.u64("balance"),
+    borsh.u8("version"),
+    borsh.u8("ogPassCounter"),
+    borsh.publicKey("unused"),
+    borsh.publicKey("unused2"),
+
   ])
 
   constructor(fields: StakeOwnerFields) {
     this.staker = fields.staker
     this.stakingConfig = fields.stakingConfig
     this.balance = fields.balance
+    this.version = fields.version
+    this.ogPassCounter = fields.ogPassCounter
+    this.unused = fields.unused
+    this.unused2 = fields.unused2
+
   }
 
   static async fetch(
@@ -83,6 +108,10 @@ export class StakeOwner {
       staker: dec.staker,
       stakingConfig: dec.stakingConfig,
       balance: dec.balance,
+      version: dec.version,
+      ogPassCounter: dec.ogPassCounter,
+      unused: dec.unused,
+      unused2: dec.unused2
     })
   }
 
@@ -91,6 +120,11 @@ export class StakeOwner {
       staker: this.staker.toString(),
       stakingConfig: this.stakingConfig.toString(),
       balance: this.balance.toString(),
+      version: this.version,
+      ogPassCounter: this.ogPassCounter,
+      unused : this.unused.toBase58(),
+      unused2: this.unused2.toBase58()
+
     }
   }
 
@@ -99,6 +133,10 @@ export class StakeOwner {
       staker: new PublicKey(obj.staker),
       stakingConfig: new PublicKey(obj.stakingConfig),
       balance: new BN(obj.balance),
+      version: obj.version,
+      ogPassCounter: obj.ogPassCounter,
+      unused: new PublicKey(obj.unused),
+      unused2: new PublicKey(obj.unused2)
     })
   }
 }
