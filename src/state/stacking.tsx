@@ -469,6 +469,8 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                 }
 
                 setUnclaimedBalance(incomeNewValue);
+            } else { 
+                setDailyrewards(0);
             }
         }
         // todo handle wallet disconnection
