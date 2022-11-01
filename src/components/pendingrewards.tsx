@@ -124,10 +124,12 @@ export function ClaimPendingRewardsButton(props: any) {
         }
     }
 
+    // {hasOg>0?<Box backgroundColor="red" borderRadius="6px" padding="2px 6px">2x</Box>:null}
+
     return (<Box position="relative">
         <Button
             border='2px solid black'
-            width='270px'
+            width='240px'
             paddingLeft='20px'
             paddingRight='20px'
             backgroundColor='black'
@@ -140,7 +142,7 @@ export function ClaimPendingRewardsButton(props: any) {
                 }
             }} {...props}>
             <Flex gap='15px' justifyContent='center' alignItems='center' fontFamily="Outfit">
-             Claim rewards {hasOg>0?<Box backgroundColor="red" borderRadius="6px" padding="2px 6px">2x</Box>:null} {claiming ? <Flex height="100%" flexDirection="column" alignItems="center"><Spinner /></Flex> : <RewardInfoBlock onMouseEnter={() => {
+             Claim rewards  {claiming ? <Flex height="100%" flexDirection="column" alignItems="center"><Spinner /></Flex> : <RewardInfoBlock onMouseEnter={() => {
                     setOpacity(1);
                 }} onMouseLeave={() => {
                     setOpacity(0);
