@@ -502,7 +502,7 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
         let rewards = stakeownerBalance + unclaimedBalance;
 
         if (hasOg > 0) {
-            rewards += unclaimedBalance * platform.ogPassBpMultiplyer / BASIS_POINTS_100P;
+            rewards = stakeownerBalance + (unclaimedBalance * platform.ogPassBpMultiplyer / BASIS_POINTS_100P);
             setPendingRewards(rewards);
         } else {
             setPendingRewards(rewards);
