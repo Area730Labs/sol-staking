@@ -21,6 +21,10 @@ export default interface Platform {
 
     totalStaked: number
     totalClaimed: number
+
+    withOgPasses: boolean
+    ogPassBpMultiplyer: number 
+
 }
 
 

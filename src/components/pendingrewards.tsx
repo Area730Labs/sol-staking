@@ -15,6 +15,7 @@ import { useState } from "react";
 import { ChakraProps, Spinner } from "@chakra-ui/react";
 import { Label } from "./label";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { FLAG_IS_OG_PASS } from "../types/Nft";
 
 function RewardInfoBlock(props: ChakraProps & any) {
     return <Box
@@ -53,8 +54,7 @@ export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, sta
             for (var it of stackedNfts) {
                 const nftInfo = stakingctx.getNft(it.mint);
 
-                // todo fix to use bitset flag
-                if (nftInfo.flags != 1) {
+                if ((nftInfo.flags & FLAG_IS_OG_PASS) === 0) {
                     ixs.push(createClaimIx(config, it.mint, it.staker, stakeOwnerAddress))
                 }
             }

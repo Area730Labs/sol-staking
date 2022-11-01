@@ -15,6 +15,7 @@ import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 import { shouldForwardProp } from '@chakra-ui/react';
 import { motion, isValidMotionProp } from 'framer-motion';
 import { useConnection } from "@solana/wallet-adapter-react";
+import { FLAG_IS_OG_PASS } from "../types/Nft";
 
 export const ChakraBox = chakra(motion.div, {
 
@@ -77,8 +78,7 @@ export function Footer() {
 
                 const nftInfo = getNft(mint);
 
-                // todo fix to use bitset flag
-                if (nftInfo.flags != 1) {
+                if ((nftInfo.flags & FLAG_IS_OG_PASS) === 0) {
                     // console.log(' -- flags is not 1 for :',mint.toBase58())
                     instructions.push(createClaimIx(config, mint, wallet.publicKey, stakeOwnerAddress))
                 }

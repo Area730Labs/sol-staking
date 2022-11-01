@@ -3,6 +3,7 @@ import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
 import * as types from "../types/Rule" // eslint-disable-line @typescript-eslint/no-unused-vars
+import { toast } from "react-toastify"
 
 
 export interface UpdateStakingArgs {
@@ -15,7 +16,7 @@ export interface UpdateStakingArgs {
   spanDuration: BN,
   withFlags: number,
   withOgPasses : number,
-  ogPassMultiplyer: BN,
+  ogPassMultiplyer: number,
 }
 
 export interface UpdateStakingAccounts {
@@ -59,10 +60,11 @@ export function updateStaking(
       spanDuration: args.spanDuration,
       withFlags: args.withFlags,
       withOgPasses: args.withOgPasses,
-      ogPassMultipyer: args.ogPassMultiplyer,
+      ogPassMultiplyer: args.ogPassMultiplyer,
     },
     buffer
   )
+
   const data = Buffer.concat([identifier, buffer]).slice(0, 8 + len)
   const ix = new TransactionInstruction({ keys, programId: PROGRAM_ID, data })
   return ix

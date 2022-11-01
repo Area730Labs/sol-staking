@@ -7,3 +7,8 @@ export default interface Nft {
     props?: { [key: string]: any }
     flags?: number
 }
+
+export const FLAG_IS_OG_PASS: number = 1;
+
+
+

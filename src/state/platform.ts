@@ -122,6 +122,9 @@ export async function getPlatformInfo(force: boolean, conn: SolanaRpc, platformK
                 totalStaked: platformConfig.nftsStaked.toNumber(),
                 totalClaimed: platformConfig.totalRewardsClaimed.toNumber(),
 
+                withOgPasses: platformConfig.withOgPass == 1,
+                ogPassBpMultiplyer: platformConfig.ogPassMultiplyer
+
             } as Platform;
 
             return config;

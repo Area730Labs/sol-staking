@@ -269,7 +269,7 @@ export function createUpdateStakingPlatformIx(
         root: whitelist.getRootArray(),
         withFlags: 1,
         withOgPasses: 1,
-        ogPassMultiplyer: new BN(ogMult),
+        ogPassMultiplyer: ogMult,
         multiplierRule: {
             steps: 3,
             conds: [{
@@ -353,7 +353,6 @@ export function createStackingPlatform(
     const [stakingConfig, sconfBump] = calcAddressWithSeed(config, "staking", alias.publicKey);
 
     console.log("config alias: ", alias.publicKey.toBase58())
-
 
     const [configAddress, configBump] = getProgramPDA(config, "config");
     const [escrowAddress, escrowBump] = getProgramPDA(config, "escrow");

@@ -2,7 +2,7 @@ import { createContext, ReactNode, useContext, useEffect, useMemo, useState } fr
 import { toast } from "react-toastify";
 import { StakingReceipt, StakingReceiptFields } from "../blockchain/idl/accounts/StakingReceipt";
 import { BASIS_POINTS_100P, prettyNumber } from "../data/uitls";
-import Nft from "../types/Nft";
+import Nft, { FLAG_IS_OG_PASS } from "../types/Nft";
 import Platform, { matchRule } from "../types/paltform";
 import { NftsSelectorTab, RankMultiplyerMap, useAppContext } from "./app";
 import { getPlatformInfo, getPlatformInfoFromCache, getStakedFromCache, getStakingActivityFromCache, platform_staked_cache } from "./platform";
@@ -124,8 +124,13 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
     const [nftMultMap, setMultMap] = useState<RankMultiplyerMap | null>(null);
     const [userNfts, updateNfts] = useState<Nft[]>([]);
     const [stackedNfts, updateStakedNfts] = useState<StakingReceipt[]>([] as StakingReceipt[]);
+
     const [pendingRewards, setPendingRewards] = useState<number>(0);
+    
     const [hasOg, setOg] = useState<number>(0);
+
+    const [stakeownerBalance, setStakeownerBalance] = useState(0);
+    const [unclaimedBalance, setUnclaimedBalance] = useState(0);
 
     const [dailyRewards, setDailyrewards] = useState(0);
     const [activity, setActivity] = useState<Operation[]>(getStakingActivityFromCache(config.stacking_config))
@@ -376,6 +381,13 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
                 for (var it of stackedNfts) {
 
+                    let stakedNft = getNft(it.mint)
+
+                    if ((stakedNft.flags & FLAG_IS_OG_PASS) > 0) {
+                        // skip og's 
+                        continue;
+                    }
+
                     const perDay = incomePerNftCalculator(fromStakeReceipt(it));
 
                     const tick_size = 1;
@@ -387,23 +399,11 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                     if (diff > 0) {
 
                         const incomePerStakedItem = diff * income_per_tick;
-
-                        // console.log(' -- income per staked item', incomePerStakedItem / config.reward_token_decimals)
-
                         income += incomePerStakedItem;
                     }
-                    // else {
-                    // console.log(' -- staked item diff is 0?. item\'s last claim. now ',it.lastClaim.toNumber(),new Date().getTime()/1000)
-                    // }
                 }
 
-                let incomeNewValue = income;
-
-                if (incomeNewValue == 0) {
-                    console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
-                }
-
-                setPendingRewards(incomeNewValue);
+                setUnclaimedBalance(income);
 
             }, 15000));
         }
@@ -419,10 +419,16 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
             const curTimestamp = (new Date()).getTime() / 1000;
 
             let dailyRewardsValue = 0;
-            let savedIncomeValues = 0;
 
             if (stackedNfts.length > 0) {
                 for (var it of stackedNfts) {
+
+                    const nftStaked = getNft(it.mint);
+
+                    if ((nftStaked.flags & FLAG_IS_OG_PASS) > 0) {
+                        // skip og pass
+                        continue;
+                    }
 
                     const perDay = incomePerNftCalculator(fromStakeReceipt(it));
 
@@ -441,6 +447,10 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                     }
                 }
 
+                if (hasOg) {
+                    dailyRewardsValue = dailyRewardsValue * platform.ogPassBpMultiplyer / BASIS_POINTS_100P;
+                }
+
                 setDailyrewards(dailyRewardsValue);
 
                 let incomeNewValue = income;
@@ -449,13 +459,13 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
                     console.log(`pending rewards are set to ZERO.income = ${income}.length of stacked = ${stackedNfts.length}`)
                 }
 
-                setPendingRewards(incomeNewValue);
+                setUnclaimedBalance(incomeNewValue);
             }
         }
         // todo handle wallet disconnection
         // need to set ZERO earnings
 
-    }, [stackedNfts, platform, wallet, nftMultMap]);
+    }, [stackedNfts.length, platform, wallet, nftMultMap, hasOg]);
 
 
     useEffect(() => {
@@ -468,16 +478,27 @@ export function StakingProvider({ children, config, nfts }: StakingProviderProps
 
                     console.log('stake owner',stake_owner.toJSON())
 
-                    const totalRewards = pendingRewards + stake_owner.balance.toNumber();
-                    setPendingRewards(totalRewards);
+                    setStakeownerBalance(stake_owner.balance.toNumber());
                     setOg(stake_owner.ogPassCounter)
 
                 }
             })
         } else {
-            setPendingRewards(0);
+            setStakeownerBalance(0);
         }
     }, [wallet])
+
+    useEffect(() => {
+
+        let rewards = stakeownerBalance + unclaimedBalance;
+
+        if (hasOg > 0) {
+            rewards = rewards *platform.ogPassBpMultiplyer / BASIS_POINTS_100P;
+        }
+
+        setPendingRewards(rewards);
+
+    },[stakeownerBalance, unclaimedBalance, hasOg])
 
     useEffect(() => {
 

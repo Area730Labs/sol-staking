@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Nft from "../types/Nft";
+import Nft, { FLAG_IS_OG_PASS } from "../types/Nft";
 import appTheme from "../state/theme"
 import { Box, GridItem, Text } from "@chakra-ui/layout";
 import { CheckIcon } from "@chakra-ui/icons";
@@ -75,7 +75,7 @@ export function NftSelection(props: NftSelectionProps) {
   const border = React.useMemo(() => {
 
     let color = "white";
-    if (nftInfo.flags === 1) {
+    if ((nftInfo.flags & FLAG_IS_OG_PASS) != 0) {
       color = "rgb(255 208 133)";
     }
 

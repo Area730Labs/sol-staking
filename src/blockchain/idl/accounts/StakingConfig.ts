@@ -22,7 +22,7 @@ export interface StakingConfigFields {
 
   withFlags : number,
   withOgPass: number,
-  ogPassMultiplyer: BN,
+  ogPassMultiplyer: number,
   spareSpace: BN,
 
   baseSpanEmissions: BN
@@ -53,7 +53,7 @@ export interface StakingConfigJSON {
 
   withFlags : number,
   withOgPass: number,
-  ogPassMultiplyer: string,
+  ogPassMultiplyer: number,
   spareSpace: string,
 
   baseSpanEmissions: string
@@ -84,7 +84,7 @@ export class StakingConfig {
 
   readonly withFlags : number
   readonly withOgPass: number
-  readonly ogPassMultiplyer: BN
+  readonly ogPassMultiplyer: number
   readonly spareSpace: BN
   
   readonly baseSpanEmissions: BN
@@ -257,7 +257,7 @@ export class StakingConfig {
       
       withFlags:this.withFlags,
       withOgPass:this.withOgPass,
-      ogPassMultiplyer:this.ogPassMultiplyer.toString(),
+      ogPassMultiplyer:this.ogPassMultiplyer,
       spareSpace:this.spareSpace.toString(),
 
       baseSpanEmissions: this.baseSpanEmissions.toString(),
@@ -290,7 +290,7 @@ export class StakingConfig {
      
       withFlags:obj.withFlags,
       withOgPass:obj.withOgPass,
-      ogPassMultiplyer:new BN(obj.ogPassMultiplyer),
+      ogPassMultiplyer:obj.ogPassMultiplyer,
       spareSpace:new  BN(obj.spareSpace),
 
       baseSpanEmissions: new BN(obj.baseSpanEmissions),
