@@ -193,7 +193,7 @@ class TxHandler {
             return this.wallet.sendTransaction(
                 tx,
                 this.connection,
-                {skipPreflight: true}
+                {skipPreflight: false}
             );
         }
     }

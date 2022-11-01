@@ -8,7 +8,7 @@ import { useStaking } from "../state/stacking";
 import { useAppContext } from "../state/app";
 import { PublicKey, TransactionInstruction, TransactionMessage, VersionedTransaction } from "@solana/web3.js";
 import { WalletAdapter } from "@solana/wallet-adapter-base";
-import { createClaimIx, createStakeNftIx, createStakeOwnerIx, createUnstakeNftIx } from "../blockchain/instructions";
+import { calcAddressWithTwoSeeds, createClaimIx, createStakeNftIx, createStakeOwnerIx, createUnstakeNftIx } from "../blockchain/instructions";
 import { getStakeOwnerForWallet } from "../state/user";
 import { StakeOwner } from "../blockchain/idl/types/StakeOwner";
 
@@ -16,6 +16,7 @@ import { shouldForwardProp } from '@chakra-ui/react';
 import { motion, isValidMotionProp } from 'framer-motion';
 import { useConnection } from "@solana/wallet-adapter-react";
 import { FLAG_IS_OG_PASS } from "../types/Nft";
+import { getOrConstructSkipGlobalCacheFlag } from "../types/cacheitem";
 
 export const ChakraBox = chakra(motion.div, {
 
@@ -110,13 +111,31 @@ export function Footer() {
 
         let mints = [];
 
-        for (var it in stakeModalContext.selectedItems) {
+        const [stakeOwnerAddress, _bump] = calcAddressWithTwoSeeds(
+            config,
+            "stake_owner",
+            config.stacking_config_alias.toBuffer(),
+            wallet.publicKey
+        )
 
-            const mint = new PublicKey(it);
-            mints.push(mint);
+        // getOrConstructSkipGlobalCacheFlag(false, "stakeowner_init", async () => {
+        //     let x = await StakeOwner.fetch(solanaConnection, stakeOwnerAddress)
+        //     return x;
+        // }, 3600, stakeOwnerAddress.toBase58())
+        
+        StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeowner) => {
+            if (stakeowner == null) {
+                instructions.push(createStakeOwnerIx(config, wallet.publicKey, stakeOwnerAddress));
+            }
+        }).finally( () => {
+            for (var it in stakeModalContext.selectedItems) {
 
-            instructions.push(createStakeNftIx(staking, mint, wallet as WalletAdapter));
-        }
+                const mint = new PublicKey(it);
+                mints.push(mint);
+
+                instructions.push(createStakeNftIx(staking, mint, wallet as WalletAdapter));
+            }
+        });
 
         /*
         connection.getLatestBlockhash().then(async (bhval) => {
