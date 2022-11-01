@@ -135,6 +135,16 @@ export function Footer() {
 
                 instructions.push(createStakeNftIx(staking, mint, wallet as WalletAdapter));
             }
+        }).then(() => {
+            return sendTx(instructions, 'stake', [], {
+                mints: mints,
+            }).catch((e) => {
+                toast.error(`Unable to stake: ${e.message}`)
+            }).then((signature) => {
+                // cleanup selection
+                stakeModalContext.setSelectedItemsCount(0);
+                stakeModalContext.setSelectedItems({});
+            })
         });
 
         /*
@@ -159,16 +169,6 @@ export function Footer() {
             transactionV0.sign([wallet.publicKey]);
 
         })*/
-
-        return sendTx(instructions, 'stake', [], {
-            mints: mints,
-        }).catch((e) => {
-            toast.error(`Unable to stake: ${e.message}`)
-        }).then((signature) => {
-            // cleanup selection
-            stakeModalContext.setSelectedItemsCount(0);
-            stakeModalContext.setSelectedItems({});
-        })
 
     }, [stakeModalContext.selectedItems, sendTx, staking])
 
