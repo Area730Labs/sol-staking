@@ -57,7 +57,7 @@ function AllStakedNfts() {
         gap="3"
         marginTop='7px'
     >
-        {platform_staked.slice(0, global_config.max_nfts_per_row - 1).map((object, i) =>
+        {platform_staked.slice(0, 6).map((object, i) =>
             <StakedSmallNft key={i} item={getNft(object)} />
         )}
         {/* {platform_staked.length <= config.small_staked_nfts_list_size ? (

@@ -45,6 +45,8 @@ export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, sta
 
     const result0 = new Promise<void>((resolve, reject) => {
 
+        let mints = [];
+
         StakeOwner.fetch(solanaConnection, stakeOwnerAddress).then((stakeOwnerInfo: StakeOwner) => {
 
             if (stakeOwnerInfo == null) {
@@ -56,7 +58,8 @@ export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, sta
 
                 if ((nftInfo.flags & FLAG_IS_OG_PASS) === 0) {
                     ixs.push(createClaimIx(config, it.mint, it.staker, stakeOwnerAddress))
-                }
+                    mints.push(it.mint);
+                } 
             }
 
             // check if user has token account
@@ -74,10 +77,13 @@ export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, sta
             }
         }).then(() => {
             ixs.push(createClaimStakeOwnerIx(config, wallet.publicKey, stakeOwnerAddress, rewardsTokenMint));
-            sendTx(ixs, 'claim').catch((e) => {
+            sendTx(ixs, 'claim',[],{
+                mints: mints,
+            }).then(() => {
+                stakingctx.setPendingRewards(0);
+            }).catch((e) => {
                 toast.error(`Unable to claim: ${e.message}`)
             })
-
         }).finally(() => {
             resolve(null);
         });
@@ -142,7 +148,7 @@ export function ClaimPendingRewardsButton(props: any) {
                 }
             }} {...props}>
             <Flex gap='15px' justifyContent='center' alignItems='center' fontFamily="Outfit">
-             Claim rewards  {claiming ? <Flex height="100%" flexDirection="column" alignItems="center"><Spinner /></Flex> : <RewardInfoBlock onMouseEnter={() => {
+                Claim rewards  {claiming ? <Flex height="100%" flexDirection="column" alignItems="center"><Spinner /></Flex> : <RewardInfoBlock onMouseEnter={() => {
                     setOpacity(1);
                 }} onMouseLeave={() => {
                     setOpacity(0);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Nft, { FLAG_IS_OG_PASS } from "../types/Nft";
 import appTheme from "../state/theme"
 import { Box, GridItem, Text } from "@chakra-ui/layout";
@@ -9,6 +9,7 @@ import { useStaking } from "../state/stacking";
 import { roundDecimals } from "./countup";
 import { ChakraProps } from "@chakra-ui/react";
 import { ChakraBox } from "./footer";
+import { BASIS_POINTS_100P } from "../data/uitls";
 
 export interface NftSelectionProps extends ChakraProps {
   item: Nft
@@ -55,7 +56,7 @@ export function NftSelection(props: NftSelectionProps) {
       setMult(100);
       setDailyIncome(Math.random() * 100)
     }
-  }, [staking.platform, staking.nftMultMap])
+  }, [staking.platform, staking.nftMultMap, nftInfo])
 
   function clickHandler() {
 
@@ -72,10 +73,14 @@ export function NftSelection(props: NftSelectionProps) {
     }
   }
 
+  const isOgPass = useMemo(() => {
+    return (nftInfo.flags & FLAG_IS_OG_PASS) != 0;
+  },[nftInfo]);
+
   const border = React.useMemo(() => {
 
     let color = "white";
-    if ((nftInfo.flags & FLAG_IS_OG_PASS) != 0) {
+    if (isOgPass) {
       color = "rgb(255 208 133)";
     }
 
@@ -86,11 +91,20 @@ export function NftSelection(props: NftSelectionProps) {
       let selectedColor = appTheme.selectedBorderColor;
       if (color != "white") {
         selectedColor = color;
-      } 
+      }
 
       return `2.5px solid ${selectedColor}`
     }
-  }, [selected]);
+  }, [selected, isOgPass]);
+
+
+  const bg = useMemo(() => {
+    if (isOgPass) {
+      return "rgba(255,208,133,0.2)";
+    } else {
+      return "white";
+    }
+  },[isOgPass])
 
   return <GridItem
     cursor="pointer"
@@ -105,7 +119,7 @@ export function NftSelection(props: NftSelectionProps) {
       boxShadow: "lg",
       border: `2.5px solid black`
     }}
-    backgroundColor={"white"}//appTheme.themeColor}
+    backgroundColor={bg}
     onClick={clickHandler}
     {...props}
   >
@@ -140,9 +154,9 @@ export function NftSelection(props: NftSelectionProps) {
       <Text width="100%" fontSize='17px' color="black" marginBottom="2" marginTop='-4px'>SolMad</Text>
 
     </Box>
-    <MultiplicationWithSuggestion value={mult}>
+    {isOgPass?<NftLabel>OG pass</NftLabel>:<MultiplicationWithSuggestion value={mult}>
       ~{dailyIncome} {staking.config.reward_token_name}
-    </MultiplicationWithSuggestion>
+    </MultiplicationWithSuggestion>}
     {props.children}
   </GridItem>
 }
@@ -175,3 +189,31 @@ function MultiplicationWithSuggestion(props: { value: number, children: any }) {
     return null;
   }
 }
+
+function NftLabel(props: { children: any }) {
+
+  const {platform} = useStaking()
+
+  const value = platform.ogPassBpMultiplyer/BASIS_POINTS_100P;
+
+  return <Box
+    borderRadius="30px"
+    // background={!isHovering ? appTheme.stressColor : appTheme.stressColor2}
+    background='#ffd085'
+    color='#5E301D'
+    // boxShadow="dark-lg"
+    // color={!isHovering ? "white" : "black"}
+    // color='white'
+    // border="1px solid gray"
+    fontWeight="bold"
+    p="2"
+    minWidth='60px'
+    position="absolute"
+    right="-10px"
+    top="-15px"
+    fontSize='22px'
+  >
+    {value}x
+  </Box>
+}
+

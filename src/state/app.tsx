@@ -315,14 +315,21 @@ export function AppProvider({ children }: { children: ReactNode; }) {
                 try {
                     switch (tx_type) {
                         case 'claim': {
-                            const timeTook = new Date().getTime() - curtx.CreatedAt;
-                            console.log('calc income for time when tx were confirming', timeTook)
-                           
-                            // todo set pending rewards 
-                            // setPendingRewards(0);
-                            console.warn('unable to set setPendingRewards(0). they moved to staking context')
+
+
+                            const k = 'last_claim_args';
+                            const claimArgs = JSON.parse(localStorage.getItem(k))
+                            localStorage.removeItem(k)
+
+                            // todo use top context (app) instead 
+                            localStorage.setItem('last_stake_op',JSON.stringify({
+                                "staking": "", // staking ref
+                                "op": 'claim',
+                                "args": claimArgs
+                            }))
 
                             setUserUpdatesCounter(userUpdatesCounter + 1);
+
                             break;
                         }
                         case 'stake': {
