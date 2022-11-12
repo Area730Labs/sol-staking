@@ -53,12 +53,22 @@ export async function claimPendingrewardsHandlerImpl(appctx: AppContextType, sta
                 ixs.push(createStakeOwnerIx(config, wallet.publicKey, stakeOwnerAddress));
             }
 
+            let used = 0;
+
             for (var it of stackedNfts) {
                 const nftInfo = stakingctx.getNft(it.mint);
+
+                if (used  >= 10) {
+                    toast.info('Claiming 10 of your staked items. We\'re fixing this bug');
+                    break;
+                }
 
                 if ((nftInfo.flags & FLAG_IS_OG_PASS) === 0) {
                     ixs.push(createClaimIx(config, it.mint, it.staker, stakeOwnerAddress))
                     mints.push(it.mint);
+
+
+                    used += 1;
                 } 
             }
 
